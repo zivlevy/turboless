@@ -1,0 +1,7 @@
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
+LD_RUNPATH_SEARCH_PATHS = $(inherited) '@executable_path/Frameworks' '@loader_path/Frameworks'
+LIBRARY_SEARCH_PATHS = "${PODS_ROOT}/Mapbox-iOS-SDK/Proj4"
+OTHER_CFLAGS = $(inherited) -iquote "$CONFIGURATION_BUILD_DIR/AFNetworking.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/FMDB.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/GRMustache.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/JRSwizzle.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/Mapbox_iOS_SDK.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/SMCalloutView.framework/Headers" -iquote "$CONFIGURATION_BUILD_DIR/YLProgressBar.framework/Headers"
+OTHER_LDFLAGS = $(inherited) -ObjC -framework "AFNetworking" -framework "FMDB" -framework "GRMustache" -framework "JRSwizzle" -framework "Mapbox_iOS_SDK" -framework "SMCalloutView" -framework "YLProgressBar"
+PODS_FRAMEWORK_BUILD_PATH = $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/Pods-TurboMaps
+PODS_ROOT = ${SRCROOT}/Pods
