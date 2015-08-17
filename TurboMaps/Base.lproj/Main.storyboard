@@ -32,12 +32,12 @@
                                     <navigationItem title="Turbu Less" id="OOE-S8-kks">
                                         <barButtonItem key="leftBarButtonItem" image="bright-7.png" id="L0n-2b-R2H" userLabel="britness">
                                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <connections>
+                                                <action selector="btnBrightness_Clicked:" destination="BYZ-38-t0r" id="Twj-Ff-ubG"/>
+                                            </connections>
                                         </barButtonItem>
                                         <barButtonItem key="rightBarButtonItem" image="gear-7.png" id="rsv-3p-5uz" userLabel="setting">
                                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            <connections>
-                                                <action selector="btnSetting_Clicked:" destination="BYZ-38-t0r" id="TgY-gh-sae"/>
-                                            </connections>
                                         </barButtonItem>
                                     </navigationItem>
                                 </items>
@@ -609,6 +609,7 @@
                         <outlet property="lblLegentModerate" destination="qhd-zJ-sYv" id="ohL-5I-bJO"/>
                         <outlet property="lblLegentSevere" destination="bq4-SY-Owq" id="dhb-QD-7pp"/>
                         <outlet property="lblSelectedAltitude" destination="9gJ-xS-noH" id="1vR-ml-Yqx"/>
+                        <outlet property="navBar" destination="A1u-ba-oxl" id="Fek-X1-mu9"/>
                         <outlet property="pickerAltitude" destination="OzG-zh-K8M" id="bOQ-JY-fh1"/>
                         <outlet property="progressBar" destination="hrF-mE-faJ" id="krT-mu-XP8"/>
                         <outlet property="viewDownload" destination="Jjc-Ep-NaG" id="7r1-Tv-N9B"/>
@@ -621,9 +622,73 @@
             </objects>
             <point key="canvasLocation" x="575" y="359"/>
         </scene>
+        <!--Brightness View Controller-->
+        <scene sceneID="UMt-Ga-S3l">
+            <objects>
+                <viewController storyboardIdentifier="Brightness" id="8dw-Np-gWy" customClass="BrightnessViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="MzS-6z-8Qa"/>
+                        <viewControllerLayoutGuide type="bottom" id="E8h-1G-jvo"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="APH-34-7cb">
+                        <rect key="frame" x="0.0" y="0.0" width="300" height="80"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="iVj-jA-CFN">
+                                <rect key="frame" x="35" y="24" width="223" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="31" id="DCA-Ur-4M2"/>
+                                    <constraint firstAttribute="width" constant="219" id="Mfz-Xz-Hoj"/>
+                                    <constraint firstAttribute="width" constant="226" id="gW8-lS-ndp"/>
+                                </constraints>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="gW8-lS-ndp"/>
+                                    </mask>
+                                </variation>
+                                <connections>
+                                    <action selector="sliderChanged:" destination="8dw-Np-gWy" eventType="valueChanged" id="BRq-Hd-1no"/>
+                                </connections>
+                            </slider>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="brightnessBigWhite.png" translatesAutoresizingMaskIntoConstraints="NO" id="ESB-gU-UHw">
+                                <rect key="frame" x="16" y="35" width="10" height="10"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="10" id="Lu1-WZ-tL9"/>
+                                    <constraint firstAttribute="width" constant="10" id="Z8w-VL-5ys"/>
+                                </constraints>
+                            </imageView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="brightnessBigWhite.png" translatesAutoresizingMaskIntoConstraints="NO" id="Bze-aB-dNP">
+                                <rect key="frame" x="264" y="30" width="20" height="20"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="20" id="St4-Td-OFC"/>
+                                    <constraint firstAttribute="height" constant="20" id="tZp-JD-Ooo"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" red="0.13333333333333333" green="0.15294117647058825" blue="0.1803921568627451" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstItem="Bze-aB-dNP" firstAttribute="leading" secondItem="iVj-jA-CFN" secondAttribute="trailing" constant="8" id="QCw-UT-5eo"/>
+                            <constraint firstItem="iVj-jA-CFN" firstAttribute="leading" secondItem="ESB-gU-UHw" secondAttribute="trailing" constant="11" id="RHG-ss-GzP"/>
+                            <constraint firstAttribute="centerY" secondItem="Bze-aB-dNP" secondAttribute="centerY" id="TT8-6a-Hy4"/>
+                            <constraint firstAttribute="centerX" secondItem="iVj-jA-CFN" secondAttribute="centerX" constant="3.5" id="aG4-eT-hAk"/>
+                            <constraint firstAttribute="centerY" secondItem="iVj-jA-CFN" secondAttribute="centerY" id="tAN-Dk-AjL"/>
+                            <constraint firstAttribute="centerY" secondItem="ESB-gU-UHw" secondAttribute="centerY" id="uMV-Uj-kMH"/>
+                        </constraints>
+                    </view>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="300" height="80"/>
+                    <connections>
+                        <outlet property="slider" destination="iVj-jA-CFN" id="buS-y9-aMu"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="D2L-CE-3OH" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1276" y="359"/>
+        </scene>
     </scenes>
     <resources>
         <image name="bright-7.png" width="29" height="30"/>
+        <image name="brightnessBigWhite.png" width="32" height="32"/>
         <image name="gear-7.png" width="30" height="30"/>
     </resources>
 </document>

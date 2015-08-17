@@ -11,6 +11,7 @@
 #import "YLProgressBar.h"
 #import "MapUtils.h"
 #import "Helpers.h"
+#import "BrightnessViewController.h"
 
 #define kColorLight [Helpers r:2 g:115 b:1 alpha:1.0]
 #define kColorLightModerate [Helpers r:197 g:194 b:9 alpha:1.0]
@@ -33,6 +34,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *lblSelectedAltitude;
 
 @property (weak, nonatomic) IBOutlet UIPickerView *pickerAltitude;
+
+//top bar
+@property (weak, nonatomic) IBOutlet UINavigationBar *navBar;
 
 
 //left menu bar
@@ -70,7 +74,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *lblLegentSevere;
 @property (weak, nonatomic) IBOutlet UILabel *lblLegentExtream;
 
-
+//Popovers
+@property (nonatomic, strong) BrightnessViewController *brightnessController;
+@property (nonatomic, strong) UIPopoverController *brightnessPopover;
 
 
 @end
@@ -399,19 +405,10 @@
     return 16  ;
 }
 
-//// The data to return for the row and component (column) that's being passed in
-//- (NSString*)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
-//{
-//    return [NSString stringWithFormat:@"%li",(long)row];
-//}
-
 
 // Catpure the picker view selection
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
-    // This method is triggered whenever the user makes a change to the picker selection.
-    // The parameter named row and component represents what was selected.
-    NSLog(@"%li",(long)row);
     _selectedAltitudeLayer = (int)row;
     [self.map removeAllAnnotations];
     [self addAnnotationsWithMap:self.map];
@@ -429,7 +426,6 @@
 
 
 
-
 #pragma mark right menu operations
 - (IBAction)btnChangeAltitude:(UIButton *)sender {
     if (sender == _btnGoDown && _selectedAltitudeLayer > 0) {
@@ -444,4 +440,32 @@
     
     [self.map removeAllAnnotations];
     [self addAnnotationsWithMap:self.map];
-}@end
+}
+
+#pragma mark - Popovers
+- (IBAction)btnBrightness_Clicked:(UIBarButtonItem *)sender {
+    if (_brightnessController == nil) {
+        UIStoryboard *sb = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        _brightnessController  = [sb instantiateViewControllerWithIdentifier:@"Brightness"];
+    }
+
+    _brightnessPopover = [[UIPopoverController alloc] initWithContentViewController:_brightnessController];
+    _brightnessPopover.popoverContentSize =  CGSizeMake(300.0, 80.0);
+    _brightnessPopover.backgroundColor = _navBar.barTintColor;
+    _brightnessController.view.backgroundColor = _navBar.barTintColor;
+    UIView *targetView = (UIView *)[sender performSelector:@selector(view)];
+    CGRect rect = targetView.frame;
+    rect.origin.x += 2 ;
+    [_brightnessPopover presentPopoverFromRect:rect inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+
+    
+    
+}
+
+#pragma mark - mixc
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
+}
+
+@end
