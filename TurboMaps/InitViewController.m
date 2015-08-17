@@ -90,6 +90,7 @@
 @implementation InitViewController
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     // init location manager
     [LocationManager sharedManager];
     
@@ -136,26 +137,15 @@
     
     //gps signal init
     [Helpers makeRound:((UIView *)_lblGpsSignal) borderWidth:1.0 borderColor:[UIColor clearColor]];
-    
-    //tile Data array init
-    self.tileData = [NSMutableArray new];
-    for (int i=0;i<=kAltitude_NumberOfSteps;i++){
-        [self.tileData addObject:[NSMutableArray new]];
-   
-    NSMutableArray * arr = self.tileData[i];
-    for (int i=0;i<5000;i++){
-        int x= arc4random_uniform(500) + 800;
-        int y= arc4random_uniform(400) + 500;
-        int value= arc4random_uniform(6);
-        NSString * tileInfo = [NSString stringWithFormat:@"%@,%@,%i",[MapUtils padInt:x padTo:4],[MapUtils padInt:y padTo:4],value];
-        [arr addObject:tileInfo];
-    }}
+
+
     
 
     
 }
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
+
     RMMapboxSource *tileSource = [[RMMapboxSource alloc] initWithMapID:@"mapbox.light"];
     
     
@@ -206,7 +196,6 @@
         _progressBar.progressStretch          = YES;
         _progressBar.trackTintColor = [UIColor whiteColor];
         
-//        NSLog (@"%lu",(unsigned long)[self.map.tileCache tileCountForSouthWest:southWest northEast:northEast minZoom:minDownloadZoom maxZoom:maxDownloadZoom]);
         [self.map.tileCache beginBackgroundCacheForTileSource:self.map.tileSource southWest:southWest northEast:northEast minZoom:minDownloadZoom maxZoom:maxDownloadZoom];
     } else {
         _viewDownload.hidden = true;
@@ -220,7 +209,22 @@
     [_pickerAltitude selectRow:_selectedAltitudeLayer inComponent:0 animated:NO];
 
 }
-
+-(void)viewDidAppear:(BOOL)animated    {
+    [super viewDidAppear:animated];
+    //tile Data array init
+    self.tileData = [NSMutableArray new];
+    for (int i=0;i<=kAltitude_NumberOfSteps;i++){
+        [self.tileData addObject:[NSMutableArray new]];
+        
+        NSMutableArray * arr = self.tileData[i];
+        for (int i=0;i<5000;i++){
+            int x= arc4random_uniform(500) + 800;
+            int y= arc4random_uniform(400) + 500;
+            int value= arc4random_uniform(6);
+            NSString * tileInfo = [NSString stringWithFormat:@"%@,%@,%i",[MapUtils padInt:x padTo:4],[MapUtils padInt:y padTo:4],value];
+            [arr addObject:tileInfo];
+        }}
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -231,7 +235,6 @@
 -(void)tileCache:(RMTileCache *)tileCache didBackgroundCacheTile:(RMTile)tile withIndex:(NSUInteger)tileIndex ofTotalTileCount:(NSUInteger)totalTileCount {
     self.count ++;
     self.progressBar.progress = self.count / self.noTilesToDownload;
-   // NSLog (@"Cached-%i",self.count);
 }
 
 -(void) tileCache:(RMTileCache *)tileCache didReceiveError:(NSError *)error whenCachingTile:(RMTile)tile    {
@@ -517,7 +520,7 @@
     if ([LocationManager sharedManager].isLocationGood) {
         _lblGpsSignal.backgroundColor = [Helpers r:102 g:205 b:0 alpha:1.0];
         ZLTile tile = [[LocationManager sharedManager] getCurrentTile];
-        NSLog(@"%i/%i",tile.x, tile.y);
+
     } else {
         _lblGpsSignal.backgroundColor = [UIColor redColor];
     }

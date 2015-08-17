@@ -169,7 +169,6 @@
     NSArray *lines = [contents componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"\r\n"]];
     for (NSString* line in lines) {
         if (line.length) {
-            NSLog(@"line: %@", line);
             NSArray *eventData = [line componentsSeparatedByString:@","];
             NSMutableDictionary * eventDictionary = [NSMutableDictionary new];
             [eventDictionary setObject:eventData[0]  forKey:@"tileX"];

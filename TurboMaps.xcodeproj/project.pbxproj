@@ -29,6 +29,8 @@
 		A5B3EB101B8209FB003D5AE2 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5B3EB0F1B8209FB003D5AE2 /* CoreLocation.framework */; };
 		A5B3EB131B820F29003D5AE2 /* LocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3EB121B820F29003D5AE2 /* LocationManager.m */; };
 		A5B3EB161B8235D8003D5AE2 /* RecorderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3EB151B8235D8003D5AE2 /* RecorderManager.m */; };
+		A5B3EB191B82920B003D5AE2 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3EB181B82920B003D5AE2 /* LoginViewController.m */; };
+		A5B3EB1C1B8295AD003D5AE2 /* AppStartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3EB1B1B8295AD003D5AE2 /* AppStartViewController.m */; };
 		A5E7A0A31B79105E00FD969C /* MapUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E7A0A21B79105E00FD969C /* MapUtils.m */; };
 		A5E7A0A51B7A0A9A00FD969C /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = A5E7A0A41B7A0A9A00FD969C /* data.json */; };
 		A5E7A0A91B7A418B00FD969C /* Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E7A0A81B7A418B00FD969C /* Helpers.m */; };
@@ -135,6 +137,10 @@
 		A5B3EB121B820F29003D5AE2 /* LocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationManager.m; sourceTree = "<group>"; };
 		A5B3EB141B8235D8003D5AE2 /* RecorderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecorderManager.h; sourceTree = "<group>"; };
 		A5B3EB151B8235D8003D5AE2 /* RecorderManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecorderManager.m; sourceTree = "<group>"; };
+		A5B3EB171B82920B003D5AE2 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
+		A5B3EB181B82920B003D5AE2 /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
+		A5B3EB1A1B8295AD003D5AE2 /* AppStartViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppStartViewController.h; sourceTree = "<group>"; };
+		A5B3EB1B1B8295AD003D5AE2 /* AppStartViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppStartViewController.m; sourceTree = "<group>"; };
 		A5E7A0A11B79105E00FD969C /* MapUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapUtils.h; path = TurboMaps/MapUtils.h; sourceTree = "<group>"; };
 		A5E7A0A21B79105E00FD969C /* MapUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MapUtils.m; path = TurboMaps/MapUtils.m; sourceTree = "<group>"; };
 		A5E7A0A41B7A0A9A00FD969C /* data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
@@ -193,6 +199,10 @@
 				A5B3EB001B81C9ED003D5AE2 /* PilotReportViewController.m */,
 				A5B3EB031B81DAD0003D5AE2 /* AboutViewController.h */,
 				A5B3EB041B81DAD0003D5AE2 /* AboutViewController.m */,
+				A5B3EB171B82920B003D5AE2 /* LoginViewController.h */,
+				A5B3EB181B82920B003D5AE2 /* LoginViewController.m */,
+				A5B3EB1A1B8295AD003D5AE2 /* AppStartViewController.h */,
+				A5B3EB1B1B8295AD003D5AE2 /* AppStartViewController.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -201,7 +211,6 @@
 			isa = PBXGroup;
 			children = (
 				A59791DE1B77ECE200AACC6F /* Main.storyboard */,
-				A59791E31B77ECE200AACC6F /* LaunchScreen.xib */,
 				A59791D31B77ECE200AACC6F /* TurbuMaps */,
 				A59791E11B77ECE200AACC6F /* Images.xcassets */,
 				A5E7A0A61B7A0AA100FD969C /* testing files */,
@@ -232,6 +241,7 @@
 				A5B3EAE71B810390003D5AE2 /* Images */,
 				A5B3EA721B810027003D5AE2 /* MapBOx Headers */,
 				A59791D41B77ECE200AACC6F /* Supporting Files */,
+				A59791E31B77ECE200AACC6F /* LaunchScreen.xib */,
 			);
 			name = TurbuMaps;
 			path = TurboMaps;
@@ -557,9 +567,11 @@
 				A5B3EAF31B81A90B003D5AE2 /* BrightnessViewController.m in Sources */,
 				A5E7A0A31B79105E00FD969C /* MapUtils.m in Sources */,
 				A59791DA1B77ECE200AACC6F /* AppDelegate.m in Sources */,
+				A5B3EB191B82920B003D5AE2 /* LoginViewController.m in Sources */,
 				A5E7A0A91B7A418B00FD969C /* Helpers.m in Sources */,
 				A59791D71B77ECE200AACC6F /* main.m in Sources */,
 				A5B3EB011B81C9ED003D5AE2 /* PilotReportViewController.m in Sources */,
+				A5B3EB1C1B8295AD003D5AE2 /* AppStartViewController.m in Sources */,
 				A5B3EAE41B8100D0003D5AE2 /* RMTile.c in Sources */,
 				A5B3EAE61B8100D0003D5AE2 /* RMFoundation.c in Sources */,
 				A5B3EB161B8235D8003D5AE2 /* RecorderManager.m in Sources */,
@@ -603,7 +615,6 @@
 				A59791E41B77ECE200AACC6F /* Base */,
 			);
 			name = LaunchScreen.xib;
-			path = TurboMaps;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
