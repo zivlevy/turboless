@@ -11,13 +11,11 @@
 #import "YLProgressBar.h"
 #import "MapUtils.h"
 #import "Helpers.h"
+#import "Const.h"
 #import "BrightnessViewController.h"
+#import "PilotReportViewController.h"
 
-#define kColorLight [Helpers r:2 g:115 b:1 alpha:1.0]
-#define kColorLightModerate [Helpers r:197 g:194 b:9 alpha:1.0]
-#define kColorModerate [Helpers r:190 g:73 b:2 alpha:1.0]
-#define kColorSevere [Helpers r:127 g:0 b:0 alpha:1.0]
-#define kColorExtream [Helpers r:97 g:0 b:151 alpha:1.0]
+
 
 #define kAltitude_Min 10
 #define kAltitude_NumberOfSteps 15
@@ -77,6 +75,9 @@
 //Popovers
 @property (nonatomic, strong) BrightnessViewController *brightnessController;
 @property (nonatomic, strong) UIPopoverController *brightnessPopover;
+
+@property (nonatomic,strong) PilotReportViewController * pilotReportController;
+@property (nonatomic,strong) UIPopoverController * pilotReportPopover;
 
 
 @end
@@ -448,7 +449,6 @@
         UIStoryboard *sb = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
         _brightnessController  = [sb instantiateViewControllerWithIdentifier:@"Brightness"];
     }
-
     _brightnessPopover = [[UIPopoverController alloc] initWithContentViewController:_brightnessController];
     _brightnessPopover.popoverContentSize =  CGSizeMake(300.0, 80.0);
     _brightnessPopover.backgroundColor = _navBar.barTintColor;
@@ -457,9 +457,20 @@
     CGRect rect = targetView.frame;
     rect.origin.x += 2 ;
     [_brightnessPopover presentPopoverFromRect:rect inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+}
 
-    
-    
+- (IBAction)btnPilotReport_Clicked:(UIButton *)sender {
+    if (_pilotReportController == nil) {
+        UIStoryboard *sb = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        _pilotReportController  = [sb instantiateViewControllerWithIdentifier:@"PilotReport"];
+    }
+    _pilotReportPopover = [[UIPopoverController alloc] initWithContentViewController:_pilotReportController];
+    _pilotReportPopover.popoverContentSize =  CGSizeMake(350.0, 100.0);
+    _pilotReportPopover.backgroundColor = _navBar.barTintColor;
+    _pilotReportController.view.backgroundColor = _navBar.barTintColor;
+    _pilotReportController.turbulenceLevel = sender.tag;
+
+    [_pilotReportPopover presentPopoverFromRect:sender.frame inView:self.viewLeftMenu permittedArrowDirections:UIPopoverArrowDirectionLeft animated:YES];
 }
 
 #pragma mark - mixc

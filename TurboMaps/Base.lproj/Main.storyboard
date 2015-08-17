@@ -408,7 +408,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="O7t-wu-BdI" userLabel="Left Menu">
                                 <rect key="frame" x="-4" y="-70" width="60" height="600"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Y6B-Ph-efN">
+                                    <button opaque="NO" tag="1" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Y6B-Ph-efN">
                                         <rect key="frame" x="10" y="540" width="40" height="40"/>
                                         <color key="backgroundColor" red="0.0078431372550000003" green="0.28627450980000002" blue="0.0039215686269999999" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
@@ -420,8 +420,11 @@
                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
+                                        <connections>
+                                            <action selector="btnPilotReport_Clicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="inN-Yr-1IA"/>
+                                        </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="goB-9y-aE5">
+                                    <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="goB-9y-aE5">
                                         <rect key="frame" x="10" y="490" width="40" height="40"/>
                                         <color key="backgroundColor" red="0.42745098040000001" green="0.53854434470000001" blue="0.76234702799999998" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
@@ -433,8 +436,11 @@
                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
+                                        <connections>
+                                            <action selector="btnPilotReport_Clicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="G4v-l3-5ZT"/>
+                                        </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w0H-uq-Z6C">
+                                    <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w0H-uq-Z6C">
                                         <rect key="frame" x="10" y="440" width="40" height="40"/>
                                         <color key="backgroundColor" red="0.26666666666666666" green="0.22352941176470589" blue="0.015686274509803921" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
@@ -448,8 +454,11 @@
                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
+                                        <connections>
+                                            <action selector="btnPilotReport_Clicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="zf7-b5-oyr"/>
+                                        </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RrH-vi-hoz">
+                                    <button opaque="NO" tag="4" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RrH-vi-hoz">
                                         <rect key="frame" x="10" y="390" width="40" height="40"/>
                                         <color key="backgroundColor" red="0.20000000000000001" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
@@ -463,8 +472,11 @@
                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
+                                        <connections>
+                                            <action selector="btnPilotReport_Clicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="NHS-D0-dif"/>
+                                        </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6G3-yf-eQh">
+                                    <button opaque="NO" tag="5" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6G3-yf-eQh">
                                         <rect key="frame" x="10" y="340" width="40" height="40"/>
                                         <color key="backgroundColor" red="0.14901960784313725" green="0.0" blue="0.29803921568627451" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
@@ -478,6 +490,9 @@
                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
+                                        <connections>
+                                            <action selector="btnPilotReport_Clicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="f8g-Un-bjp"/>
+                                        </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Report" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zpq-eu-Gbu">
                                         <rect key="frame" x="10" y="314" width="42" height="21"/>
@@ -622,6 +637,51 @@
             </objects>
             <point key="canvasLocation" x="575" y="359"/>
         </scene>
+        <!--Pilot Report View Controller-->
+        <scene sceneID="1nr-9K-AtR">
+            <objects>
+                <viewController storyboardIdentifier="PilotReport" id="QH1-iB-key" customClass="PilotReportViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="wlG-jX-uxN"/>
+                        <viewControllerLayoutGuide type="bottom" id="yQJ-Jp-g1q"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="eCb-5j-29a">
+                        <rect key="frame" x="0.0" y="0.0" width="350" height="100"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="y8S-Ek-yTZ">
+                                <rect key="frame" x="23" y="36" width="235" height="29"/>
+                                <segments>
+                                    <segment title="Now"/>
+                                    <segment title="30 sec ago"/>
+                                    <segment title="1 min ago"/>
+                                </segments>
+                                <color key="tintColor" red="0.96862745100000003" green="0.96862745100000003" blue="0.96862745100000003" alpha="1" colorSpace="calibratedRGB"/>
+                            </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lMY-mr-xtB">
+                                <rect key="frame" x="284" y="25" width="50" height="50"/>
+                                <color key="tintColor" red="0.96862745100000003" green="0.96862745100000003" blue="0.96862745100000003" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="Send">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="btnSend_Clicked:" destination="QH1-iB-key" eventType="touchUpInside" id="v5P-We-YjL"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <size key="freeformSize" width="350" height="100"/>
+                    <connections>
+                        <outlet property="btnSend" destination="lMY-mr-xtB" id="z0q-9W-L2o"/>
+                        <outlet property="segTime" destination="y8S-Ek-yTZ" id="tCv-qj-O2Q"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1r6-eE-pOw" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="239" y="-172"/>
+        </scene>
         <!--Brightness View Controller-->
         <scene sceneID="UMt-Ga-S3l">
             <objects>
@@ -683,7 +743,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="D2L-CE-3OH" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1276" y="359"/>
+            <point key="canvasLocation" x="-130" y="-182"/>
         </scene>
     </scenes>
     <resources>
