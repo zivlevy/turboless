@@ -14,12 +14,14 @@
 #import "Const.h"
 #import "BrightnessViewController.h"
 #import "PilotReportViewController.h"
+#import "AboutViewController.h"
+
+//managers
+#import "LocationManager.h"
+#import "RecorderManager.h"
 
 
 
-#define kAltitude_Min 10
-#define kAltitude_NumberOfSteps 15
-#define kAltitude_Step 2
 @interface InitViewController ()<RMTileCacheBackgroundDelegate,RMMapViewDelegate,UIPickerViewDataSource,UIPickerViewDelegate>
 @property (nonatomic,strong) RMMapView * map;
 
@@ -27,14 +29,12 @@
 
 //right menu bar
 @property (weak, nonatomic) IBOutlet UIView *viewRightMenu;
-@property (weak, nonatomic) IBOutlet UIButton *btnGoUp;
-@property (weak, nonatomic) IBOutlet UIButton *btnGoDown;
-@property (weak, nonatomic) IBOutlet UILabel *lblSelectedAltitude;
 
 @property (weak, nonatomic) IBOutlet UIPickerView *pickerAltitude;
 
 //top bar
-@property (weak, nonatomic) IBOutlet UINavigationBar *navBar;
+@property (weak, nonatomic) IBOutlet UIToolbar *navBar;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *GPSSignal;
 
 
 //left menu bar
@@ -71,6 +71,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *lblLegentModerate;
 @property (weak, nonatomic) IBOutlet UILabel *lblLegentSevere;
 @property (weak, nonatomic) IBOutlet UILabel *lblLegentExtream;
+@property (weak, nonatomic) IBOutlet UILabel *lblGpsSignal;
 
 //Popovers
 @property (nonatomic, strong) BrightnessViewController *brightnessController;
@@ -79,18 +80,37 @@
 @property (nonatomic,strong) PilotReportViewController * pilotReportController;
 @property (nonatomic,strong) UIPopoverController * pilotReportPopover;
 
+@property (nonatomic,strong) AboutViewController * aboutViewController;
+@property (nonatomic,strong) UIPopoverController * aboutPopover;
 
+//timers
+@property (nonatomic,strong) NSTimer * timerGpsSignal;
 @end
 
 @implementation InitViewController
 - (void)viewDidLoad {
     [super viewDidLoad];
+    // init location manager
+    [LocationManager sharedManager];
+    
+    //init recorder manager
+    [RecorderManager sharedManager];
+    
+    //set timer to watch for good location
+    _timerGpsSignal = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
+                                            selector:@selector(checkGoodLocation:) userInfo:nil repeats:YES];
+
+
+    ///////////
     [[RMConfiguration sharedInstance] setAccessToken:@"pk.eyJ1IjoianVzdGluIiwiYSI6IlpDbUJLSUEifQ.4mG8vhelFMju6HpIY-Hi5A"];
 
     //Download progress bar init
     [Helpers roundCornersOnView:_viewDownload onTopLeft:YES topRight:YES bottomLeft:YES bottomRight:YES radius:8.0];
     _progressBar.progress =0.0;
     
+    
+    // topbar init
+    _navBar.clipsToBounds=YES;
     //menu bars init
     [Helpers roundCornersOnView:_viewRightMenu onTopLeft:YES topRight:NO bottomLeft:YES bottomRight:NO radius:12.0];
     [Helpers roundCornersOnView:_viewLeftMenu onTopLeft:NO topRight:YES bottomLeft:NO bottomRight:YES radius:12.0];
@@ -100,20 +120,22 @@
     _btnReport_moderate.backgroundColor = kColorModerate;
     _btnReport_severe.backgroundColor = kColorSevere;
     _btnReport_Extreme.backgroundColor = kColorExtream;
+    
     [Helpers makeRound:_btnReport_light borderWidth:1 borderColor:[UIColor whiteColor]];
     [Helpers makeRound:_btnReport_lightModerate borderWidth:1 borderColor:[UIColor whiteColor]];
     [Helpers makeRound:_btnReport_moderate borderWidth:1 borderColor:[UIColor whiteColor]];
     [Helpers makeRound:_btnReport_severe borderWidth:1 borderColor:[UIColor whiteColor]];
     [Helpers makeRound:_btnReport_Extreme borderWidth:1 borderColor:[UIColor whiteColor]];
     
-    [Helpers makeRoundCorners:_btnGoDown radius:8 borderWidth:1 borderColor:[UIColor whiteColor]];
-    [Helpers makeRoundCorners:_btnGoUp radius:8 borderWidth:1 borderColor:[UIColor whiteColor]];
     //legend init
     _lblLegendLight.backgroundColor = kColorLight;
     _lblLegentLightModerate.backgroundColor = kColorLightModerate;
     _lblLegentModerate.backgroundColor = kColorModerate;
     _lblLegentSevere.backgroundColor = kColorSevere;
     _lblLegentExtream.backgroundColor = kColorExtream;
+    
+    //gps signal init
+    [Helpers makeRound:((UIView *)_lblGpsSignal) borderWidth:1.0 borderColor:[UIColor clearColor]];
     
     //tile Data array init
     self.tileData = [NSMutableArray new];
@@ -128,6 +150,9 @@
         NSString * tileInfo = [NSString stringWithFormat:@"%@,%@,%i",[MapUtils padInt:x padTo:4],[MapUtils padInt:y padTo:4],value];
         [arr addObject:tileInfo];
     }}
+    
+
+    
 }
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
@@ -189,11 +214,10 @@
     
     //altitude init
     _selectedAltitudeLayer = 5;
-    _lblSelectedAltitude.text = @"20";
     
     _pickerAltitude.delegate = self;
     _pickerAltitude.dataSource = self;
-    [_pickerAltitude selectRow:5 inComponent:0 animated:NO];
+    [_pickerAltitude selectRow:_selectedAltitudeLayer inComponent:0 animated:NO];
 
 }
 
@@ -427,22 +451,6 @@
 
 
 
-#pragma mark right menu operations
-- (IBAction)btnChangeAltitude:(UIButton *)sender {
-    if (sender == _btnGoDown && _selectedAltitudeLayer > 0) {
-        _selectedAltitudeLayer -= 1;
-    } else if (sender == _btnGoUp && _selectedAltitudeLayer < kAltitude_NumberOfSteps) {
-        _selectedAltitudeLayer += 1;
-    } else {
-        return;
-    }
-    
-    _lblSelectedAltitude.text = [NSString stringWithFormat:@"%i",kAltitude_Min+_selectedAltitudeLayer * kAltitude_Step];
-    
-    [self.map removeAllAnnotations];
-    [self addAnnotationsWithMap:self.map];
-}
-
 #pragma mark - Popovers
 - (IBAction)btnBrightness_Clicked:(UIBarButtonItem *)sender {
     if (_brightnessController == nil) {
@@ -451,28 +459,69 @@
     }
     _brightnessPopover = [[UIPopoverController alloc] initWithContentViewController:_brightnessController];
     _brightnessPopover.popoverContentSize =  CGSizeMake(300.0, 80.0);
-    _brightnessPopover.backgroundColor = _navBar.barTintColor;
+    _brightnessPopover.backgroundColor = _navBar.backgroundColor;
     _brightnessController.view.backgroundColor = _navBar.barTintColor;
-    UIView *targetView = (UIView *)[sender performSelector:@selector(view)];
-    CGRect rect = targetView.frame;
-    rect.origin.x += 2 ;
-    [_brightnessPopover presentPopoverFromRect:rect inView:self.view permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+    if (self.presentedViewController) {
+        [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
+    }
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        
+    [_brightnessPopover presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+    }];
+
 }
 
+
+- (IBAction)btnAbout_Clicked:(id)sender {
+    if (_aboutViewController == nil) {
+        UIStoryboard *sb = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        _aboutViewController  = [sb instantiateViewControllerWithIdentifier:@"About"];
+    }
+    _aboutPopover = [[UIPopoverController alloc] initWithContentViewController:_aboutViewController];
+    _aboutPopover.popoverContentSize =  CGSizeMake(400.0, 400.0);
+    _aboutPopover.backgroundColor = _navBar.backgroundColor;
+    _aboutViewController.view.backgroundColor = _navBar.barTintColor;
+    if (self.presentedViewController) {
+        [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
+    }
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        
+            [_aboutPopover presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+    }];
+
+}
 - (IBAction)btnPilotReport_Clicked:(UIButton *)sender {
     if (_pilotReportController == nil) {
         UIStoryboard *sb = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
         _pilotReportController  = [sb instantiateViewControllerWithIdentifier:@"PilotReport"];
     }
     _pilotReportPopover = [[UIPopoverController alloc] initWithContentViewController:_pilotReportController];
-    _pilotReportPopover.popoverContentSize =  CGSizeMake(350.0, 100.0);
-    _pilotReportPopover.backgroundColor = _navBar.barTintColor;
-    _pilotReportController.view.backgroundColor = _navBar.barTintColor;
+    _pilotReportPopover.popoverContentSize =  CGSizeMake(100.0, 100.0);
+    _pilotReportPopover.backgroundColor = _navBar.backgroundColor;
+    _pilotReportController.view.backgroundColor = _navBar.backgroundColor;
     _pilotReportController.turbulenceLevel = sender.tag;
-
+    if (self.presentedViewController) {
+        [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
+    }
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        
     [_pilotReportPopover presentPopoverFromRect:sender.frame inView:self.viewLeftMenu permittedArrowDirections:UIPopoverArrowDirectionLeft animated:YES];
+    }];
+
 }
 
+#pragma mark - timers
+
+- (void) checkGoodLocation:(NSTimer *)incomingTimer
+{
+    if ([LocationManager sharedManager].isLocationGood) {
+        _lblGpsSignal.backgroundColor = [Helpers r:102 g:205 b:0 alpha:1.0];
+        ZLTile tile = [[LocationManager sharedManager] getCurrentTile];
+        NSLog(@"%i/%i",tile.x, tile.y);
+    } else {
+        _lblGpsSignal.backgroundColor = [UIColor redColor];
+    }
+}
 #pragma mark - mixc
 - (UIStatusBarStyle)preferredStatusBarStyle
 {

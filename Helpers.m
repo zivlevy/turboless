@@ -46,7 +46,7 @@
     view.layer.borderColor = borderColor.CGColor;
     
 }
-+(void) makeRound:(UIButton *) button borderWidth:(int)borderWidth borderColor:(UIColor *) borderColor
++(void) makeRound:(UIView *) button borderWidth:(int)borderWidth borderColor:(UIColor *) borderColor
 {
     button.layer.cornerRadius = button.bounds.size.height/2;
     button.layer.borderWidth = borderWidth;

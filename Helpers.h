@@ -17,7 +17,7 @@
 +(void) makeRoundCorners:(UIView *) view radius:(int) radius borderWidth:(int)borderWidth borderColor:(UIColor *) borderColor;
 
 // makeRound: gets a UIButton and makes it round
-+(void) makeRound:(UIButton *) button borderWidth:(int)borderWidth borderColor:(UIColor *) borderColor;
++(void) makeRound:(UIView *) button borderWidth:(int)borderWidth borderColor:(UIColor *) borderColor;
 
 +(UIColor *) r:(int)r g:(int)g b:(int)b alpha:(float)alpha ;
 

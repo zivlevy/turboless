@@ -9,10 +9,11 @@
 #import "PilotReportViewController.h"
 #import "Helpers.h"
 #import "Const.h"
+#import "RecorderManager.h"
+#import "LocationManager.h"
 
 @interface PilotReportViewController ()
 @property (weak, nonatomic) IBOutlet UIButton *btnSend;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *segTime;
 
 @end
 
@@ -26,7 +27,6 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [_segTime setSelectedSegmentIndex:0];
     switch (_turbulenceLevel) {
         case 1:
             _btnSend.backgroundColor = kColorLight;
@@ -47,7 +47,27 @@
             break;
     }
 }
-- (IBAction)btnSend_Clicked:(id)sender {
+- (IBAction)btnSend_Clicked:(UIButton *)sender {
+    ZLTurbulenceEvent event;
+    
+    // find current location
+    ZLTile tile = [[LocationManager sharedManager] getCurrentTile];
+    event.tileX=tile.x;
+    event.tileY=tile.y;
+    event.altitude=tile.altitude;
+    
+    event.severity=(int)_turbulenceLevel;
+    event.isPilotEvent = YES;
+    
+    //TODO
+    event.flightNumber = @"0";
+    NSDate * now = [NSDate date];
+    event.date = now;
+    
+    //TODO
+    event.userId = @"e098288";
+    
+    [[RecorderManager sharedManager] writeTurbulenceEvent:event];
     [self dismissViewControllerAnimated:YES completion:^{
         
     }];

@@ -57,7 +57,7 @@
 +(NSString*) transformWorldCoordinateToTilePathForZoom:(int)zoom fromLon:(double) lon  fromLat:(double) lat
 {
     
-    int padding = [NSString stringWithFormat:@"%i",(int)pow(2,zoom)].length;
+    int padding = (int)[NSString stringWithFormat:@"%i",(int)pow(2,zoom)].length;
     int tileX = (int)(floor((lon + 180.0) / 360.0 * pow(2.0, zoom)));
     int tileY = (int)(floor((1.0 - log( tan(lat * M_PI/180.0) + 1.0 / cos(lat * M_PI/180.0)) / M_PI) / 2.0 * pow(2.0, zoom)));
     NSString * path = [NSString stringWithFormat:@"%@%@%@",[self padInt:tileX padTo:padding], [self padInt:tileY padTo:padding],[self padInt:zoom padTo:2]];

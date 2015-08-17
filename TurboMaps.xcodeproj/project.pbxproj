@@ -24,6 +24,11 @@
 		A5B3EAF51B81B2CE003D5AE2 /* slider20.png in Resources */ = {isa = PBXBuildFile; fileRef = A5B3EAF41B81B2CE003D5AE2 /* slider20.png */; };
 		A5B3EAF71B81B512003D5AE2 /* brightnessBigWhite.png in Resources */ = {isa = PBXBuildFile; fileRef = A5B3EAF61B81B512003D5AE2 /* brightnessBigWhite.png */; };
 		A5B3EB011B81C9ED003D5AE2 /* PilotReportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3EB001B81C9ED003D5AE2 /* PilotReportViewController.m */; };
+		A5B3EB051B81DAD0003D5AE2 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3EB041B81DAD0003D5AE2 /* AboutViewController.m */; };
+		A5B3EB091B81E03B003D5AE2 /* appIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = A5B3EB081B81E03B003D5AE2 /* appIcon.png */; };
+		A5B3EB101B8209FB003D5AE2 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5B3EB0F1B8209FB003D5AE2 /* CoreLocation.framework */; };
+		A5B3EB131B820F29003D5AE2 /* LocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3EB121B820F29003D5AE2 /* LocationManager.m */; };
+		A5B3EB161B8235D8003D5AE2 /* RecorderManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3EB151B8235D8003D5AE2 /* RecorderManager.m */; };
 		A5E7A0A31B79105E00FD969C /* MapUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E7A0A21B79105E00FD969C /* MapUtils.m */; };
 		A5E7A0A51B7A0A9A00FD969C /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = A5E7A0A41B7A0A9A00FD969C /* data.json */; };
 		A5E7A0A91B7A418B00FD969C /* Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E7A0A81B7A418B00FD969C /* Helpers.m */; };
@@ -122,8 +127,16 @@
 		A5B3EAFF1B81C9ED003D5AE2 /* PilotReportViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PilotReportViewController.h; sourceTree = "<group>"; };
 		A5B3EB001B81C9ED003D5AE2 /* PilotReportViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PilotReportViewController.m; sourceTree = "<group>"; };
 		A5B3EB021B81D3F1003D5AE2 /* Const.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Const.h; sourceTree = "<group>"; };
-		A5E7A0A11B79105E00FD969C /* MapUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapUtils.h; sourceTree = "<group>"; };
-		A5E7A0A21B79105E00FD969C /* MapUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapUtils.m; sourceTree = "<group>"; };
+		A5B3EB031B81DAD0003D5AE2 /* AboutViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
+		A5B3EB041B81DAD0003D5AE2 /* AboutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
+		A5B3EB081B81E03B003D5AE2 /* appIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = appIcon.png; sourceTree = "<group>"; };
+		A5B3EB0F1B8209FB003D5AE2 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		A5B3EB111B820F29003D5AE2 /* LocationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationManager.h; sourceTree = "<group>"; };
+		A5B3EB121B820F29003D5AE2 /* LocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationManager.m; sourceTree = "<group>"; };
+		A5B3EB141B8235D8003D5AE2 /* RecorderManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecorderManager.h; sourceTree = "<group>"; };
+		A5B3EB151B8235D8003D5AE2 /* RecorderManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecorderManager.m; sourceTree = "<group>"; };
+		A5E7A0A11B79105E00FD969C /* MapUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapUtils.h; path = TurboMaps/MapUtils.h; sourceTree = "<group>"; };
+		A5E7A0A21B79105E00FD969C /* MapUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MapUtils.m; path = TurboMaps/MapUtils.m; sourceTree = "<group>"; };
 		A5E7A0A41B7A0A9A00FD969C /* data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
 		A5E7A0A71B7A418B00FD969C /* Helpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Helpers.h; sourceTree = "<group>"; };
 		A5E7A0A81B7A418B00FD969C /* Helpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Helpers.m; sourceTree = "<group>"; };
@@ -136,6 +149,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5B3EB101B8209FB003D5AE2 /* CoreLocation.framework in Frameworks */,
 				46927B891A7F976AAF1A51EC /* Pods_TurboMaps.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -162,6 +176,7 @@
 		2C67C06F240F790A0786A0B3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A5B3EB0F1B8209FB003D5AE2 /* CoreLocation.framework */,
 				68E3FBE5E399854A55953C74 /* Pods_TurboMaps.framework */,
 			);
 			name = Frameworks;
@@ -176,6 +191,8 @@
 				A5B3EAF21B81A90B003D5AE2 /* BrightnessViewController.m */,
 				A5B3EAFF1B81C9ED003D5AE2 /* PilotReportViewController.h */,
 				A5B3EB001B81C9ED003D5AE2 /* PilotReportViewController.m */,
+				A5B3EB031B81DAD0003D5AE2 /* AboutViewController.h */,
+				A5B3EB041B81DAD0003D5AE2 /* AboutViewController.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -184,6 +201,7 @@
 			isa = PBXGroup;
 			children = (
 				A59791DE1B77ECE200AACC6F /* Main.storyboard */,
+				A59791E31B77ECE200AACC6F /* LaunchScreen.xib */,
 				A59791D31B77ECE200AACC6F /* TurbuMaps */,
 				A59791E11B77ECE200AACC6F /* Images.xcassets */,
 				A5E7A0A61B7A0AA100FD969C /* testing files */,
@@ -206,15 +224,13 @@
 		A59791D31B77ECE200AACC6F /* TurbuMaps */ = {
 			isa = PBXGroup;
 			children = (
-				A5B3EAE71B810390003D5AE2 /* Images */,
-				A5B3EA721B810027003D5AE2 /* New Group */,
+				A5B3EB0A1B82075D003D5AE2 /* Managers */,
 				A59791D81B77ECE200AACC6F /* AppDelegate.h */,
 				A59791D91B77ECE200AACC6F /* AppDelegate.m */,
 				A536F09A1B80FA5E008661C1 /* ViewControllers */,
-				A59791E31B77ECE200AACC6F /* LaunchScreen.xib */,
 				A5E7A0AA1B7A419000FD969C /* Helpers */,
-				A5E7A0A11B79105E00FD969C /* MapUtils.h */,
-				A5E7A0A21B79105E00FD969C /* MapUtils.m */,
+				A5B3EAE71B810390003D5AE2 /* Images */,
+				A5B3EA721B810027003D5AE2 /* MapBOx Headers */,
 				A59791D41B77ECE200AACC6F /* Supporting Files */,
 			);
 			name = TurbuMaps;
@@ -247,7 +263,7 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		A5B3EA721B810027003D5AE2 /* New Group */ = {
+		A5B3EA721B810027003D5AE2 /* MapBOx Headers */ = {
 			isa = PBXGroup;
 			children = (
 				A5B3EAA91B8100D0003D5AE2 /* RMUserTrackingBarButtonItem.h */,
@@ -310,12 +326,13 @@
 				A5B3EAE21B8100D0003D5AE2 /* RMAbstractMercatorTileSource.h */,
 				A5B3EAE31B8100D0003D5AE2 /* Mapbox.h */,
 			);
-			name = "New Group";
+			name = "MapBOx Headers";
 			sourceTree = "<group>";
 		};
 		A5B3EAE71B810390003D5AE2 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				A5B3EB081B81E03B003D5AE2 /* appIcon.png */,
 				A5B3EAFA1B81C4E3003D5AE2 /* small */,
 				A5B3EAE81B810398003D5AE2 /* Bar Icons */,
 			);
@@ -340,6 +357,17 @@
 			name = small;
 			sourceTree = "<group>";
 		};
+		A5B3EB0A1B82075D003D5AE2 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				A5B3EB111B820F29003D5AE2 /* LocationManager.h */,
+				A5B3EB121B820F29003D5AE2 /* LocationManager.m */,
+				A5B3EB141B8235D8003D5AE2 /* RecorderManager.h */,
+				A5B3EB151B8235D8003D5AE2 /* RecorderManager.m */,
+			);
+			name = Managers;
+			sourceTree = "<group>";
+		};
 		A5E7A0A61B7A0AA100FD969C /* testing files */ = {
 			isa = PBXGroup;
 			children = (
@@ -352,6 +380,8 @@
 		A5E7A0AA1B7A419000FD969C /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				A5E7A0A11B79105E00FD969C /* MapUtils.h */,
+				A5E7A0A21B79105E00FD969C /* MapUtils.m */,
 				A5E7A0A71B7A418B00FD969C /* Helpers.h */,
 				A5E7A0A81B7A418B00FD969C /* Helpers.m */,
 				A5B3EB021B81D3F1003D5AE2 /* Const.h */,
@@ -413,6 +443,11 @@
 					A59791D01B77ECE200AACC6F = {
 						CreatedOnToolsVersion = 6.4;
 						DevelopmentTeam = 8M68CMYFST;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					A59791E91B77ECE200AACC6F = {
 						CreatedOnToolsVersion = 6.4;
@@ -447,6 +482,7 @@
 				A5B3EAF51B81B2CE003D5AE2 /* slider20.png in Resources */,
 				A59791E01B77ECE200AACC6F /* Main.storyboard in Resources */,
 				A5B3EAF01B81062B003D5AE2 /* bright-7.png in Resources */,
+				A5B3EB091B81E03B003D5AE2 /* appIcon.png in Resources */,
 				A59791E51B77ECE200AACC6F /* LaunchScreen.xib in Resources */,
 				A59791E21B77ECE200AACC6F /* Images.xcassets in Resources */,
 				A5B3EAF71B81B512003D5AE2 /* brightnessBigWhite.png in Resources */,
@@ -517,6 +553,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5B3EB131B820F29003D5AE2 /* LocationManager.m in Sources */,
 				A5B3EAF31B81A90B003D5AE2 /* BrightnessViewController.m in Sources */,
 				A5E7A0A31B79105E00FD969C /* MapUtils.m in Sources */,
 				A59791DA1B77ECE200AACC6F /* AppDelegate.m in Sources */,
@@ -525,6 +562,8 @@
 				A5B3EB011B81C9ED003D5AE2 /* PilotReportViewController.m in Sources */,
 				A5B3EAE41B8100D0003D5AE2 /* RMTile.c in Sources */,
 				A5B3EAE61B8100D0003D5AE2 /* RMFoundation.c in Sources */,
+				A5B3EB161B8235D8003D5AE2 /* RecorderManager.m in Sources */,
+				A5B3EB051B81DAD0003D5AE2 /* AboutViewController.m in Sources */,
 				A5B3EAE51B8100D0003D5AE2 /* RMPixel.c in Sources */,
 				A5AE64AD1B77F05700677EA7 /* InitViewController.m in Sources */,
 			);
@@ -564,6 +603,7 @@
 				A59791E41B77ECE200AACC6F /* Base */,
 			);
 			name = LaunchScreen.xib;
+			path = TurboMaps;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
