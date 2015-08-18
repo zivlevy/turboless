@@ -21,4 +21,9 @@
 
 +(UIColor *) r:(int)r g:(int)g b:(int)b alpha:(float)alpha ;
 
++ (NSString *)applicationDocumentsDirectory;
++(NSString *) getFilePathInDocuments:(NSString *) fileName;
+
+//dates
++(NSString *) getGMTTimeString:(NSDate *) dateValue withFormat:(NSString *) format;
 @end

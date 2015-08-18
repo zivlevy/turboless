@@ -9,7 +9,7 @@
 #ifndef TurboMaps_Const_h
 #define TurboMaps_Const_h
 
-#define kBaseURL @"http://localhost:3002/"
+#define kBaseURL @"http://84.94.182.244:3000"
 
 #define FEET_PER_METER 3.28084
 
@@ -23,4 +23,7 @@
 #define kAltitude_NumberOfSteps 15
 #define kAltitude_Step 2
 
+
+//notifications
+#define kNotification_turbulenceServerNewFile @"turbulenceServerNewFile"
 #endif

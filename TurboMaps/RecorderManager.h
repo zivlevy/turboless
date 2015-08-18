@@ -23,4 +23,5 @@ typedef struct {
 @interface RecorderManager : NSObject
 + (RecorderManager *)sharedManager;
 -(void)writeTurbulenceEvent:(ZLTurbulenceEvent) event;
+-(bool)isReachable;
 @end

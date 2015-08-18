@@ -67,12 +67,13 @@
     return self;
 }
 
+#pragma mark - event handeling
 
 -(void)writeTurbulenceEvent:(ZLTurbulenceEvent) event
 {
     //check that data is valid
     bool isSeverityValid = (event.severity >0 && event.severity <=5);
-    bool isAltitudeValid = YES;//event.altitude >0 && event.altitude <=kAltitude_NumberOfSteps;
+    bool isAltitudeValid = YES;//TODO return --> event.altitude >0 && event.altitude <=kAltitude_NumberOfSteps;
     bool isTileXValid = event.tileX >=0 && event.tileX <=2047;
     bool isTileYValid = event.tileY >=0 && event.tileY <=2047;
     
@@ -189,7 +190,7 @@
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     manager.requestSerializer = [AFJSONRequestSerializer serializer];
     
-    NSString * strURL = [NSString stringWithFormat:@"%@/report",kBaseURL];
+    NSString * strURL = [NSString stringWithFormat:@"%@/reports",kBaseURL];
     [manager POST:strURL parameters:JSON
           success:^(AFHTTPRequestOperation *operation, id responseObject)
     {
@@ -255,6 +256,11 @@
     }
 }
 
+
+#pragma mark - public helpers
+-(bool)isReachable{
+    return _isReachable;
+}
 
 
 

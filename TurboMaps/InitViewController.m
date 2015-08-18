@@ -16,9 +16,12 @@
 #import "PilotReportViewController.h"
 #import "AboutViewController.h"
 
+#import "Turbulence.h"
 //managers
 #import "LocationManager.h"
 #import "RecorderManager.h"
+#import "RouteManager.h"
+#import "TurbulenceManager.h"
 
 
 
@@ -60,8 +63,7 @@
 //holds the current altitude layer to be displayed
 @property int selectedAltitudeLayer;
 
-//the tiles by altitude level each cell in the array holds a level starting at 10
-@property (nonatomic,strong) NSMutableArray * tileData;
+
 
 
 
@@ -72,6 +74,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *lblLegentSevere;
 @property (weak, nonatomic) IBOutlet UILabel *lblLegentExtream;
 @property (weak, nonatomic) IBOutlet UILabel *lblGpsSignal;
+@property (weak, nonatomic) IBOutlet UILabel *lblLastUpdate;
+
+
 
 //Popovers
 @property (nonatomic, strong) BrightnessViewController *brightnessController;
@@ -88,6 +93,17 @@
 @end
 
 @implementation InitViewController
+
+-(void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [_timerGpsSignal invalidate];
+    _timerGpsSignal = nil;
+    _map=nil;
+}
+-(void)dealloc{
+    NSLog(@"Dealloc");
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -97,13 +113,21 @@
     //init recorder manager
     [RecorderManager sharedManager];
     
+    //init route manager
+    [RouteManager sharedManager];
+    
+    //init turbulence manager manager
+    [TurbulenceManager sharedManager];
+
+    
     //set timer to watch for good location
     _timerGpsSignal = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
                                             selector:@selector(checkGoodLocation:) userInfo:nil repeats:YES];
 
 
     ///////////
-    [[RMConfiguration sharedInstance] setAccessToken:@"pk.eyJ1IjoianVzdGluIiwiYSI6IlpDbUJLSUEifQ.4mG8vhelFMju6HpIY-Hi5A"];
+    [[RMConfiguration sharedInstance] setAccessToken:@"pk.eyJ1Ijoieml2bGV2eSIsImEiOiJwaEpQeUNRIn0.OZupy_Vjyl5eRCRlgV6otg"];
+    
 
     //Download progress bar init
     [Helpers roundCornersOnView:_viewDownload onTopLeft:YES topRight:YES bottomLeft:YES bottomRight:YES radius:8.0];
@@ -146,8 +170,15 @@
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
 
-    RMMapboxSource *tileSource = [[RMMapboxSource alloc] initWithMapID:@"mapbox.light"];
-    
+    // configure map tile source based on previous metadata if available
+    RMMapboxSource * tileSource;
+    NSString * tileJSON = [[NSUserDefaults standardUserDefaults]objectForKey:@"tileJSON"];
+    if (tileJSON) {
+        tileSource = [[RMMapboxSource alloc]initWithTileJSON:tileJSON];
+    } else {
+        tileSource = [[RMMapboxSource alloc] initWithMapID:@"mapbox.light"];
+    }
+
     
     self.map = [[RMMapView alloc] initWithFrame:self.view.bounds
                                   andTilesource:tileSource];
@@ -156,7 +187,7 @@
     // set zoom
     self.map.zoom = 6;
     self.map.maxZoom = 6;
-    self.map.minZoom = 2;
+    self.map.minZoom = 3;
     self.map.autoresizingMask =  UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight ;
     // set coordinates
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake(33.5,32.0);
@@ -175,11 +206,11 @@
         [cash setMinimalPurge:10];
         
     }
-    if (! [[NSUserDefaults standardUserDefaults]boolForKey:@"offlineIsReady"]) {
+    if (![[NSUserDefaults standardUserDefaults]boolForKey:@"offlineIsReady"]) {
 
         
 
-        int minDownloadZoom = 0;
+        int minDownloadZoom = 3;
         int maxDownloadZoom = 6;
         
         CLLocationCoordinate2D southWest = CLLocationCoordinate2DMake(-85,-180);
@@ -207,25 +238,15 @@
     _pickerAltitude.delegate = self;
     _pickerAltitude.dataSource = self;
     [_pickerAltitude selectRow:_selectedAltitudeLayer inComponent:0 animated:NO];
+    
+   
 
 }
--(void)viewDidAppear:(BOOL)animated    {
+
+-(void) viewDidAppear:(BOOL)animated    {
     [super viewDidAppear:animated];
-    //tile Data array init
-    self.tileData = [NSMutableArray new];
-    for (int i=0;i<=kAltitude_NumberOfSteps;i++){
-        [self.tileData addObject:[NSMutableArray new]];
-        
-        NSMutableArray * arr = self.tileData[i];
-        for (int i=0;i<5000;i++){
-            int x= arc4random_uniform(500) + 800;
-            int y= arc4random_uniform(400) + 500;
-            int value= arc4random_uniform(6);
-            NSString * tileInfo = [NSString stringWithFormat:@"%@,%@,%i",[MapUtils padInt:x padTo:4],[MapUtils padInt:y padTo:4],value];
-            [arr addObject:tileInfo];
-        }}
+     [self addAnnotationsWithMap:_map];
 }
-
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -242,6 +263,10 @@
 }
 -(void)tileCacheDidFinishBackgroundCache:(RMTileCache *)tileCache {
     [[NSUserDefaults standardUserDefaults] setBool:true forKey:@"offlineIsReady"];
+    
+    NSString * tileJSON =  ((RMMapboxSource *)_map.tileSource).tileJSON;
+    [[NSUserDefaults standardUserDefaults] setObject:tileJSON forKey:@"tileJSON"];
+
     [[NSUserDefaults standardUserDefaults] synchronize];
     _viewDownload.hidden = true;
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Map downnload for offline use completed." message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
@@ -256,10 +281,11 @@
 
     
 }
+
 - (RMMapLayer *)mapView:(RMMapView *)mapView layerForAnnotation:(RMAnnotation *)annotation
 {
 
-
+    
     if (annotation.isUserLocationAnnotation)
         return nil;
     int  zoomLevelForAnnotation;
@@ -286,6 +312,8 @@
         default:
             break;
     }
+
+    zoomLevelForAnnotation = 11;
 
     int zoomFactor = pow(2.0, zoomLevelForAnnotation);
     RMCircle *circle = [[RMCircle alloc] initWithView:mapView radiusInMeters:40075.016686*1000/zoomFactor/2];
@@ -315,6 +343,7 @@
             annotationColor =colorLevel5;
             break;
         default:
+            annotationColor =colorLevel5;
             break;
     } 
     circle.fillColor = annotationColor;
@@ -389,15 +418,15 @@
         default:
             break;
     }
+    
+    
     NSMutableArray * arr = [NSMutableArray new];
-    for (NSString * tileData in self.tileData[self.selectedAltitudeLayer]) {
-        NSArray *items = [tileData componentsSeparatedByString:@","];
-        NSString * strX = items[0];
-        NSString * strY = items[1];
-        NSString * strValue = items[2];
-        int x = strX.intValue;
-        int y = strY.intValue;
-        int value = strValue.intValue;
+    NSDictionary * dict = [[TurbulenceManager sharedManager]getTurbulanceDictionaryArLevel:self.selectedAltitudeLayer];
+    
+    for ( Turbulence * turbulence in [dict allValues]) {
+        int x = turbulence.tileX;
+        int y = turbulence.tileY;
+        int value = turbulence.severity;
         
         
         
@@ -415,9 +444,32 @@
         annotation.userInfo = [NSNumber numberWithInt:value];
         [arr addObject:annotation];
         
+
         
     }
+
+    Airport * airport = [[RouteManager sharedManager] getAirportByICAO:@"LLBG"];
+    Airport * CDG = [[RouteManager sharedManager] getAirportByICAO:@"KJFK"];
+    CLLocationCoordinate2D start = CLLocationCoordinate2DMake(airport.latitude, airport.longitude);
+    CLLocationCoordinate2D end = CLLocationCoordinate2DMake(CDG.latitude, CDG.longitude);
+    RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:self.map
+                                                          coordinate:start
+                                                            andTitle:@"Coverage Area"];
+    [arr addObject:annotation];
+    annotation = [[RMAnnotation alloc] initWithMapView:self.map
+                                            coordinate:end
+                                              andTitle:@"Coverage Area"];
+    [arr addObject:annotation];
+    RMAnnotation * GC = [[RMGreatCircleAnnotation alloc] initWithMapView:_map coordinate1:start coordinate2:end];
+    [arr addObject:GC];
+     GC = [[RMGreatCircleAnnotation alloc] initWithMapView:_map coordinate1:end coordinate2:start];
+//    [arr addObject:GC];
     [self.map addAnnotations:arr];
+    
+    //update last server update
+    long lastTurbulenceUpdateDate = [[TurbulenceManager sharedManager]getSavedServerUpdateSince1970];
+    _lblLastUpdate.text =[NSString stringWithFormat:@"Updated @ %@",[Helpers getGMTTimeString:[NSDate dateWithTimeIntervalSince1970:lastTurbulenceUpdateDate] withFormat:@"dd/MM HH:mm"]];
+
 }
 
 #pragma mark - UIpicker
@@ -519,13 +571,12 @@
 {
     if ([LocationManager sharedManager].isLocationGood) {
         _lblGpsSignal.backgroundColor = [Helpers r:102 g:205 b:0 alpha:1.0];
-        ZLTile tile = [[LocationManager sharedManager] getCurrentTile];
 
     } else {
         _lblGpsSignal.backgroundColor = [UIColor redColor];
     }
 }
-#pragma mark - mixc
+#pragma mark - misc
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
     return UIStatusBarStyleLightContent;

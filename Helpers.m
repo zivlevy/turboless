@@ -57,4 +57,25 @@
     return [UIColor colorWithRed:(float)r/255.0 green:(float)g/255.0 blue:(float)b/255.0 alpha:alpha];
 }
 
+#pragma mark - file system
++ (NSString *)applicationDocumentsDirectory {
+    NSURL * url =  [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
+                                                   inDomains:NSUserDomainMask] lastObject];
+    return url.path;
+}
+
++(NSString *) getFilePathInDocuments:(NSString *) fileName
+{
+    return [[Helpers applicationDocumentsDirectory] stringByAppendingPathComponent:fileName];
+}
+
++(NSString *) getGMTTimeString:(NSDate *) dateValue withFormat:(NSString *) format
+{
+    NSDateFormatter* df_local = [[NSDateFormatter alloc] init];
+    //[df_local setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]]; //ODO add Daytime saving support
+    [df_local setDateFormat:format];
+    NSString * formatedDate = [df_local stringFromDate:dateValue];
+    
+    return formatedDate;
+}
 @end

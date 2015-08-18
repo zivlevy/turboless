@@ -33,7 +33,7 @@
 {
     [super viewDidAppear:animated];
     
-    if (true) {
+    if (false) {
         [self performSegueWithIdentifier:@"segueLogin" sender:self];
     } else {
         [self performSegueWithIdentifier:@"segueMainView" sender:self];
@@ -49,5 +49,6 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
+-(IBAction)prepareForUnwind:(UIStoryboardSegue *)segue {
+}
 @end

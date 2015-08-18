@@ -2941,6 +2941,7 @@
 
 - (void)correctPositionOfAllAnnotationsIncludingInvisibles:(BOOL)correctAllAnnotations animated:(BOOL)animated
 {
+    
     // Prevent blurry movements
     [CATransaction begin];
 

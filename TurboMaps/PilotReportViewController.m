@@ -48,6 +48,18 @@
     }
 }
 - (IBAction)btnSend_Clicked:(UIButton *)sender {
+    [self dismissViewControllerAnimated:YES completion:^{
+        
+    }];
+    
+
+    //Check for valid gps fix
+    if (![[LocationManager sharedManager] isLocationGood]) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"GPS fix is not available. \n Can't send information." message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+    }
+
     ZLTurbulenceEvent event;
     
     // find current location
@@ -56,6 +68,12 @@
     event.tileY=tile.y;
     event.altitude=tile.altitude;
     
+    // check for valid altitude
+    if (event.altitude <=0 || event.altitude>kAltitude_NumberOfSteps) {
+//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"GPS fix is not available. \n Can't send information." message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+//        [alert show];
+//        return;
+    }
     event.severity=(int)_turbulenceLevel;
     event.isPilotEvent = YES;
     
@@ -68,9 +86,7 @@
     event.userId = @"e098288";
     
     [[RecorderManager sharedManager] writeTurbulenceEvent:event];
-    [self dismissViewControllerAnimated:YES completion:^{
-        
-    }];
+
 }
 
 

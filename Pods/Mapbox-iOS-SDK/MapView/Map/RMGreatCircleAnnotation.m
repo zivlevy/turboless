@@ -67,6 +67,8 @@
             int numsegs = 100;
             NSMutableArray *coords = [NSMutableArray arrayWithCapacity:numsegs];
             double f = 0.0;
+            [coords addObject:[[CLLocation alloc] initWithLatitude:self.coordinate1.latitude longitude:self.coordinate1.longitude]];
+
             for(int i=1; i<=numsegs; i++)
             {
                 f += 1.0 / (float)numsegs;
@@ -109,6 +111,7 @@
                     [aShape addLineToCoordinate:((CLLocation *)coords2[j]).coordinate];
             }
         }];
+        shape.lineColor = [UIColor redColor];
 
         super.layer = shape;
     }
