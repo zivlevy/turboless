@@ -7,7 +7,7 @@
 //
 
 #import "LocationManager.h"
-#import <CoreLocation/CoreLocation.h>
+
 #import "Const.h"
 
 
@@ -88,5 +88,9 @@
     
 }
 
+-(CLLocation *) getCurrentLocation
+{
+    return _currentLocation;
+}
 
 @end

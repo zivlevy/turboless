@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import <CoreLocation/CoreLocation.h>
 typedef struct {
     int x;
     int y;
@@ -19,4 +19,5 @@ typedef struct {
 @property bool isLocationGood;
 + (LocationManager *)sharedManager;
 -(ZLTile)getCurrentTile;
+-(CLLocation *) getCurrentLocation;
 @end

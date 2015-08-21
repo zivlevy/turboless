@@ -43,6 +43,8 @@
 //top bar
 @property (weak, nonatomic) IBOutlet UIToolbar *navBar;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *barItemGPS;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *BarItemTitle;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *barItemUserLocation;
 
 //left menu bar
 @property (weak, nonatomic) IBOutlet UIView *viewLeftMenu;
@@ -188,6 +190,12 @@
     
     self.map = [[RMMapView alloc] initWithFrame:self.view.bounds
                                   andTilesource:tileSource];
+    
+    //USer location
+    
+    _map.showsUserLocation   = YES;
+    _map.userTrackingMode = RMUserTrackingModeFollowWithHeading | RMUserTrackingModeFollow;
+    _map.tintColor = [UIColor colorWithRed:0.5 green:0.6 blue:1.0 alpha:1];
     
     
     // set zoom
@@ -622,10 +630,15 @@
 - (void) checkGoodLocation:(NSTimer *)incomingTimer
 {
     if ([LocationManager sharedManager].isLocationGood) {
-        _barItemGPS.tintColor = [Helpers r:102 g:205 b:0 alpha:1.0];
+        _barItemGPS.tintColor = [UIColor whiteColor]; //[Helpers r:102 g:205 b:0 alpha:1.0];
+        CLLocation * currentLocation = [[LocationManager sharedManager] getCurrentLocation];
+        int currentAltitude = currentLocation.altitude * FEET_PER_METER;
+        int currentVerticalAccuracy = currentLocation.verticalAccuracy * FEET_PER_METER;
+        _BarItemTitle.title = [NSString stringWithFormat:@"Alt: %i Feet / Accuracy: %i Feet",currentAltitude,currentVerticalAccuracy];
 
     } else {
         _barItemGPS.tintColor = [UIColor redColor];
+        _BarItemTitle.title =@"Turbuless";
     }
 }
 
@@ -678,4 +691,15 @@
     [self addAnnotationsWithMap:_map];
 }
 
+- (IBAction)btnSwap_Clicked:(UIButton *)sender {
+    [[RouteManager sharedManager] swapAirportOriginDestination];
+    _lblTakoff.text = [RouteManager sharedManager].currentFlight.originAirport.ICAO;
+    _lblLand.text = [RouteManager sharedManager].currentFlight.destinationAirport.ICAO;
+    [_map removeAllAnnotations];
+    [self addAnnotationsWithMap:_map];
+
+}
+- (IBAction)btnUserLocation_Click:(UIBarButtonItem *)sender {
+    _map.userTrackingMode = RMUserTrackingModeFollow;
+}
 @end

@@ -19,4 +19,5 @@
 -(NSArray*) getAirportsBySymbols:(NSString *) str;
 -(Airport *) getAirportByICAO:(NSString *) ICAO;
 -(NSArray *) getAirports;
+-(void) swapAirportOriginDestination;
 @end

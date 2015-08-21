@@ -53,15 +53,17 @@
 
 
     self.searchController.searchBar.tintColor = kColorToolbarBackground;
+    
+    [self.tableVIew reloadData];
+
 }
 
 -(void) viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 100 ), dispatch_get_main_queue(), ^{
-
-        [self.searchController.searchBar becomeFirstResponder];
-
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 30000 ), dispatch_get_main_queue(), ^{
+[self.searchController.searchBar becomeFirstResponder];
+        
     });
     
 }

@@ -121,6 +121,13 @@
     return airport;
 }
 
+-(void) swapAirportOriginDestination
+{
+    Airport * temp = _currentFlight.originAirport;
+    _currentFlight.originAirport = _currentFlight.destinationAirport;
+    _currentFlight.destinationAirport = temp;
+    
+}
 
 
 @end

@@ -15,6 +15,11 @@
 		A545ADE01B866E26005928AC /* land.png in Resources */ = {isa = PBXBuildFile; fileRef = A545ADDE1B866E26005928AC /* land.png */; };
 		A545ADE11B866E26005928AC /* land@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A545ADDF1B866E26005928AC /* land@2x.png */; };
 		A545ADE31B86A184005928AC /* earth-america-7.png in Resources */ = {isa = PBXBuildFile; fileRef = A545ADE21B86A184005928AC /* earth-america-7.png */; };
+		A545ADFB1B871706005928AC /* satellite.png in Resources */ = {isa = PBXBuildFile; fileRef = A545ADF91B871706005928AC /* satellite.png */; };
+		A545ADFC1B871706005928AC /* satellite@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A545ADFA1B871706005928AC /* satellite@2x.png */; };
+		A545AE001B871837005928AC /* swap.png in Resources */ = {isa = PBXBuildFile; fileRef = A545ADFF1B871837005928AC /* swap.png */; };
+		A545AE031B874002005928AC /* TrackingLocation.png in Resources */ = {isa = PBXBuildFile; fileRef = A545AE011B874002005928AC /* TrackingLocation.png */; };
+		A545AE041B874002005928AC /* TrackingLocation@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A545AE021B874002005928AC /* TrackingLocation@2x.png */; };
 		A59791D71B77ECE200AACC6F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A59791D61B77ECE200AACC6F /* main.m */; };
 		A59791DA1B77ECE200AACC6F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A59791D91B77ECE200AACC6F /* AppDelegate.m */; };
 		A59791E01B77ECE200AACC6F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A59791DE1B77ECE200AACC6F /* Main.storyboard */; };
@@ -70,6 +75,11 @@
 		A545ADDE1B866E26005928AC /* land.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = land.png; sourceTree = "<group>"; };
 		A545ADDF1B866E26005928AC /* land@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "land@2x.png"; sourceTree = "<group>"; };
 		A545ADE21B86A184005928AC /* earth-america-7.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "earth-america-7.png"; sourceTree = "<group>"; };
+		A545ADF91B871706005928AC /* satellite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = satellite.png; sourceTree = "<group>"; };
+		A545ADFA1B871706005928AC /* satellite@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "satellite@2x.png"; sourceTree = "<group>"; };
+		A545ADFF1B871837005928AC /* swap.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = swap.png; sourceTree = "<group>"; };
+		A545AE011B874002005928AC /* TrackingLocation.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TrackingLocation.png; sourceTree = "<group>"; };
+		A545AE021B874002005928AC /* TrackingLocation@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "TrackingLocation@2x.png"; sourceTree = "<group>"; };
 		A59791D11B77ECE200AACC6F /* TurboMaps.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TurboMaps.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A59791D51B77ECE200AACC6F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A59791D61B77ECE200AACC6F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -381,6 +391,9 @@
 		A5B3EAE71B810390003D5AE2 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				A545ADFF1B871837005928AC /* swap.png */,
+				A545ADF91B871706005928AC /* satellite.png */,
+				A545ADFA1B871706005928AC /* satellite@2x.png */,
 				A545ADDA1B866669005928AC /* to.png */,
 				A545ADDB1B866669005928AC /* to@2x.png */,
 				A545ADDE1B866E26005928AC /* land.png */,
@@ -395,6 +408,8 @@
 		A5B3EAE81B810398003D5AE2 /* Bar Icons */ = {
 			isa = PBXGroup;
 			children = (
+				A545AE011B874002005928AC /* TrackingLocation.png */,
+				A545AE021B874002005928AC /* TrackingLocation@2x.png */,
 				A545ADE21B86A184005928AC /* earth-america-7.png */,
 				A5B3EAEF1B81062B003D5AE2 /* bright-7.png */,
 				A5B3EAED1B8105F2003D5AE2 /* gear-7.png */,
@@ -558,18 +573,23 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A545AE031B874002005928AC /* TrackingLocation.png in Resources */,
 				A545ADDC1B866669005928AC /* to.png in Resources */,
 				A545ADE31B86A184005928AC /* earth-america-7.png in Resources */,
+				A545AE001B871837005928AC /* swap.png in Resources */,
+				A545ADFC1B871706005928AC /* satellite@2x.png in Resources */,
 				A5E5AF6F1B830BC700E413A9 /* airports.txt in Resources */,
 				A5B3EAF51B81B2CE003D5AE2 /* slider20.png in Resources */,
 				A545ADE01B866E26005928AC /* land.png in Resources */,
 				A59791E01B77ECE200AACC6F /* Main.storyboard in Resources */,
 				A545ADE11B866E26005928AC /* land@2x.png in Resources */,
+				A545ADFB1B871706005928AC /* satellite.png in Resources */,
 				A5B3EAF01B81062B003D5AE2 /* bright-7.png in Resources */,
 				A545ADDD1B866669005928AC /* to@2x.png in Resources */,
 				A5B3EB091B81E03B003D5AE2 /* appIcon.png in Resources */,
 				A59791E51B77ECE200AACC6F /* LaunchScreen.xib in Resources */,
 				A59791E21B77ECE200AACC6F /* Images.xcassets in Resources */,
+				A545AE041B874002005928AC /* TrackingLocation@2x.png in Resources */,
 				A5B3EAF71B81B512003D5AE2 /* brightnessBigWhite.png in Resources */,
 				A5E7A0A51B7A0A9A00FD969C /* data.json in Resources */,
 				A5B3EAEE1B8105F2003D5AE2 /* gear-7.png in Resources */,
