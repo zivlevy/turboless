@@ -52,26 +52,18 @@
 6,Wewak Intl,Wewak,Papua New Guinea,WWK,AYWK,-3.583828,143.669186,19
 7996,Bamberg BF,Bamberg,Germany,BAM,BAMB,49.911,10.9,800
 7642,Tasiilaq,Angmagssalik,Greenland,AGM,BGAM,65.612222,-37.618333,24
-5438,Alluitsup Paa Heliport,Alluitsup Paa,Greenland,LLU,BGAP,60.4644,-45.5778,89
 7,Narsarsuaq,Narssarssuaq,Greenland,UAK,BGBW,61.160517,-45.425978,112
 3996,Qasigiannguit,Qasigiannguit,Greenland,JCH,BGCH,68.833336,-51,2
 5439,Neerlerit Inaat Airport,Neerlerit Inaat,Greenland,CNP,BGCO,70.7433,-22.6606,45
 3997,Aasiaat,Aasiaat,Greenland,JEG,BGEM,68.7,-52.75,2
-5440,Paamiut Heliport,Paamiut,Greenland,JFR,BGFH,61.9922,-49.6625,0
 8,Nuuk,Godthaab,Greenland,GOH,BGGH,64.190922,-51.678064,283
-5441,Qeqertarsuaq Heliport,Qeqertarsuaq Airport,Greenland,JGO,BGGN,69.2511,-53.5381,0
-5442,Qaqortoq Heliport,Qaqortoq,Greenland,JJU,BGJH,60.7158,-46.0294,0
 3995,Ilulissat,Ilulissat,Greenland,JAV,BGJN,69.23444,-51.05111,2
 5443,Maniitsoq Airport,Maniitsoq,Greenland,JSU,BGMQ,65.4125,-52.9394,91
-5444,Nanortalik Heliport,Nanortalik,Greenland,JNN,BGNN,60.14,-45.2317,0
-5445,Narsaq Heliport,Narsaq,Greenland,JNS,BGNS,60.9167,-46.0586,0
 5446,Qaanaaq Airport,Qaanaaq,Greenland,NAQ,BGQQ,77.4886,-69.3887,51
-8208,Ittoqqortoormiit Heliport,Ittoqqortoormiit,Greenland,OBY,BGSC,70.485278,-21.966667,238
 9,Sondre Stromfjord,Sondrestrom,Greenland,SFJ,BGSF,67.016969,-50.689325,165
 5447,Sisimiut Airport,Sisimiut,Greenland,JHS,BGSS,66.9513,-53.7293,33
 10,Thule Air Base,Thule,Greenland,THU,BGTL,76.531203,-68.703161,251
 5448,Upernavik Airport,Upernavik,Greenland,JUV,BGUK,72.7902,-56.1306,414
-8628,Uummannaq Heliport,Uummannaq,Greenland,UMD,BGUM,70.4047,52.0702,5
 5449,Qaarsut Airport,Uummannaq,Greenland,JQA,BGUQ,70.7342,-52.6962,289
 11,Akureyri,Akureyri,Iceland,AEY,BIAR,65.659994,-18.072703,6
 7464,Bildudalur Airport,Bildudalur,Iceland,BIU,BIBD,65.641389,-23.546111,26
@@ -326,7 +318,6 @@
 8033,Revelstoke Airport,Revelstoke,Canada,YRV,CYRV,50.9667,-118.183,1459
 133,Sudbury,Sudbury,Canada,YSB,CYSB,46.625,-80.798889,1141
 134,Sherbrooke,Sherbrooke,Canada,YSC,CYSC,45.438611,-71.691389,792
-8149,Suffield Heliport,Suffield,Canada,YSD,CYSD,50.2666701,-111.182999,2525
 5528,Stony Rapids Airport,Stony Rapids,Canada,YSF,CYSF,59.2503,-105.841,805
 135,Saint John,St. John,Canada,YSJ,CYSJ,45.316111,-65.890278,357
 5529,Sanikiluaq Airport,Sanikiluaq,Canada,YSK,CYSK,56.5378,-79.2467,104
@@ -537,7 +528,6 @@
 304,Brussels South,Charleroi,Belgium,CRL,EBCI,50.459197,4.453817,614
 7787,Ebenhofen BF,Ebenhofen,Germany,EBE,EBEN,47.824,10.623,1200
 308,Wevelgem,Kortrijk-vevelgem,Belgium,QKT,EBKT,50.817222,3.204722,64
-7810,Knokke-Heist Westkapelle Heliport,Knokke,Belgium,KNO,EBKW,51.3222,3.29306,0
 309,Liege,Liege,Belgium,LGG,EBLG,50.637417,5.443222,659
 310,Oostende,Ostend,Belgium,OST,EBOS,51.198889,2.862222,13
 317,Bautzen,Bautzen,Germany,BBJ,EDAB,51.193531,14.519747,568
@@ -616,7 +606,6 @@
 416,Tartu,Tartu,Estonia,TAY,EETU,58.307461,26.690428,219
 417,Enontekio,Enontekio,Finland,ENF,EFET,68.362586,23.424322,1005
 419,Halli,Halli,Finland,KEV,EFHA,61.85605,24.7866,479
-7725,Hernesaari Heliport,Helsinki,Finland,HEN,EFHE,60.1478,24.9244,7
 420,Helsinki Malmi,Helsinki,Finland,HEM,EFHF,60.254558,25.042828,57
 421,Helsinki Vantaa,Helsinki,Finland,HEL,EFHK,60.317222,24.963333,179
 424,Hyvinkaa,Hyvinkaa,Finland,HYV,EFHV,60.654444,24.881111,430
@@ -678,9 +667,7 @@
 494,Bournemouth,Bournemouth,United Kingdom,BOH,EGHH,50.78,-1.8425,38
 495,Southampton,Southampton,United Kingdom,SOU,EGHI,50.950261,-1.356803,44
 7805,Bembridge,Bembridge,United Kingdom,BBP,EGHJ,50.677778,-1.109444,53
-5573,Penzance Heliport,Penzance,United Kingdom,PZE,EGHK,50.1281,-5.51845,14
 496,Lasham,Lasham,United Kingdom,QLA,EGHL,51.187167,-1.0335,618
-7498,Tresco Heliport,Tresco,United Kingdom,TSO,EGHT,49.945556,-6.331389,20
 497,Alderney,Alderney,Guernsey,ACI,EGJA,49.706111,-2.214722,290
 498,Guernsey,Guernsey,Guernsey,GCI,EGJB,49.434956,-2.601969,336
 499,Jersey,Jersey,Jersey,JER,EGJJ,49.207947,-2.195508,277
@@ -838,7 +825,6 @@
 664,Torp,Sandefjord,Norway,TRF,ENTO,59.186703,10.258628,286
 665,Vaernes,Trondheim,Norway,TRD,ENVA,63.457556,10.92425,56
 4328,Airport,Vadso,Norway,VDS,ENVD,70.065,29.844,127
-5590,V?r?y Heliport,V?r?y,Norway,VRY,ENVR,67.6667,12.6833,36
 666,Sola,Stavanger,Norway,SVG,ENZV,58.876778,5.637856,29
 5591,Bydgoszcz Ignacy Jan Paderewski Airport,Bydgoszcz,Poland,BZG,EPBY,53.0968,17.9777,235
 668,Lech Walesa,Gdansk,Poland,GDN,EPGD,54.377569,18.466222,489
@@ -1196,7 +1182,6 @@
 1055,Lanzarote,Las Palmas,Spain,ACE,GCRR,28.945464,-13.605225,47
 1056,Tenerife Sur,Tenerife,Spain,TFS,GCTS,28.044475,-16.572489,209
 1057,Tenerife Norte,Tenerife,Spain,TFN,GCXO,28.482653,-16.341536,2073
-5661,Ceuta Heliport,Ceuta,Spain,JCU,GECT,35.8969,-5.29908,0
 1058,Melilla,Melilla,Spain,MLN,GEML,35.279817,-2.956256,156
 5662,Sherbro International Airport,Bonthe,Sierra Leone,BTE,GFBN,7.53242,-12.5189,14
 5663,Bo Airport,Bo,Sierra Leone,KBS,GFBO,7.9444,-11.761,328
@@ -1323,7 +1308,6 @@
 3967,Asmara Intl,Asmara,Eritrea,ASM,HHAS,15.291853,38.910667,7661
 3968,Massawa Intl,Massawa,Eritrea,MSW,HHMS,15.669989,39.370103,194
 3966,Assab Intl,Assab,Eritrea,ASA,HHSB,13.071783,42.645006,46
-6415,Waikoloa Heliport,Waikoloa Village,United States,WKL,HI07,19.9136,-155.864,109
 5692,Amboseli Airport,Amboseli National Park,Kenya,ASV,HKAM,-2.64505,37.2531,3755
 1138,Eldoret Intl,Eldoret,Kenya,EDL,HKEL,0.404458,35.238928,6941
 8712,Garissa,Garissa,Kenya,GAS,HKGA,-0.468611,39.649444,469
@@ -1889,8 +1873,6 @@
 4354,Joplin Rgnl,Joplin,United States,JLN,KJLN,37.151814,-94.498269,981
 5745,Jamestown Regional Airport,Jamestown,United States,JMS,KJMS,46.9297,-98.6782,1498
 8496,Regional Airport,Joliet,United States,JOT,KJOT,41.517778,-88.175556,582
-7729,West 30th St. Heliport,New York,United States,JRA,KJRA,40.7545,-74.0071,7
-3993,Wall Street Heliport,New York,United States,JRB,KJRB,40.701214,-74.009028,7
 4169,John Murtha Johnstown-Cambria County Airport,Johnstown,United States,JST,KJST,40.316111,-78.833889,2284
 7840,Southern Wisconsin Regional Airport,Janesville,United States,JVL,KJVL,42.62025,-89.0415556,808
 8499,Reynolds Field,Jackson,United States,JXN,KJXN,42.260556,-84.460556,1001
@@ -2708,7 +2690,6 @@
 1598,Mahanaim I Ben Yaakov,Rosh Pina,Israel,RPN,LLIB,32.981047,35.571908,922
 1602,Ovda,Ovda,Israel,VDA,LLOV,29.94025,34.93585,1492
 1605,Sde Dov,Tel-aviv,Israel,SDV,LLSD,32.114661,34.782239,43
-4005,Xewkija Heliport,Gozo,Malta,GZM,LMMG,36.027222,14.272778,300
 1606,Luqa,Malta,Malta,MLA,LMML,35.857497,14.4775,300
 6797,Hohenems,Hohenems,Austria,HOJ,LOIH,47.385,9.7,412
 1609,Graz,Graz,Austria,GRZ,LOWG,46.991067,15.439628,1115
@@ -3095,7 +3076,6 @@
 5884,Niue International Airport,Alofi,Niue,IUE,NIUE,-19.080028,-169.925639,209
 5885,Pointe Vele Airport,Futuna Island,Wallis and Futuna,FUT,NLWF,-14.3114,-178.066,20
 1968,Wallis,Wallis,Wallis and Futuna,WLS,NLWW,-13.238281,-176.199228,79
-4032,East 34th Street Heliport,New York,United States,TSS,NONE,40.7425,-73.971944,10
 1969,Faleolo Intl,Faleolo,Samoa,APW,NSFA,-13.829969,-172.008336,58
 4290,Fagali\\'i,Apia,Samoa,FGI,NSFI,-13.84861111,-171.7408333,25
 7627,Fitiuta Airport,Fiti\\'uta,American Samoa,FTI,NSFQ,-14.216111,-169.423611,110

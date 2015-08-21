@@ -15,7 +15,7 @@
 #import "BrightnessViewController.h"
 #import "PilotReportViewController.h"
 #import "AboutViewController.h"
-
+#import "AirportSearchViewController.h"
 #import "Turbulence.h"
 //managers
 #import "LocationManager.h"
@@ -25,20 +25,24 @@
 
 
 
-@interface InitViewController ()<RMTileCacheBackgroundDelegate,RMMapViewDelegate,UIPickerViewDataSource,UIPickerViewDelegate>
+@interface InitViewController ()<AboutViewDelegate,RMTileCacheBackgroundDelegate,RMMapViewDelegate,UIPickerViewDataSource,UIPickerViewDelegate,AirportSearchDelegate>
 @property (nonatomic,strong) RMMapView * map;
+
 
 
 
 //right menu bar
 @property (weak, nonatomic) IBOutlet UIView *viewRightMenu;
+@property (weak, nonatomic) IBOutlet UIButton *btnTakoff;
+@property (weak, nonatomic) IBOutlet UIButton *btnLand;
+@property (weak, nonatomic) IBOutlet UILabel *lblTakoff;
+@property (weak, nonatomic) IBOutlet UILabel *lblLand;
 
 @property (weak, nonatomic) IBOutlet UIPickerView *pickerAltitude;
 
 //top bar
 @property (weak, nonatomic) IBOutlet UIToolbar *navBar;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *GPSSignal;
-
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *barItemGPS;
 
 //left menu bar
 @property (weak, nonatomic) IBOutlet UIView *viewLeftMenu;
@@ -73,7 +77,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *lblLegentModerate;
 @property (weak, nonatomic) IBOutlet UILabel *lblLegentSevere;
 @property (weak, nonatomic) IBOutlet UILabel *lblLegentExtream;
-@property (weak, nonatomic) IBOutlet UILabel *lblGpsSignal;
+
 @property (weak, nonatomic) IBOutlet UILabel *lblLastUpdate;
 
 
@@ -88,20 +92,19 @@
 @property (nonatomic,strong) AboutViewController * aboutViewController;
 @property (nonatomic,strong) UIPopoverController * aboutPopover;
 
+@property (nonatomic,strong) AirportSearchViewController * airportSearchViewController;
+@property (nonatomic,strong) UIPopoverController * airportSearchPopover;
+
 //timers
 @property (nonatomic,strong) NSTimer * timerGpsSignal;
 @end
 
 @implementation InitViewController
 
--(void)viewWillDisappear:(BOOL)animated{
-    [super viewWillDisappear:animated];
-    [_timerGpsSignal invalidate];
-    _timerGpsSignal = nil;
-    _map=nil;
-}
+
 -(void)dealloc{
-    NSLog(@"Dealloc");
+    NSLog(@"Dealloc initViewController");
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewDidLoad {
@@ -119,13 +122,9 @@
     //init turbulence manager manager
     [TurbulenceManager sharedManager];
 
+    //notifications observers
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(turbuleceUpdatedFromServer:) name:kNotification_turbulenceServerNewFile object:nil];
     
-    //set timer to watch for good location
-    _timerGpsSignal = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
-                                            selector:@selector(checkGoodLocation:) userInfo:nil repeats:YES];
-
-
-    ///////////
     [[RMConfiguration sharedInstance] setAccessToken:@"pk.eyJ1Ijoieml2bGV2eSIsImEiOiJwaEpQeUNRIn0.OZupy_Vjyl5eRCRlgV6otg"];
     
 
@@ -136,6 +135,8 @@
     
     // topbar init
     _navBar.clipsToBounds=YES;
+    _navBar.backgroundColor=kColorToolbarBackground;
+    _navBar.tintColor = [UIColor clearColor];
     //menu bars init
     [Helpers roundCornersOnView:_viewRightMenu onTopLeft:YES topRight:NO bottomLeft:YES bottomRight:NO radius:12.0];
     [Helpers roundCornersOnView:_viewLeftMenu onTopLeft:NO topRight:YES bottomLeft:NO bottomRight:YES radius:12.0];
@@ -159,17 +160,22 @@
     _lblLegentSevere.backgroundColor = kColorSevere;
     _lblLegentExtream.backgroundColor = kColorExtream;
     
-    //gps signal init
-    [Helpers makeRound:((UIView *)_lblGpsSignal) borderWidth:1.0 borderColor:[UIColor clearColor]];
-
-
+    //airports init
+    _lblTakoff.text = [RouteManager sharedManager].currentFlight.originAirport.ICAO;
+    _lblLand.text = [RouteManager sharedManager].currentFlight.destinationAirport.ICAO;
     
+
+
 
     
 }
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
 
+    //set timer to watch for good location
+    _timerGpsSignal = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
+                                                     selector:@selector(checkGoodLocation:) userInfo:nil repeats:YES];
+    
     // configure map tile source based on previous metadata if available
     RMMapboxSource * tileSource;
     NSString * tileJSON = [[NSUserDefaults standardUserDefaults]objectForKey:@"tileJSON"];
@@ -188,7 +194,7 @@
     self.map.zoom = 6;
     self.map.maxZoom = 6;
     self.map.minZoom = 3;
-    self.map.autoresizingMask =  UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight ;
+//    self.map.autoresizingMask =  UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight ;
     // set coordinates
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake(33.5,32.0);
     
@@ -241,6 +247,13 @@
     
    
 
+}
+
+-(void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    [_timerGpsSignal invalidate];
+    _timerGpsSignal = nil;
+    _map=nil;
 }
 
 -(void) viewDidAppear:(BOOL)animated    {
@@ -361,7 +374,7 @@
 
 }
 -(void) beforeMapZoom:(RMMapView *)map byUser:(BOOL)wasUserAction {
-    [map removeAllAnnotations    ];
+    [map removeAllAnnotations];
 }
 - (void)beforeMapMove:(RMMapView *)map byUser:(BOOL)wasUserAction {
 
@@ -448,28 +461,35 @@
         
     }
 
-    Airport * airport = [[RouteManager sharedManager] getAirportByICAO:@"LLBG"];
-    Airport * CDG = [[RouteManager sharedManager] getAirportByICAO:@"KJFK"];
-    CLLocationCoordinate2D start = CLLocationCoordinate2DMake(airport.latitude, airport.longitude);
-    CLLocationCoordinate2D end = CLLocationCoordinate2DMake(CDG.latitude, CDG.longitude);
-    RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:self.map
-                                                          coordinate:start
-                                                            andTitle:@"Coverage Area"];
-    [arr addObject:annotation];
-    annotation = [[RMAnnotation alloc] initWithMapView:self.map
-                                            coordinate:end
-                                              andTitle:@"Coverage Area"];
-    [arr addObject:annotation];
-    RMAnnotation * GC = [[RMGreatCircleAnnotation alloc] initWithMapView:_map coordinate1:start coordinate2:end];
-    [arr addObject:GC];
-     GC = [[RMGreatCircleAnnotation alloc] initWithMapView:_map coordinate1:end coordinate2:start];
-//    [arr addObject:GC];
-    [self.map addAnnotations:arr];
+    Airport * origin = [RouteManager sharedManager].currentFlight.originAirport;
+    Airport * dest = [RouteManager sharedManager].currentFlight.destinationAirport;
+    if (![origin.ICAO isEqualToString:dest.ICAO] && dest && origin) {
+        CLLocationCoordinate2D start = CLLocationCoordinate2DMake(origin.latitude, origin.longitude);
+        CLLocationCoordinate2D end = CLLocationCoordinate2DMake(dest.latitude, dest.longitude);
+        RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:self.map
+                                                              coordinate:start
+                                                                andTitle:@"Coverage Area"];
+        [arr addObject:annotation];
+        annotation = [[RMAnnotation alloc] initWithMapView:self.map
+                                                coordinate:end
+                                                  andTitle:@"Coverage Area"];
+        [arr addObject:annotation];
+        RMAnnotation * GC = [[RMGreatCircleAnnotation alloc] initWithMapView:_map coordinate1:start coordinate2:end];
+        [arr addObject:GC];
+        GC = [[RMGreatCircleAnnotation alloc] initWithMapView:_map coordinate1:end coordinate2:start];
+        
+        [self.map addAnnotations:arr];
+
+        
+    }
     
     //update last server update
     long lastTurbulenceUpdateDate = [[TurbulenceManager sharedManager]getSavedServerUpdateSince1970];
-    _lblLastUpdate.text =[NSString stringWithFormat:@"Updated @ %@",[Helpers getGMTTimeString:[NSDate dateWithTimeIntervalSince1970:lastTurbulenceUpdateDate] withFormat:@"dd/MM HH:mm"]];
-
+    if (lastTurbulenceUpdateDate == 0) {
+        _lblLastUpdate.text =@"No data is available";
+    } else {
+        _lblLastUpdate.text =[NSString stringWithFormat:@"Updated @ %@",[Helpers getGMTTimeString:[NSDate dateWithTimeIntervalSince1970:lastTurbulenceUpdateDate] withFormat:@"dd/MM HH:mm"]];
+    }
 }
 
 #pragma mark - UIpicker
@@ -513,9 +533,9 @@
         _brightnessController  = [sb instantiateViewControllerWithIdentifier:@"Brightness"];
     }
     _brightnessPopover = [[UIPopoverController alloc] initWithContentViewController:_brightnessController];
-    _brightnessPopover.popoverContentSize =  CGSizeMake(300.0, 80.0);
-    _brightnessPopover.backgroundColor = _navBar.backgroundColor;
-    _brightnessController.view.backgroundColor = _navBar.barTintColor;
+    _brightnessPopover.popoverContentSize =  CGSizeMake(300.0, 150.0);
+    _brightnessPopover.backgroundColor = kColorToolbarBackground;
+    _brightnessController.view.backgroundColor = kColorToolbarBackground;
     if (self.presentedViewController) {
         [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
     }
@@ -531,11 +551,12 @@
     if (_aboutViewController == nil) {
         UIStoryboard *sb = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
         _aboutViewController  = [sb instantiateViewControllerWithIdentifier:@"About"];
+        _aboutViewController.delegate=self;
     }
     _aboutPopover = [[UIPopoverController alloc] initWithContentViewController:_aboutViewController];
     _aboutPopover.popoverContentSize =  CGSizeMake(400.0, 400.0);
-    _aboutPopover.backgroundColor = _navBar.backgroundColor;
-    _aboutViewController.view.backgroundColor = _navBar.barTintColor;
+    _aboutPopover.backgroundColor = kColorToolbarBackground;
+    _aboutViewController.view.backgroundColor = kColorToolbarBackground;
     if (self.presentedViewController) {
         [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
     }
@@ -552,8 +573,8 @@
     }
     _pilotReportPopover = [[UIPopoverController alloc] initWithContentViewController:_pilotReportController];
     _pilotReportPopover.popoverContentSize =  CGSizeMake(100.0, 100.0);
-    _pilotReportPopover.backgroundColor = _navBar.backgroundColor;
-    _pilotReportController.view.backgroundColor = _navBar.backgroundColor;
+    _pilotReportPopover.backgroundColor = kColorToolbarBackground;
+    _pilotReportController.view.backgroundColor = kColorToolbarBackground;
     _pilotReportController.turbulenceLevel = sender.tag;
     if (self.presentedViewController) {
         [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
@@ -565,21 +586,96 @@
 
 }
 
+
+- (IBAction)btnTakeoffLanding_clocked:(UIButton *)sender {
+    
+    if (_airportSearchViewController == nil) {
+        UIStoryboard *sb = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        _airportSearchViewController  = [sb instantiateViewControllerWithIdentifier:@"AirportSearch"];
+    }
+    _airportSearchPopover = [[UIPopoverController alloc] initWithContentViewController:_airportSearchViewController];
+    _airportSearchPopover.popoverContentSize =  CGSizeMake(250.0, 300.0);
+    _airportSearchPopover.backgroundColor = kColorToolbarBackground;
+    _airportSearchViewController.view.backgroundColor = kColorToolbarBackground;
+    _airportSearchViewController.delegate=self;
+    if (sender.tag ==1) { //takeoff
+        _airportSearchViewController.taragetControl = @"takeoff";
+        _airportSearchViewController.inputAirportICAO = _lblTakoff.text;
+    } else { //landing
+        _airportSearchViewController.taragetControl = @"landing";
+        _airportSearchViewController.inputAirportICAO = _lblLand.text;
+    }
+
+    
+    if (self.presentedViewController) {
+        [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
+    }
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        
+        [_airportSearchPopover presentPopoverFromRect:sender.frame inView:self.viewRightMenu permittedArrowDirections:UIPopoverArrowDirectionRight animated:YES];
+    }];
+    
+}
+
 #pragma mark - timers
 
 - (void) checkGoodLocation:(NSTimer *)incomingTimer
 {
     if ([LocationManager sharedManager].isLocationGood) {
-        _lblGpsSignal.backgroundColor = [Helpers r:102 g:205 b:0 alpha:1.0];
+        _barItemGPS.tintColor = [Helpers r:102 g:205 b:0 alpha:1.0];
 
     } else {
-        _lblGpsSignal.backgroundColor = [UIColor redColor];
+        _barItemGPS.tintColor = [UIColor redColor];
     }
+}
+
+#pragma mark - notification handling
+-(void)turbuleceUpdatedFromServer:(NSNotification*)notification
+{
+    NSLog(@"Server Updated");
+     [_map removeAllAnnotations];
+    [self addAnnotationsWithMap:_map];
 }
 #pragma mark - misc
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
     return UIStatusBarStyleLightContent;
+}
+
+#pragma mark - about view delegate
+-(void) logout {
+    NSLog (@"About logout");
+    [_aboutPopover dismissPopoverAnimated:NO];
+    _aboutPopover = nil;
+    [self performSegueWithIdentifier:@"segueUnwind" sender:self];
+}
+
+
+#pragma mark - airport search delegate
+-(void)airportSelected:(Airport *)airport toTargetControl:(NSString *)targetControl
+{
+    [self.airportSearchPopover dismissPopoverAnimated:YES];
+
+    if ([targetControl isEqualToString:@"takeoff"]) {
+        self.lblTakoff.text = airport.ICAO;
+        [RouteManager sharedManager].currentFlight.originAirport = airport;
+        
+        
+    } else {
+        self.lblLand.text = airport.ICAO;
+        [RouteManager sharedManager].currentFlight.destinationAirport = airport;
+    }
+    [_map removeAllAnnotations];
+    [self addAnnotationsWithMap:_map];
+}
+
+-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
+{
+    
+    
+    self.map.autoresizingMask =  UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight ;
+    [_map removeAllAnnotations];
+    [self addAnnotationsWithMap:_map];
 }
 
 @end

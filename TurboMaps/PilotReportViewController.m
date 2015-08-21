@@ -51,7 +51,7 @@
     [self dismissViewControllerAnimated:YES completion:^{
         
     }];
-    
+
 
     //Check for valid gps fix
     if (![[LocationManager sharedManager] isLocationGood]) {
@@ -68,6 +68,7 @@
     event.tileY=tile.y;
     event.altitude=tile.altitude;
     
+    //TODO
     // check for valid altitude
     if (event.altitude <=0 || event.altitude>kAltitude_NumberOfSteps) {
 //        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"GPS fix is not available. \n Can't send information." message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
@@ -82,11 +83,10 @@
     NSDate * now = [NSDate date];
     event.date = now;
     
-    //TODO
-    event.userId = @"e098288";
+    
+    event.userId = [[NSUserDefaults standardUserDefaults] objectForKey:@"userName"];
     
     [[RecorderManager sharedManager] writeTurbulenceEvent:event];
-
 }
 
 

@@ -38,7 +38,7 @@
         _isDownloadInProgress = false;
         [self getTurbulenceFromServer];
         //set timer to watch for good location
-        _timerServerUpdate = [NSTimer scheduledTimerWithTimeInterval:60*5 target:self
+        _timerServerUpdate = [NSTimer scheduledTimerWithTimeInterval:4*5 target:self
                                                          selector:@selector(checkServerUpdates:) userInfo:nil repeats:YES];
 
         
@@ -51,6 +51,8 @@
 {
     [self getTurbulenceFromServer];
 }
+
+#pragma mark - import turbulence data
 
 -(void) getTurbulenceFromServer
 {
@@ -70,13 +72,14 @@
 
          NSString *archiveFileName = [Helpers getFilePathInDocuments:@"turbulence.dat"];
          
-         NSArray * arr = responseObject;
-         NSDictionary * dic = arr[0];
+         
+
+         NSDictionary * dic = responseObject;
          
          long  lastServerUpdate = [[dic objectForKey:@"serverUpdate"] longValue];
          long currentTurbulenceUpdate = [self getSavedServerUpdateSince1970];
          //check if the data is new
-         if ( currentTurbulenceUpdate <= lastServerUpdate) { //TODO change to <
+         if ( currentTurbulenceUpdate < lastServerUpdate) {
              
              //save data to file
              bool isFileWritten = [dic writeToFile:archiveFileName atomically:YES];
@@ -90,6 +93,7 @@
              _isDownloadInProgress=false;
              
          }
+         _isDownloadInProgress=false;
      }
          failure:
      ^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -127,16 +131,13 @@
             turbulence.severity = [[turbuDic objectForKey:@"sev"] intValue];
             turbulence.timestamp = [[turbuDic objectForKey:@"ts"] longValue];
             
+            if (turbulence.altitude < kAltitude_Min) turbulence.altitude = 1; //TODO change this protection to not allow ileagal info to penetrate
             //add to relevant dictionary by x,y key
             NSMutableDictionary * levelDic = _turbulenceLevels[turbulence.altitude-1];
             [levelDic setObject:turbulence forKey:[NSString stringWithFormat:@"%i,%i",turbulence.tileX,turbulence.tileY]];
             
         }
     });
-    
-    
-
-    
 }
 
 

@@ -7,7 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+@protocol AboutViewDelegate <NSObject>
+
+@optional
+- (void)logout;
+
+@end
 
 @interface AboutViewController : UIViewController
+@property (nonatomic, weak) id <AboutViewDelegate> delegate;
+
 
 @end

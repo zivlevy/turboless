@@ -32,6 +32,11 @@
     [Helpers makeRound:((UIView *)_imageAppIcon) borderWidth:2 borderColor:[UIColor whiteColor]];
     
 }
+
+-(void)dealloc{
+    
+    NSLog(@"dealloc");
+}
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
@@ -42,10 +47,9 @@
     
     //check that user name is valid
     if (![self isValidEmpID:_txtUserID.text withAlert:YES]) {
-//        return;
+        return;
     }
-    
-    
+    [[NSUserDefaults standardUserDefaults] setObject:self.txtUserID.text forKey:@"userName"];
     [self performSegueWithIdentifier:@"segueLoginToMainView" sender:self];
     
 }
@@ -58,7 +62,7 @@
     {
         NSScanner *scanner = [NSScanner scannerWithString:[empID substringFromIndex:1]];
         BOOL  isNumeric = [scanner scanInteger:NULL] && [scanner isAtEnd];
-        if (empID.length==7 && [[empID substringToIndex:1] isEqualToString:@"e"] && isNumeric) {
+        if (empID.length==7 && [[empID substringToIndex:2] isEqualToString:@"e0"] && isNumeric) {
             isLegalempID=YES;
         }
     }

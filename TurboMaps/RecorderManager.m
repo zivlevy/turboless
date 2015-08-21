@@ -174,7 +174,10 @@
             NSMutableDictionary * eventDictionary = [NSMutableDictionary new];
             [eventDictionary setObject:eventData[0]  forKey:@"tileX"];
             [eventDictionary setObject:eventData[1]  forKey:@"tileY"];
-            [eventDictionary setObject:eventData[2]  forKey:@"alt"];
+            int alt = [eventData[2] intValue];
+            if (alt <kAltitude_Min) alt = kAltitude_Min;
+            NSString * strAlt = [NSString stringWithFormat:@"%i",alt]; //TODO change
+            [eventDictionary setObject:strAlt  forKey:@"alt"];
             [eventDictionary setObject:eventData[3]  forKey:@"sev"];
             [eventDictionary setObject:eventData[4]  forKey:@"pEv"];
             [eventDictionary setObject:eventData[5]  forKey:@"fNum"];
@@ -189,7 +192,11 @@
     //send
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     manager.requestSerializer = [AFJSONRequestSerializer serializer];
-    
+    NSMutableSet  * theset = [[NSMutableSet alloc]initWithSet:manager.responseSerializer.acceptableContentTypes];
+
+    [theset addObject:@"text/plain"];
+    manager.responseSerializer.acceptableContentTypes = [theset copy];
+   manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     NSString * strURL = [NSString stringWithFormat:@"%@/reports",kBaseURL];
     [manager POST:strURL parameters:JSON
           success:^(AFHTTPRequestOperation *operation, id responseObject)

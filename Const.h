@@ -9,8 +9,8 @@
 #ifndef TurboMaps_Const_h
 #define TurboMaps_Const_h
 
-#define kBaseURL @"http://84.94.182.244:3000"
-
+#define kBaseURL @"http://130.211.149.18:3000"
+//#define kBaseURL @"http://84.94.182.244:3000"
 #define FEET_PER_METER 3.28084
 
 #define kColorLight [Helpers r:2 g:115 b:1 alpha:1.0]
@@ -23,7 +23,9 @@
 #define kAltitude_NumberOfSteps 15
 #define kAltitude_Step 2
 
-
+//UIColors
+#define kColorViewBackground [Helpers r:39 g:40 b:44 alpha:1.0]
+#define kColorToolbarBackground [Helpers r:39 g:44 b:54 alpha:1.0]
 //notifications
 #define kNotification_turbulenceServerNewFile @"turbulenceServerNewFile"
 #endif

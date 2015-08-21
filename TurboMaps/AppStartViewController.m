@@ -32,8 +32,9 @@
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    NSString * userName=[[NSUserDefaults standardUserDefaults] objectForKey:@"userName"];
     
-    if (false) {
+    if (!userName) {
         [self performSegueWithIdentifier:@"segueLogin" sender:self];
     } else {
         [self performSegueWithIdentifier:@"segueMainView" sender:self];
@@ -50,5 +51,6 @@
     // Dispose of any resources that can be recreated.
 }
 -(IBAction)prepareForUnwind:(UIStoryboardSegue *)segue {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"userName"];
 }
 @end

@@ -28,10 +28,17 @@
 
 - (id)init {
     if (self = [super init]) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
             [self readAirportsFile];
-        });
-        
+            //init current flight from storage
+            _currentFlight = [Flight new];
+            NSString * originICAO = [[NSUserDefaults standardUserDefaults] objectForKey:@"originAirport"];
+            _currentFlight.originAirport = [self getAirportByICAO:originICAO];
+            
+            NSString * destinationICAO = [[NSUserDefaults standardUserDefaults] objectForKey:@"destinationAirport"];
+            _currentFlight.destinationAirport =[self getAirportByICAO:destinationICAO];
+            
+            _currentFlight.flightNumber = [[NSUserDefaults standardUserDefaults] objectForKey:@"flightNumber"];
+
     }
     return self;
 }
@@ -68,17 +75,36 @@
             [allAirports setObject:airport forKey:airport.ICAO];
         }
         self.airports = allAirports;
+        
+
     }
 }
 
 -(NSArray*) getAirportsBySymbols:(NSString *) str
 {
-
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ICAO CONTAINS %@ or symbol CONTAINS %@", str,str];
+    if ([str isEqualToString:@""])
+    {
+        NSSortDescriptor *ageDescriptor = [[NSSortDescriptor alloc] initWithKey:@"ICAO" ascending:YES];
+        NSArray *sortDescriptors = @[ageDescriptor];
+        NSArray *sorted = [[_airports allValues] sortedArrayUsingDescriptors:sortDescriptors];
+        return sorted;
+    }
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"ICAO CONTAINS[cd] %@ or symbol CONTAINS[cd] %@ or city CONTAINS[cd] %@", str,str,str];
     NSArray *filtered = [[_airports allValues] filteredArrayUsingPredicate:predicate];
-    return filtered;
+    
+    NSSortDescriptor *ageDescriptor = [[NSSortDescriptor alloc] initWithKey:@"ICAO" ascending:YES];
+    NSArray *sortDescriptors = @[ageDescriptor];
+    NSArray *sorted = [filtered sortedArrayUsingDescriptors:sortDescriptors];
+    return sorted;
 }
 
+-(NSArray *) getAirports{
+    NSArray * arr =[_airports allValues];
+    
+
+    
+    return arr;
+}
 -(Airport *) getAirportByICAO:(NSString *) ICAO
 {
     Airport * airport = nil;

@@ -26,9 +26,9 @@
     [Helpers makeRound:((UIView *)_imageAppIcon) borderWidth:2 borderColor:[UIColor whiteColor]];
     [Helpers makeRound:((UIView *)_btnLogout) borderWidth:1 borderColor:[UIColor whiteColor]];
 
-
-    
 }
+
+
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
@@ -39,6 +39,14 @@
     } else {
        self.btnLogout.hidden=NO;
     }
+}
+-(void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    
+}
+- (IBAction)btnLogout_Clicked:(id)sender {
+    [self.delegate logout];
+
 }
 
 
