@@ -28,17 +28,26 @@
 
 - (id)init {
     if (self = [super init]) {
-            [self readAirportsFile];
-            //init current flight from storage
-            _currentFlight = [Flight new];
-            NSString * originICAO = [[NSUserDefaults standardUserDefaults] objectForKey:@"originAirport"];
-            _currentFlight.originAirport = [self getAirportByICAO:originICAO];
-            
-            NSString * destinationICAO = [[NSUserDefaults standardUserDefaults] objectForKey:@"destinationAirport"];
-            _currentFlight.destinationAirport =[self getAirportByICAO:destinationICAO];
-            
-            _currentFlight.flightNumber = [[NSUserDefaults standardUserDefaults] objectForKey:@"flightNumber"];
-
+        [self readAirportsFile];
+        
+        //init current flight from storage
+        _currentFlight = [Flight new];
+        NSString * originICAO = [[NSUserDefaults standardUserDefaults] objectForKey:@"originAirport"];
+        if (!originICAO) {
+            originICAO = @"LLBG";
+            [[NSUserDefaults standardUserDefaults] setObject:originICAO forKey:@"originAirport"];
+        }
+        _currentFlight.originAirport = [self getAirportByICAO:originICAO];
+        
+        NSString * destinationICAO = [[NSUserDefaults standardUserDefaults] objectForKey:@"destinationAirport"];
+        if (!destinationICAO) {
+            destinationICAO = @"KJFK";
+            [[NSUserDefaults standardUserDefaults] setObject:destinationICAO forKey:@"destinationAirport"];
+        }
+        _currentFlight.destinationAirport =[self getAirportByICAO:destinationICAO];
+        
+        _currentFlight.flightNumber = [[NSUserDefaults standardUserDefaults] objectForKey:@"flightNumber"];
+        
     }
     return self;
 }

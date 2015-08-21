@@ -88,7 +88,6 @@
                  NSLog(@"coudn't save Turbulence file");
              } else {
                  [self buildTurbulenceFromFile ];
-                 [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_turbulenceServerNewFile object:nil];
              }
              _isDownloadInProgress=false;
              
@@ -137,6 +136,12 @@
             [levelDic setObject:turbulence forKey:[NSString stringWithFormat:@"%i,%i",turbulence.tileX,turbulence.tileY]];
             
         }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_turbulenceServerNewFile object:nil];
+        });
+        
+        
+
     });
 }
 
