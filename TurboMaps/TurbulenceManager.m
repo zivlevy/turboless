@@ -40,6 +40,7 @@
         //set timer to watch for good location
         _timerServerUpdate = [NSTimer scheduledTimerWithTimeInterval:4*5 target:self
                                                          selector:@selector(checkServerUpdates:) userInfo:nil repeats:YES];
+        
 
         
     }
@@ -77,7 +78,7 @@
          NSDictionary * dic = responseObject;
          
          long  lastServerUpdate = [[dic objectForKey:@"serverUpdate"] longValue];
-         long currentTurbulenceUpdate = [self getSavedServerUpdateSince1970];
+         long currentTurbulenceUpdate = (long)[self getSavedServerUpdateSince1970];
          //check if the data is new
          if ( currentTurbulenceUpdate < lastServerUpdate) {
              
@@ -172,4 +173,6 @@
     }
     
 }
+
+
 @end

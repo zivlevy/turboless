@@ -8,20 +8,21 @@
 
 #import <Foundation/Foundation.h>
 #import "LocationManager.h"
-typedef struct {
-    int tileX;
-    int tileY;
-    int altitude;
-    int severity;
-    bool isPilotEvent;
-    __unsafe_unretained NSString * flightNumber;
-    __unsafe_unretained NSDate * date;
-    __unsafe_unretained NSString * userId;
-    
-} ZLTurbulenceEvent;
+#import "TurbulenceEvent.h"
+//typedef struct {
+//    int tileX;
+//    int tileY;
+//    int altitude;
+//    int severity;
+//    bool isPilotEvent;
+//    __unsafe_unretained NSString * flightNumber;
+//    __unsafe_unretained NSDate * date;
+//    __unsafe_unretained NSString * userId;
+//    
+//} ZLTurbulenceEvent;
 
 @interface RecorderManager : NSObject
 + (RecorderManager *)sharedManager;
--(void)writeTurbulenceEvent:(ZLTurbulenceEvent) event;
+-(void)writeTurbulenceEvent:(TurbulenceEvent *) event;
 -(bool)isReachable;
 @end

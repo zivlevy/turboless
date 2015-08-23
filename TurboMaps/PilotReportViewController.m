@@ -60,7 +60,7 @@
         return;
     }
 
-    ZLTurbulenceEvent event;
+    TurbulenceEvent * event = [TurbulenceEvent new];
     
     // find current location
     ZLTile tile = [[LocationManager sharedManager] getCurrentTile];

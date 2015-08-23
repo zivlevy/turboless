@@ -17,7 +17,9 @@ typedef struct {
 @interface LocationManager : NSObject
 
 @property bool isLocationGood;
+
 + (LocationManager *)sharedManager;
 -(ZLTile)getCurrentTile;
 -(CLLocation *) getCurrentLocation;
+-(ZLTile) getTileForLocation:(CLLocation *)location;
 @end

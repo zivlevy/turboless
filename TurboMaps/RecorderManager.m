@@ -11,7 +11,7 @@
 #import "AFNetworking.h"
 
 @interface RecorderManager ()
-@property bool isReachable;
+@property bool isReachableState;
 @property bool isFileTransferInProgress;
 @property (nonatomic,strong)NSTimer * timerTrySendData;
 @end
@@ -37,25 +37,25 @@
             switch (status) {
                 case AFNetworkReachabilityStatusNotReachable:
                     NSLog(@"No Internet Connection");
-                    _isReachable = NO;
+                    _isReachableState = NO;
                     break;
                 case AFNetworkReachabilityStatusReachableViaWiFi:
                     NSLog(@"WIFI");
                     
-                    _isReachable = YES;
+                    _isReachableState = YES;
                     break;
                 case AFNetworkReachabilityStatusReachableViaWWAN:
                     NSLog(@"3G");
-                    _isReachable = YES;
+                    _isReachableState = YES;
                     break;
                 default:
                     NSLog(@"Unkown network status");
-                    _isReachable = NO;
+                    _isReachableState = NO;
                     break;
                     
                     
             }
-            if (_isReachable) {
+            if (_isReachableState) {
                 [self tryTransferFile];
             }
         }];
@@ -69,7 +69,7 @@
 
 #pragma mark - event handeling
 
--(void)writeTurbulenceEvent:(ZLTurbulenceEvent) event
+-(void)writeTurbulenceEvent:(TurbulenceEvent *) event
 {
     //check that data is valid
     bool isSeverityValid = (event.severity >0 && event.severity <=5);
@@ -121,7 +121,7 @@
 -(void)tryTransferFile
 {
     //if not reachable
-    if (!_isReachable) {
+    if (!_isReachableState) {
         return;
     }
     
@@ -175,7 +175,7 @@
             [eventDictionary setObject:eventData[0]  forKey:@"tileX"];
             [eventDictionary setObject:eventData[1]  forKey:@"tileY"];
             int alt = [eventData[2] intValue];
-            if (alt <kAltitude_Min) alt = kAltitude_Min;
+            if (alt <kAltitude_Min) alt = kAltitude_Min; //TODO remove relese
             NSString * strAlt = [NSString stringWithFormat:@"%i",alt]; //TODO change
             [eventDictionary setObject:strAlt  forKey:@"alt"];
             [eventDictionary setObject:eventData[3]  forKey:@"sev"];
@@ -266,7 +266,7 @@
 
 #pragma mark - public helpers
 -(bool)isReachable{
-    return _isReachable;
+    return _isReachableState;
 }
 
 

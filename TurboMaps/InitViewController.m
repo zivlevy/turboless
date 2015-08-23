@@ -22,6 +22,7 @@
 #import "RecorderManager.h"
 #import "RouteManager.h"
 #import "TurbulenceManager.h"
+#import "AccelerometerManager.h"
 
 
 
@@ -48,6 +49,8 @@
 
 //left menu bar
 @property (weak, nonatomic) IBOutlet UIView *viewLeftMenu;
+@property (weak, nonatomic) IBOutlet UIView *viewTurbulence;
+@property (weak, nonatomic) IBOutlet UIImageView *imageShake;
 
 // ** btn report
 @property (weak, nonatomic) IBOutlet UIButton *btnReport_light;
@@ -99,6 +102,7 @@
 
 //timers
 @property (nonatomic,strong) NSTimer * timerGpsSignal;
+@property (nonatomic,strong) NSTimer * timerHideTurbulenceMarker;
 @end
 
 @implementation InitViewController
@@ -121,11 +125,21 @@
     //init route manager
     [RouteManager sharedManager];
     
-    //init turbulence manager manager
+    //init turbulence manager
     [TurbulenceManager sharedManager];
 
+    //init accelerometer  manager
+    [AccelerometerManager sharedManager];
+    
+    
     //notifications observers
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(turbuleceUpdatedFromServer:) name:kNotification_turbulenceServerNewFile object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newTurbulenceEvent:) name:kNotification_TurbulenceEvent object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceInMotion:) name:kNotification_DeviceInMotion object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceStatic:) name:kNotification_DeviceInStatic object:nil];
     
     [[RMConfiguration sharedInstance] setAccessToken:@"pk.eyJ1Ijoieml2bGV2eSIsImEiOiJwaEpQeUNRIn0.OZupy_Vjyl5eRCRlgV6otg"];
     
@@ -166,8 +180,9 @@
     _lblTakoff.text = [RouteManager sharedManager].currentFlight.originAirport.ICAO;
     _lblLand.text = [RouteManager sharedManager].currentFlight.destinationAirport.ICAO;
     
-
-
+    //turbulence view init
+    [Helpers makeRound:_viewTurbulence borderWidth:1 borderColor:[UIColor whiteColor]];
+    _viewTurbulence.hidden = true;
 
     
 }
@@ -492,7 +507,7 @@
     }
     
     //update last server update
-    long lastTurbulenceUpdateDate = [[TurbulenceManager sharedManager]getSavedServerUpdateSince1970];
+    long lastTurbulenceUpdateDate = (long)[[TurbulenceManager sharedManager]getSavedServerUpdateSince1970];
     if (lastTurbulenceUpdateDate == 0) {
         _lblLastUpdate.text =@"No data is available";
     } else {
@@ -630,13 +645,21 @@
 - (void) checkGoodLocation:(NSTimer *)incomingTimer
 {
     if ([LocationManager sharedManager].isLocationGood) {
-        _barItemGPS.tintColor = [UIColor whiteColor]; //[Helpers r:102 g:205 b:0 alpha:1.0];
+
+        
+        //update display
+        _barItemGPS.tintColor = [UIColor whiteColor];
         CLLocation * currentLocation = [[LocationManager sharedManager] getCurrentLocation];
         int currentAltitude = currentLocation.altitude * FEET_PER_METER;
         int currentVerticalAccuracy = currentLocation.verticalAccuracy * FEET_PER_METER;
         _BarItemTitle.title = [NSString stringWithFormat:@"Alt: %i Feet / Accuracy: %i Feet",currentAltitude,currentVerticalAccuracy];
 
+        
+
+        
     } else {
+
+        //update display
         _barItemGPS.tintColor = [UIColor redColor];
         _BarItemTitle.title =@"Turbuless";
     }
@@ -649,7 +672,60 @@
      [_map removeAllAnnotations];
     [self addAnnotationsWithMap:_map];
 }
+
+-(void)newTurbulenceEvent:(NSNotification*)notification
+{
+    
+    NSLog(@"New Turbulence event");
+    Turbulence * turbulence = notification.object;
+    _viewTurbulence.backgroundColor = [self getColorForSeverity:turbulence.severity];
+    _viewTurbulence.hidden = false;
+
+    _timerHideTurbulenceMarker = [NSTimer scheduledTimerWithTimeInterval:4 target:self selector:@selector(hideTurbulenceMarker:) userInfo:nil repeats:NO];
+}
+
+-(void)deviceInMotion:(NSNotification *) notification
+{
+    _imageShake.hidden=false;
+}
+
+-(void)deviceStatic:(NSNotification *) notification
+{
+    _imageShake.hidden=true;
+}
+
+
+-(void)hideTurbulenceMarker:(NSTimer*)timer
+{
+    _viewTurbulence.hidden=true;
+}
+
 #pragma mark - misc
+-(UIColor *)getColorForSeverity:(int) severity
+{
+    
+    switch (severity) {
+        case 1:
+            return kColorLight;
+            break;
+        case 2:
+            return kColorLightModerate;
+            break;
+        case 3:
+            return kColorModerate;
+            break;
+        case 4:
+            return kColorSevere;
+            break;
+        case 5:
+            return kColorExtream;
+            break;
+        default:
+            return nil;
+            break;
+    }
+}
+
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
     return UIStatusBarStyleLightContent;

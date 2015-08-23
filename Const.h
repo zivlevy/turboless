@@ -9,7 +9,10 @@
 #ifndef TurboMaps_Const_h
 #define TurboMaps_Const_h
 
-#define kBaseURL @"http://130.211.149.18:3000"
+
+#define DEBUG_MODE 0
+
+#define kBaseURL @"http://104.197.5.131:3000"
 //#define kBaseURL @"http://84.94.182.244:3000"
 #define FEET_PER_METER 3.28084
 
@@ -28,4 +31,11 @@
 #define kColorToolbarBackground [Helpers r:39 g:44 b:54 alpha:1.0]
 //notifications
 #define kNotification_turbulenceServerNewFile @"turbulenceServerNewFile"
+#define kNotification_IOSAccelerometerDataRecieved @"IOSAccelerometerDataRecieved"
+#define kNotification_LocationStatusChanged @"LocationStatusChanged"
+
+#define kNotification_TurbulenceEvent @"TurbulenceEvent"
+#define kNotification_DeviceInMotion @"DeviceInMotion"
+#define kNotification_DeviceInStatic @"DeviceInStatic"
+
 #endif
