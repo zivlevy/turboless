@@ -26,7 +26,7 @@
 -(void) viewDidLoad
 {
     [super viewDidLoad];
-
+    
     NSSortDescriptor *ageDescriptor = [[NSSortDescriptor alloc] initWithKey:@"ICAO" ascending:YES];
     NSArray *sortDescriptors = @[ageDescriptor];
     _airports = [[[RouteManager sharedManager] getAirports] sortedArrayUsingDescriptors:sortDescriptors];
@@ -41,28 +41,28 @@
     self.searchController.searchBar.delegate  = self;
     self.searchController.searchResultsUpdater = self;
     self.searchController.dimsBackgroundDuringPresentation = NO;
-
+    
     self.tableVIew.tableHeaderView = self.searchController.searchBar;
-        self.definesPresentationContext = YES;
+    self.definesPresentationContext = YES;
     [self.searchController.searchBar sizeToFit];
-
+    
 }
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-
-
+    
+    
     self.searchController.searchBar.tintColor = kColorToolbarBackground;
     
     [self.tableVIew reloadData];
-
+    
 }
 
 -(void) viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 30000 ), dispatch_get_main_queue(), ^{
-[self.searchController.searchBar becomeFirstResponder];
+        [self.searchController.searchBar becomeFirstResponder];
         
     });
     
@@ -87,27 +87,27 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-
-
-
-        Airport * selectedAirport;
-        if (self.searchController.active)
-        {
-            selectedAirport = self.searchResults [indexPath.row];
-            
-        }
-        else {
-            selectedAirport = _airports [indexPath.row];
-            
-        }
-        [self.delegate airportSelected: selectedAirport toTargetControl:_taragetControl ];
-        NSLog(@"%@",selectedAirport.ICAO);
-
+    
+    
+    
+    Airport * selectedAirport;
+    if (self.searchController.active)
+    {
+        selectedAirport = self.searchResults [indexPath.row];
+        
+    }
+    else {
+        selectedAirport = _airports [indexPath.row];
+        
+    }
+    [self.delegate airportSelected: selectedAirport toTargetControl:_taragetControl ];
+    NSLog(@"%@",selectedAirport.ICAO);
+    
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-
+    
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
     Airport * airport ;
     if (self.searchController.active)
@@ -121,7 +121,7 @@
     cell.textLabel.text = [NSString stringWithFormat:@"%@ / %@",airport.ICAO ,airport.symbol];
     cell.detailTextLabel.text = [NSString stringWithFormat:@"%@, %@",airport.name ,airport.city];
     
- 
+    
     return cell;
     
 }

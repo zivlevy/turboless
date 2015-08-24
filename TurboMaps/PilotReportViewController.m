@@ -78,8 +78,8 @@
     event.severity=(int)_turbulenceLevel;
     event.isPilotEvent = YES;
     
-    //TODO
-    event.flightNumber = @"0";
+
+    event.flightNumber = [[NSUserDefaults standardUserDefaults] objectForKey:@"flightNumber"];
     NSDate * now = [NSDate date];
     event.date = now;
     

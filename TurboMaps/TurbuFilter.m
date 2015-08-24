@@ -110,7 +110,8 @@
     if ([self isTurbulenceFilter:pwr]) {
         _inTurbulenceSuspect = true;
         _turbulenceSuspectCount=1;
-        _currentTurbulencePeak = pwr;
+        double absPwr = pwr < 0 ? -pwr : pwr;
+        _currentTurbulencePeak = absPwr;
     }
 }
 
@@ -176,8 +177,8 @@
                     event.severity=[self turbulenceLevel:_currentTurbulencePeak];
                     event.isPilotEvent = NO;
                     
-                    //TODO
-                    event.flightNumber = @"0";
+                    event.flightNumber = [[NSUserDefaults standardUserDefaults] objectForKey:@"flightNumber"];
+
                     NSDate * now = [NSDate date];
                     event.date = now;
                     

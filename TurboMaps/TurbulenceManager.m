@@ -134,6 +134,9 @@
             if (turbulence.altitude < kAltitude_Min) turbulence.altitude = 1; //TODO change this protection to not allow ileagal info to penetrate
             //add to relevant dictionary by x,y key
             NSMutableDictionary * levelDic = _turbulenceLevels[turbulence.altitude-1];
+            if ([[NSDate date]timeIntervalSince1970] - turbulence.timestamp < 12*3600) {
+                NSLog (@"%@",turbulence);
+            }
             [levelDic setObject:turbulence forKey:[NSString stringWithFormat:@"%i,%i",turbulence.tileX,turbulence.tileY]];
             
         }

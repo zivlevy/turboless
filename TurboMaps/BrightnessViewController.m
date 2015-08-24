@@ -10,6 +10,7 @@
 
 @interface BrightnessViewController ()
 @property (weak, nonatomic) IBOutlet UISlider *slider;
+@property (weak, nonatomic) IBOutlet UISwitch *swcKeepDisplayOn;
 
 @end
 
@@ -25,11 +26,13 @@
     [_slider setThumbImage:sliderThumb forState:UIControlStateNormal];
     [_slider setThumbImage:sliderThumb forState:UIControlStateHighlighted];
     
+    [self.swcKeepDisplayOn setOn:[[NSUserDefaults standardUserDefaults] boolForKey :@"keepDisplayOn"]];
     [super viewDidLoad];
 }
 
 -(void) viewWillAppear:(BOOL)animated
 {
+    [super viewWillAppear:animated];
        _slider.value = [[UIScreen mainScreen] brightness]; 
 }
 
@@ -38,4 +41,12 @@
         [[UIScreen mainScreen] setBrightness:sender.value];
 }
 
+- (IBAction)swcKeepDisplayOn_Changed:(UISwitch *)sender{
+    if ([sender isOn]) {
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
+    } else {
+        [UIApplication sharedApplication].idleTimerDisabled = NO;
+    }
+    [[NSUserDefaults standardUserDefaults] setBool:[sender isOn] forKey:@"keepDisplayOn"];
+}
 @end

@@ -38,4 +38,5 @@
 #define kNotification_DeviceInMotion @"DeviceInMotion"
 #define kNotification_DeviceInStatic @"DeviceInStatic"
 
+#define kNotification_FlightNumberChanged @"FlightNumberChanged"
 #endif

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		46927B891A7F976AAF1A51EC /* Pods_TurboMaps.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68E3FBE5E399854A55953C74 /* Pods_TurboMaps.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A545ADCA1B8634B7005928AC /* Flight.m in Sources */ = {isa = PBXBuildFile; fileRef = A545ADC91B8634B7005928AC /* Flight.m */; };
-		A545ADCD1B86358D005928AC /* FlightViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A545ADCC1B86358D005928AC /* FlightViewController.m */; };
 		A545ADDC1B866669005928AC /* to.png in Resources */ = {isa = PBXBuildFile; fileRef = A545ADDA1B866669005928AC /* to.png */; };
 		A545ADDD1B866669005928AC /* to@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A545ADDB1B866669005928AC /* to@2x.png */; };
 		A545ADE01B866E26005928AC /* land.png in Resources */ = {isa = PBXBuildFile; fileRef = A545ADDE1B866E26005928AC /* land.png */; };
@@ -27,6 +26,8 @@
 		A59791E51B77ECE200AACC6F /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = A59791E31B77ECE200AACC6F /* LaunchScreen.xib */; };
 		A59791F11B77ECE200AACC6F /* TurboMapsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A59791F01B77ECE200AACC6F /* TurboMapsTests.m */; };
 		A5AE64AD1B77F05700677EA7 /* InitViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5AE64AC1B77F05700677EA7 /* InitViewController.m */; };
+		A5B3A78E1B8A48FF00E447EE /* FlightNumberViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3A78D1B8A48FF00E447EE /* FlightNumberViewController.m */; };
+		A5B3A7931B8AE31F00E447EE /* AKPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3A7921B8AE31F00E447EE /* AKPickerView.m */; };
 		A5B3EAE41B8100D0003D5AE2 /* RMTile.c in Sources */ = {isa = PBXBuildFile; fileRef = A5B3EAB21B8100D0003D5AE2 /* RMTile.c */; };
 		A5B3EAE51B8100D0003D5AE2 /* RMPixel.c in Sources */ = {isa = PBXBuildFile; fileRef = A5B3EABC1B8100D0003D5AE2 /* RMPixel.c */; };
 		A5B3EAE61B8100D0003D5AE2 /* RMFoundation.c in Sources */ = {isa = PBXBuildFile; fileRef = A5B3EAD51B8100D0003D5AE2 /* RMFoundation.c */; };
@@ -47,7 +48,6 @@
 		A5B992141B88B41100DEFC07 /* TurbuFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B992131B88B41100DEFC07 /* TurbuFilter.m */; };
 		A5B992181B88B76500DEFC07 /* AccelerometerEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B992171B88B76500DEFC07 /* AccelerometerEvent.m */; };
 		A5B9921E1B88C9A900DEFC07 /* testViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B9921D1B88C9A900DEFC07 /* testViewController.m */; };
-		A5B992211B88CCAE00DEFC07 /* DDFileReader.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B992201B88CCAE00DEFC07 /* DDFileReader.m */; };
 		A5B9922B1B892FB500DEFC07 /* shake.png in Resources */ = {isa = PBXBuildFile; fileRef = A5B9922A1B892FB500DEFC07 /* shake.png */; };
 		A5B9922E1B8936A900DEFC07 /* TurbulenceEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B9922D1B8936A900DEFC07 /* TurbulenceEvent.m */; };
 		A5E5AF6F1B830BC700E413A9 /* airports.txt in Resources */ = {isa = PBXBuildFile; fileRef = A5E5AF6E1B830BC700E413A9 /* airports.txt */; };
@@ -75,8 +75,6 @@
 		68E3FBE5E399854A55953C74 /* Pods_TurboMaps.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TurboMaps.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A545ADC81B8634B7005928AC /* Flight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Flight.h; sourceTree = "<group>"; };
 		A545ADC91B8634B7005928AC /* Flight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Flight.m; sourceTree = "<group>"; };
-		A545ADCB1B86358D005928AC /* FlightViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlightViewController.h; sourceTree = "<group>"; };
-		A545ADCC1B86358D005928AC /* FlightViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlightViewController.m; sourceTree = "<group>"; };
 		A545ADDA1B866669005928AC /* to.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = to.png; sourceTree = "<group>"; };
 		A545ADDB1B866669005928AC /* to@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "to@2x.png"; sourceTree = "<group>"; };
 		A545ADDE1B866E26005928AC /* land.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = land.png; sourceTree = "<group>"; };
@@ -100,6 +98,10 @@
 		A59791F01B77ECE200AACC6F /* TurboMapsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TurboMapsTests.m; sourceTree = "<group>"; };
 		A5AE64AB1B77F05700677EA7 /* InitViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InitViewController.h; sourceTree = "<group>"; };
 		A5AE64AC1B77F05700677EA7 /* InitViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InitViewController.m; sourceTree = "<group>"; };
+		A5B3A78C1B8A48FF00E447EE /* FlightNumberViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlightNumberViewController.h; sourceTree = "<group>"; };
+		A5B3A78D1B8A48FF00E447EE /* FlightNumberViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FlightNumberViewController.m; sourceTree = "<group>"; };
+		A5B3A7911B8AE31F00E447EE /* AKPickerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKPickerView.h; sourceTree = "<group>"; };
+		A5B3A7921B8AE31F00E447EE /* AKPickerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKPickerView.m; sourceTree = "<group>"; };
 		A5B3EAA91B8100D0003D5AE2 /* RMUserTrackingBarButtonItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMUserTrackingBarButtonItem.h; sourceTree = "<group>"; };
 		A5B3EAAA1B8100D0003D5AE2 /* RMUserLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMUserLocation.h; sourceTree = "<group>"; };
 		A5B3EAAB1B8100D0003D5AE2 /* RMTileSourcesContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RMTileSourcesContainer.h; sourceTree = "<group>"; };
@@ -188,8 +190,6 @@
 		A5B992171B88B76500DEFC07 /* AccelerometerEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AccelerometerEvent.m; sourceTree = "<group>"; };
 		A5B9921C1B88C9A900DEFC07 /* testViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testViewController.h; sourceTree = "<group>"; };
 		A5B9921D1B88C9A900DEFC07 /* testViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = testViewController.m; sourceTree = "<group>"; };
-		A5B9921F1B88CCAE00DEFC07 /* DDFileReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DDFileReader.h; sourceTree = "<group>"; };
-		A5B992201B88CCAE00DEFC07 /* DDFileReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DDFileReader.m; sourceTree = "<group>"; };
 		A5B9922A1B892FB500DEFC07 /* shake.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shake.png; sourceTree = "<group>"; };
 		A5B9922C1B8936A900DEFC07 /* TurbulenceEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TurbulenceEvent.h; sourceTree = "<group>"; };
 		A5B9922D1B8936A900DEFC07 /* TurbulenceEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TurbulenceEvent.m; sourceTree = "<group>"; };
@@ -268,8 +268,8 @@
 				A5B3EB1B1B8295AD003D5AE2 /* AppStartViewController.m */,
 				A5E5AF801B8442CF00E413A9 /* AirportSearchViewController.h */,
 				A5E5AF811B8442CF00E413A9 /* AirportSearchViewController.m */,
-				A545ADCB1B86358D005928AC /* FlightViewController.h */,
-				A545ADCC1B86358D005928AC /* FlightViewController.m */,
+				A5B3A78C1B8A48FF00E447EE /* FlightNumberViewController.h */,
+				A5B3A78D1B8A48FF00E447EE /* FlightNumberViewController.m */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -300,7 +300,8 @@
 		A59791D31B77ECE200AACC6F /* TurbuMaps */ = {
 			isa = PBXGroup;
 			children = (
-				A5B992191B88C97400DEFC07 /* New Group */,
+				A5B3A78F1B8AE2FB00E447EE /* External frameworks */,
+				A5B992191B88C97400DEFC07 /* Debug items */,
 				A5B992151B88B41800DEFC07 /* TurboFilter */,
 				A5E5AF731B832E3600E413A9 /* base classes */,
 				A5B3EB0A1B82075D003D5AE2 /* Managers */,
@@ -342,6 +343,23 @@
 				A59791EF1B77ECE200AACC6F /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		A5B3A78F1B8AE2FB00E447EE /* External frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A5B3A7901B8AE31F00E447EE /* AKPickerView */,
+			);
+			name = "External frameworks";
+			sourceTree = "<group>";
+		};
+		A5B3A7901B8AE31F00E447EE /* AKPickerView */ = {
+			isa = PBXGroup;
+			children = (
+				A5B3A7911B8AE31F00E447EE /* AKPickerView.h */,
+				A5B3A7921B8AE31F00E447EE /* AKPickerView.m */,
+			);
+			path = AKPickerView;
 			sourceTree = "<group>";
 		};
 		A5B3EA721B810027003D5AE2 /* MapBOx Headers */ = {
@@ -475,15 +493,13 @@
 			name = TurboFilter;
 			sourceTree = "<group>";
 		};
-		A5B992191B88C97400DEFC07 /* New Group */ = {
+		A5B992191B88C97400DEFC07 /* Debug items */ = {
 			isa = PBXGroup;
 			children = (
-				A5B9921F1B88CCAE00DEFC07 /* DDFileReader.h */,
-				A5B992201B88CCAE00DEFC07 /* DDFileReader.m */,
 				A5B9921C1B88C9A900DEFC07 /* testViewController.h */,
 				A5B9921D1B88C9A900DEFC07 /* testViewController.m */,
 			);
-			name = "New Group";
+			name = "Debug items";
 			sourceTree = "<group>";
 		};
 		A5E5AF6D1B830B7900E413A9 /* Data Files */ = {
@@ -715,19 +731,19 @@
 				A5E5AF761B832E4A00E413A9 /* Airport.m in Sources */,
 				A5E5AF7F1B83B26E00E413A9 /* Turbulence.m in Sources */,
 				A5E5AF821B8442CF00E413A9 /* AirportSearchViewController.m in Sources */,
-				A5B992211B88CCAE00DEFC07 /* DDFileReader.m in Sources */,
 				A5E5AF721B8321A900E413A9 /* RouteManager.m in Sources */,
+				A5B3A78E1B8A48FF00E447EE /* FlightNumberViewController.m in Sources */,
 				A59791DA1B77ECE200AACC6F /* AppDelegate.m in Sources */,
 				A5B3EB191B82920B003D5AE2 /* LoginViewController.m in Sources */,
 				A5B9921E1B88C9A900DEFC07 /* testViewController.m in Sources */,
 				A5E7A0A91B7A418B00FD969C /* Helpers.m in Sources */,
 				A545ADCA1B8634B7005928AC /* Flight.m in Sources */,
+				A5B3A7931B8AE31F00E447EE /* AKPickerView.m in Sources */,
 				A5B992141B88B41100DEFC07 /* TurbuFilter.m in Sources */,
 				A59791D71B77ECE200AACC6F /* main.m in Sources */,
 				A5B3EB011B81C9ED003D5AE2 /* PilotReportViewController.m in Sources */,
 				A5B3EB1C1B8295AD003D5AE2 /* AppStartViewController.m in Sources */,
 				A5B3EAE41B8100D0003D5AE2 /* RMTile.c in Sources */,
-				A545ADCD1B86358D005928AC /* FlightViewController.m in Sources */,
 				A5B3EAE61B8100D0003D5AE2 /* RMFoundation.c in Sources */,
 				A5B3EB161B8235D8003D5AE2 /* RecorderManager.m in Sources */,
 				A5B3EB051B81DAD0003D5AE2 /* AboutViewController.m in Sources */,

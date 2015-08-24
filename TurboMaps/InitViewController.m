@@ -16,6 +16,7 @@
 #import "PilotReportViewController.h"
 #import "AboutViewController.h"
 #import "AirportSearchViewController.h"
+#import "FlightNumberViewController.h"
 #import "Turbulence.h"
 //managers
 #import "LocationManager.h"
@@ -24,9 +25,11 @@
 #import "TurbulenceManager.h"
 #import "AccelerometerManager.h"
 
+#import "AKPickerView.h"
 
 
-@interface InitViewController ()<AboutViewDelegate,RMTileCacheBackgroundDelegate,RMMapViewDelegate,UIPickerViewDataSource,UIPickerViewDelegate,AirportSearchDelegate>
+
+@interface InitViewController ()<AboutViewDelegate,RMTileCacheBackgroundDelegate,RMMapViewDelegate,UIPickerViewDataSource,UIPickerViewDelegate,AirportSearchDelegate,AKPickerViewDataSource,AKPickerViewDelegate>
 @property (nonatomic,strong) RMMapView * map;
 
 
@@ -38,7 +41,9 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnLand;
 @property (weak, nonatomic) IBOutlet UILabel *lblTakoff;
 @property (weak, nonatomic) IBOutlet UILabel *lblLand;
+@property (weak, nonatomic) IBOutlet UIButton *btnFlightNumber;
 
+@property (nonatomic,strong) AKPickerView * pickerHistory;
 @property (weak, nonatomic) IBOutlet UIPickerView *pickerAltitude;
 
 //top bar
@@ -59,6 +64,8 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnReport_severe;
 @property (weak, nonatomic) IBOutlet UIButton *btnReport_Extreme;
 
+//bottom bar
+@property (weak, nonatomic) IBOutlet UIView *viewBottomBar;
 
 //mapHolder view
 @property (weak, nonatomic) IBOutlet UIView *viewMapHolder;
@@ -97,6 +104,9 @@
 @property (nonatomic,strong) AboutViewController * aboutViewController;
 @property (nonatomic,strong) UIPopoverController * aboutPopover;
 
+@property (nonatomic,strong) FlightNumberViewController * flightNumberViewController;
+@property (nonatomic,strong) UIPopoverController * flightNumberPopover;
+
 @property (nonatomic,strong) AirportSearchViewController * airportSearchViewController;
 @property (nonatomic,strong) UIPopoverController * airportSearchPopover;
 
@@ -127,7 +137,7 @@
     
     //init turbulence manager
     [TurbulenceManager sharedManager];
-
+    
     //init accelerometer  manager
     [AccelerometerManager sharedManager];
     
@@ -138,12 +148,15 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newTurbulenceEvent:) name:kNotification_TurbulenceEvent object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceInMotion:) name:kNotification_DeviceInMotion object:nil];
-
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceStatic:) name:kNotification_DeviceInStatic object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(flightNumberChanged:) name:kNotification_FlightNumberChanged object:nil];
+    
     
     [[RMConfiguration sharedInstance] setAccessToken:@"pk.eyJ1Ijoieml2bGV2eSIsImEiOiJwaEpQeUNRIn0.OZupy_Vjyl5eRCRlgV6otg"];
     
-
+    
     //Download progress bar init
     [Helpers roundCornersOnView:_viewDownload onTopLeft:YES topRight:YES bottomLeft:YES bottomRight:YES radius:8.0];
     _progressBar.progress =0.0;
@@ -180,15 +193,24 @@
     _lblTakoff.text = [RouteManager sharedManager].currentFlight.originAirport.ICAO;
     _lblLand.text = [RouteManager sharedManager].currentFlight.destinationAirport.ICAO;
     
+    //flight number init
+    [_btnFlightNumber setTitle:[[NSUserDefaults standardUserDefaults]objectForKey:@"flightNumber"]  forState:UIControlStateNormal]  ;
+    [Helpers makeRound:_btnFlightNumber borderWidth:1 borderColor:[UIColor whiteColor]];
     //turbulence view init
     [Helpers makeRound:_viewTurbulence borderWidth:1 borderColor:[UIColor whiteColor]];
     _viewTurbulence.hidden = true;
-
+    
+    //keep display on init
+    if ([[NSUserDefaults standardUserDefaults] boolForKey :@"keepDisplayOn"]) {
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
+    } else {
+        [UIApplication sharedApplication].idleTimerDisabled = NO;
+    }
     
 }
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
-
+    
     //set timer to watch for good location
     _timerGpsSignal = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
                                                      selector:@selector(checkGoodLocation:) userInfo:nil repeats:YES];
@@ -201,12 +223,12 @@
     } else {
         tileSource = [[RMMapboxSource alloc] initWithMapID:@"mapbox.light"];
     }
-
+    
     
     self.map = [[RMMapView alloc] initWithFrame:self.view.bounds
                                   andTilesource:tileSource];
     
-    //USer location
+    //User location
     
     _map.showsUserLocation   = YES;
     _map.userTrackingMode = RMUserTrackingModeFollowWithHeading | RMUserTrackingModeFollow;
@@ -217,16 +239,16 @@
     self.map.zoom = 6;
     self.map.maxZoom = 6;
     self.map.minZoom = 3;
-//    self.map.autoresizingMask =  UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight ;
+    //    self.map.autoresizingMask =  UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight ;
     // set coordinates
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake(33.5,32.0);
     
     // center the map to the coordinates
     self.map.centerCoordinate = center;
-
+    
     [_viewMapHolder insertSubview:self.map atIndex:0];
     
-
+    
     self.map.tileCache.backgroundCacheDelegate = self;
     self.map.delegate=self;
     
@@ -236,9 +258,9 @@
         
     }
     if (![[NSUserDefaults standardUserDefaults]boolForKey:@"offlineIsReady"]) {
-
         
-
+        
+        
         int minDownloadZoom = 3;
         int maxDownloadZoom = 6;
         
@@ -249,7 +271,7 @@
         self.noTilesToDownload = [self.map.tileCache tileCountForSouthWest:southWest northEast:northEast minZoom:minDownloadZoom maxZoom:maxDownloadZoom];
         _progressBar.type               =  YLProgressBarTypeRounded ;
         _progressBar.indicatorTextDisplayMode     =  YLProgressBarIndicatorTextDisplayModeProgress;
-
+        
         _progressBar.progressTintColor  = [UIColor blueColor];
         _progressBar.stripesOrientation = YLProgressBarStripesOrientationVertical;
         _progressBar.stripesDirection   = YLProgressBarStripesDirectionLeft;
@@ -268,8 +290,30 @@
     _pickerAltitude.dataSource = self;
     [_pickerAltitude selectRow:_selectedAltitudeLayer inComponent:0 animated:NO];
     
-   
+    //history init
 
+    _pickerHistory = [[AKPickerView alloc] initWithFrame:CGRectMake(280 ,13,50,24)];
+    [Helpers makeRound:_pickerHistory borderWidth:1 borderColor:[UIColor whiteColor]];
+    _pickerHistory.delegate = self;
+    _pickerHistory.dataSource = self;
+//    _pickerHistory.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.viewBottomBar addSubview:_pickerHistory];
+    _pickerHistory.backgroundColor = [Helpers r:59 g:59 b:59 alpha:1.0];
+    _pickerHistory.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
+    _pickerHistory.highlightedFont = [UIFont fontWithName:@"HelveticaNeue" size:14];
+    _pickerHistory.textColor = [UIColor whiteColor];
+    _pickerHistory.highlightedTextColor = [UIColor whiteColor];
+    _pickerHistory.interitemSpacing = 15.0;
+    _pickerHistory.fisheyeFactor = 0.005;
+    _pickerHistory.pickerViewStyle = AKPickerViewStyle3D;
+    _pickerHistory.maskDisabled = true;
+    
+
+    
+    [_pickerHistory reloadData];
+
+    
+    
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
@@ -281,7 +325,7 @@
 
 -(void) viewDidAppear:(BOOL)animated    {
     [super viewDidAppear:animated];
-     [self addAnnotationsWithMap:_map];
+    [self addAnnotationsWithMap:_map];
 }
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -302,11 +346,11 @@
     
     NSString * tileJSON =  ((RMMapboxSource *)_map.tileSource).tileJSON;
     [[NSUserDefaults standardUserDefaults] setObject:tileJSON forKey:@"tileJSON"];
-
+    
     [[NSUserDefaults standardUserDefaults] synchronize];
     _viewDownload.hidden = true;
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Map downnload for offline use completed." message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-
+    
     [alert show];
     
 }
@@ -314,13 +358,13 @@
 
 #pragma mark - mapbox delegate
 -(void) mapViewRegionDidChange:(RMMapView *)mapView {
-
+    
     
 }
 
 - (RMMapLayer *)mapView:(RMMapView *)mapView layerForAnnotation:(RMAnnotation *)annotation
 {
-
+    
     
     if (annotation.isUserLocationAnnotation)
         return nil;
@@ -348,12 +392,12 @@
         default:
             break;
     }
-
+    
     zoomLevelForAnnotation = 11;
-
+    
     int zoomFactor = pow(2.0, zoomLevelForAnnotation);
     RMCircle *circle = [[RMCircle alloc] initWithView:mapView radiusInMeters:40075.016686*1000/zoomFactor/2];
-
+    
     UIColor * colorLevel1 = kColorLight;
     UIColor * colorLevel2 = kColorLightModerate;
     UIColor * colorLevel3 = kColorModerate;
@@ -381,7 +425,7 @@
         default:
             annotationColor =colorLevel5;
             break;
-    } 
+    }
     circle.fillColor = annotationColor;
     circle.lineWidthInPixels = 0.0;
     
@@ -394,26 +438,26 @@
     NSLog(@"You tapped at %f, %f",
           [map pixelToCoordinate:point].latitude,
           [map pixelToCoordinate:point].longitude);
-
+    
 }
 -(void) beforeMapZoom:(RMMapView *)map byUser:(BOOL)wasUserAction {
     [map removeAllAnnotations];
 }
 - (void)beforeMapMove:(RMMapView *)map byUser:(BOOL)wasUserAction {
-
-
-//    [map removeAllAnnotations    ];
-
+    
+    
+    //    [map removeAllAnnotations    ];
+    
 }
 
 - (void)afterMapZoom:(RMMapView *)map byUser:(BOOL)wasUserAction{
-
+    
     [self addAnnotationsWithMap:map];
-
+    
 }
 - (void)afterMapMove:(RMMapView *)map byUser:(BOOL)wasUserAction{
     
-//    [self addAnnotationsWithMap:map];
+    //    [self addAnnotationsWithMap:map];
     
 }
 
@@ -421,7 +465,7 @@
 
 #pragma mark - logic functions
 -(void) addAnnotationsWithMap:(RMMapView *)map {
-    // add test tiles
+
     
     NSString *  zoomLevelForAnnotation;
     int zoomFactor;
@@ -478,12 +522,17 @@
         
         
         annotation.userInfo = [NSNumber numberWithInt:value];
-        [arr addObject:annotation];
         
-
+        if ([[NSDate date] timeIntervalSince1970] - turbulence.timestamp < (_pickerHistory.selectedItem+1) *6 * 3600) {
+            NSLog (@"%@ - %i",[NSDate dateWithTimeIntervalSince1970:turbulence.timestamp],turbulence.severity);
+            [arr addObject:annotation];
+        }
+        
+        
+        
         
     }
-
+    
     Airport * origin = [RouteManager sharedManager].currentFlight.originAirport;
     Airport * dest = [RouteManager sharedManager].currentFlight.destinationAirport;
     if (![origin.ICAO isEqualToString:dest.ICAO] && dest && origin) {
@@ -499,10 +548,9 @@
         [arr addObject:annotation];
         RMAnnotation * GC = [[RMGreatCircleAnnotation alloc] initWithMapView:_map coordinate1:start coordinate2:end];
         [arr addObject:GC];
-        GC = [[RMGreatCircleAnnotation alloc] initWithMapView:_map coordinate1:end coordinate2:start];
         
         [self.map addAnnotations:arr];
-
+        
         
     }
     
@@ -564,9 +612,9 @@
     }
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         
-    [_brightnessPopover presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+        [_brightnessPopover presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
     }];
-
+    
 }
 
 
@@ -585,9 +633,9 @@
     }
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         
-            [_aboutPopover presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
+        [_aboutPopover presentPopoverFromBarButtonItem:sender permittedArrowDirections:UIPopoverArrowDirectionUp animated:YES];
     }];
-
+    
 }
 - (IBAction)btnPilotReport_Clicked:(UIButton *)sender {
     if (_pilotReportController == nil) {
@@ -604,9 +652,9 @@
     }
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         
-    [_pilotReportPopover presentPopoverFromRect:sender.frame inView:self.viewLeftMenu permittedArrowDirections:UIPopoverArrowDirectionLeft animated:YES];
+        [_pilotReportPopover presentPopoverFromRect:sender.frame inView:self.viewLeftMenu permittedArrowDirections:UIPopoverArrowDirectionLeft animated:YES];
     }];
-
+    
 }
 
 
@@ -628,7 +676,7 @@
         _airportSearchViewController.taragetControl = @"landing";
         _airportSearchViewController.inputAirportICAO = _lblLand.text;
     }
-
+    
     
     if (self.presentedViewController) {
         [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
@@ -640,12 +688,31 @@
     
 }
 
+- (IBAction)btnFlightNumber_Clicked:(UIButton *)sender {
+    if (_flightNumberViewController == nil) {
+        UIStoryboard *sb = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        _flightNumberViewController  = [sb instantiateViewControllerWithIdentifier:@"FlightNumber"];
+    }
+    _flightNumberPopover = [[UIPopoverController alloc] initWithContentViewController:_flightNumberViewController];
+    _flightNumberPopover.popoverContentSize =  CGSizeMake(250.0, 100.0);
+    _flightNumberPopover.backgroundColor = kColorToolbarBackground;
+    _flightNumberViewController.view.backgroundColor = kColorToolbarBackground;
+    
+    if (self.presentedViewController) {
+        [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
+    }
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        
+        [_flightNumberPopover presentPopoverFromRect:sender.frame inView:self.viewRightMenu permittedArrowDirections:UIPopoverArrowDirectionRight animated:YES];
+    }];
+}
+
 #pragma mark - timers
 
 - (void) checkGoodLocation:(NSTimer *)incomingTimer
 {
     if ([LocationManager sharedManager].isLocationGood) {
-
+        
         
         //update display
         _barItemGPS.tintColor = [UIColor whiteColor];
@@ -653,12 +720,12 @@
         int currentAltitude = currentLocation.altitude * FEET_PER_METER;
         int currentVerticalAccuracy = currentLocation.verticalAccuracy * FEET_PER_METER;
         _BarItemTitle.title = [NSString stringWithFormat:@"Alt: %i Feet / Accuracy: %i Feet",currentAltitude,currentVerticalAccuracy];
-
         
-
+        
+        
         
     } else {
-
+        
         //update display
         _barItemGPS.tintColor = [UIColor redColor];
         _BarItemTitle.title =@"Turbuless";
@@ -669,7 +736,7 @@
 -(void)turbuleceUpdatedFromServer:(NSNotification*)notification
 {
     NSLog(@"Server Updated");
-     [_map removeAllAnnotations];
+    [_map removeAllAnnotations];
     [self addAnnotationsWithMap:_map];
 }
 
@@ -680,7 +747,7 @@
     Turbulence * turbulence = notification.object;
     _viewTurbulence.backgroundColor = [self getColorForSeverity:turbulence.severity];
     _viewTurbulence.hidden = false;
-
+    
     _timerHideTurbulenceMarker = [NSTimer scheduledTimerWithTimeInterval:4 target:self selector:@selector(hideTurbulenceMarker:) userInfo:nil repeats:NO];
 }
 
@@ -694,6 +761,13 @@
     _imageShake.hidden=true;
 }
 
+-(void)flightNumberChanged:(NSNotification *) notification
+{
+    [_btnFlightNumber setTitle:[[NSUserDefaults standardUserDefaults]objectForKey:@"flightNumber"]  forState:UIControlStateNormal]  ;
+}
+
+
+#pragma mark ------------------------
 
 -(void)hideTurbulenceMarker:(NSTimer*)timer
 {
@@ -744,7 +818,7 @@
 -(void)airportSelected:(Airport *)airport toTargetControl:(NSString *)targetControl
 {
     [self.airportSearchPopover dismissPopoverAnimated:YES];
-
+    
     if ([targetControl isEqualToString:@"takeoff"]) {
         self.lblTakoff.text = airport.ICAO;
         [RouteManager sharedManager].currentFlight.originAirport = airport;
@@ -773,9 +847,45 @@
     _lblLand.text = [RouteManager sharedManager].currentFlight.destinationAirport.ICAO;
     [_map removeAllAnnotations];
     [self addAnnotationsWithMap:_map];
-
+    
 }
 - (IBAction)btnUserLocation_Click:(UIBarButtonItem *)sender {
     _map.userTrackingMode = RMUserTrackingModeFollow;
+}
+
+
+
+#pragma mark - AKPickerViewDelegate
+
+- (NSUInteger)numberOfItemsInPickerView:(AKPickerView *)pickerView
+{
+    return 15;
+}
+
+/*
+ * AKPickerView now support images!
+ *
+ * Please comment '-pickerView:titleForItem:' entirely
+ * and uncomment '-pickerView:imageForItem:' to see how it works.
+ *
+ */
+
+- (NSString *)pickerView:(AKPickerView *)pickerView titleForItem:(NSInteger)item
+{
+    return [NSString stringWithFormat:@"%lih", 6 * (item+1)];
+}
+
+/*
+ - (UIImage *)pickerView:(AKPickerView *)pickerView imageForItem:(NSInteger)item
+ {
+	return [UIImage imageNamed:self.titles[item]];
+ }
+ */
+
+
+- (void)pickerView:(AKPickerView *)pickerView didSelectItem:(NSInteger)item
+{
+    [_map removeAllAnnotations];
+    [self addAnnotationsWithMap:_map];
 }
 @end
