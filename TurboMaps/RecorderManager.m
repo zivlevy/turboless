@@ -107,6 +107,8 @@
         [myHandle writeData:[content dataUsingEncoding:NSUTF8StringEncoding]];
     }
     
+    [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_TurbulenceEventWrittenToFile object:content userInfo:nil];
+    
 }
 
 

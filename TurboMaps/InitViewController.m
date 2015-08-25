@@ -24,6 +24,7 @@
 #import "RouteManager.h"
 #import "TurbulenceManager.h"
 #import "AccelerometerManager.h"
+#import "DebugManager.h"
 
 #import "AKPickerView.h"
 
@@ -56,6 +57,7 @@
 @property (weak, nonatomic) IBOutlet UIView *viewLeftMenu;
 @property (weak, nonatomic) IBOutlet UIView *viewTurbulence;
 @property (weak, nonatomic) IBOutlet UIImageView *imageShake;
+@property (weak, nonatomic) IBOutlet UIButton *btnDebug;
 
 // ** btn report
 @property (weak, nonatomic) IBOutlet UIButton *btnReport_light;
@@ -141,6 +143,8 @@
     //init accelerometer  manager
     [AccelerometerManager sharedManager];
     
+    //init debug manager
+    [DebugManager sharedManager];
     
     //notifications observers
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(turbuleceUpdatedFromServer:) name:kNotification_turbulenceServerNewFile object:nil];
@@ -182,6 +186,7 @@
     [Helpers makeRound:_btnReport_severe borderWidth:1 borderColor:[UIColor whiteColor]];
     [Helpers makeRound:_btnReport_Extreme borderWidth:1 borderColor:[UIColor whiteColor]];
     
+    [Helpers makeRound:_btnDebug borderWidth:1 borderColor:[UIColor whiteColor]];
     //legend init
     _lblLegendLight.backgroundColor = kColorLight;
     _lblLegentLightModerate.backgroundColor = kColorLightModerate;
@@ -291,12 +296,12 @@
     [_pickerAltitude selectRow:_selectedAltitudeLayer inComponent:0 animated:NO];
     
     //history init
-
-    _pickerHistory = [[AKPickerView alloc] initWithFrame:CGRectMake(280 ,13,50,24)];
+    
+    _pickerHistory = [[AKPickerView alloc] initWithFrame:CGRectMake(280 ,10,75,30)];
     [Helpers makeRound:_pickerHistory borderWidth:1 borderColor:[UIColor whiteColor]];
     _pickerHistory.delegate = self;
     _pickerHistory.dataSource = self;
-//    _pickerHistory.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    //    _pickerHistory.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.viewBottomBar addSubview:_pickerHistory];
     _pickerHistory.backgroundColor = [Helpers r:59 g:59 b:59 alpha:1.0];
     _pickerHistory.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:14];
@@ -308,7 +313,8 @@
     _pickerHistory.pickerViewStyle = AKPickerViewStyle3D;
     _pickerHistory.maskDisabled = true;
     
-
+    
+    
     
     [_pickerHistory reloadData];
 
@@ -523,14 +529,14 @@
         
         annotation.userInfo = [NSNumber numberWithInt:value];
         
-        if ([[NSDate date] timeIntervalSince1970] - turbulence.timestamp < (_pickerHistory.selectedItem+1) *6 * 3600) {
+        if (_pickerHistory.selectedItem+1 ==15) {
+            [arr addObject:annotation];
+        }
+        else if ([[NSDate date] timeIntervalSince1970] - turbulence.timestamp < (_pickerHistory.selectedItem+1) *6 * 3600) {
             NSLog (@"%@ - %i",[NSDate dateWithTimeIntervalSince1970:turbulence.timestamp],turbulence.severity);
             [arr addObject:annotation];
         }
-        
-        
-        
-        
+
     }
     
     Airport * origin = [RouteManager sharedManager].currentFlight.originAirport;
@@ -872,6 +878,9 @@
 
 - (NSString *)pickerView:(AKPickerView *)pickerView titleForItem:(NSInteger)item
 {
+    if (item+1==15) {
+        return @"ALL";
+    }
     return [NSString stringWithFormat:@"%lih", 6 * (item+1)];
 }
 

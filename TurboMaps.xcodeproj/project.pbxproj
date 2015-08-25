@@ -50,6 +50,16 @@
 		A5B9921E1B88C9A900DEFC07 /* testViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B9921D1B88C9A900DEFC07 /* testViewController.m */; };
 		A5B9922B1B892FB500DEFC07 /* shake.png in Resources */ = {isa = PBXBuildFile; fileRef = A5B9922A1B892FB500DEFC07 /* shake.png */; };
 		A5B9922E1B8936A900DEFC07 /* TurbulenceEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B9922D1B8936A900DEFC07 /* TurbulenceEvent.m */; };
+		A5E239591B8B936E00D83DC8 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A5E2394B1B8B936E00D83DC8 /* Info.plist */; };
+		A5E2395A1B8B936E00D83DC8 /* Main.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E2394D1B8B936E00D83DC8 /* Main.m */; };
+		A5E2395B1B8B936E00D83DC8 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = A5E239501B8B936E00D83DC8 /* ioapi.c */; };
+		A5E2395C1B8B936E00D83DC8 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = A5E239521B8B936E00D83DC8 /* mztools.c */; };
+		A5E2395D1B8B936E00D83DC8 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = A5E239541B8B936E00D83DC8 /* unzip.c */; };
+		A5E2395E1B8B936E00D83DC8 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = A5E239561B8B936E00D83DC8 /* zip.c */; };
+		A5E239601B8B93C500D83DC8 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A5E2395F1B8B93C500D83DC8 /* libz.dylib */; };
+		A5E239631B8B997700D83DC8 /* DebugManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E239621B8B997700D83DC8 /* DebugManager.m */; };
+		A5E2396A1B8C66EF00D83DC8 /* navArrow.png in Resources */ = {isa = PBXBuildFile; fileRef = A5E239681B8C66EF00D83DC8 /* navArrow.png */; };
+		A5E2396B1B8C66EF00D83DC8 /* navArrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A5E239691B8C66EF00D83DC8 /* navArrow@2x.png */; };
 		A5E5AF6F1B830BC700E413A9 /* airports.txt in Resources */ = {isa = PBXBuildFile; fileRef = A5E5AF6E1B830BC700E413A9 /* airports.txt */; };
 		A5E5AF721B8321A900E413A9 /* RouteManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E5AF711B8321A900E413A9 /* RouteManager.m */; };
 		A5E5AF761B832E4A00E413A9 /* Airport.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E5AF751B832E4A00E413A9 /* Airport.m */; };
@@ -193,6 +203,24 @@
 		A5B9922A1B892FB500DEFC07 /* shake.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shake.png; sourceTree = "<group>"; };
 		A5B9922C1B8936A900DEFC07 /* TurbulenceEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TurbulenceEvent.h; sourceTree = "<group>"; };
 		A5B9922D1B8936A900DEFC07 /* TurbulenceEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TurbulenceEvent.m; sourceTree = "<group>"; };
+		A5E2394B1B8B936E00D83DC8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A5E2394C1B8B936E00D83DC8 /* Main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Main.h; sourceTree = "<group>"; };
+		A5E2394D1B8B936E00D83DC8 /* Main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Main.m; sourceTree = "<group>"; };
+		A5E2394F1B8B936E00D83DC8 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
+		A5E239501B8B936E00D83DC8 /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
+		A5E239511B8B936E00D83DC8 /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
+		A5E239521B8B936E00D83DC8 /* mztools.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mztools.c; sourceTree = "<group>"; };
+		A5E239531B8B936E00D83DC8 /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mztools.h; sourceTree = "<group>"; };
+		A5E239541B8B936E00D83DC8 /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unzip.c; sourceTree = "<group>"; };
+		A5E239551B8B936E00D83DC8 /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
+		A5E239561B8B936E00D83DC8 /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zip.c; sourceTree = "<group>"; };
+		A5E239571B8B936E00D83DC8 /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
+		A5E239581B8B936E00D83DC8 /* ZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZipArchive.h; sourceTree = "<group>"; };
+		A5E2395F1B8B93C500D83DC8 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		A5E239611B8B997700D83DC8 /* DebugManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugManager.h; sourceTree = "<group>"; };
+		A5E239621B8B997700D83DC8 /* DebugManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugManager.m; sourceTree = "<group>"; };
+		A5E239681B8C66EF00D83DC8 /* navArrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navArrow.png; sourceTree = "<group>"; };
+		A5E239691B8C66EF00D83DC8 /* navArrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "navArrow@2x.png"; sourceTree = "<group>"; };
 		A5E5AF6E1B830BC700E413A9 /* airports.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = airports.txt; sourceTree = "<group>"; };
 		A5E5AF701B8321A900E413A9 /* RouteManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouteManager.h; sourceTree = "<group>"; };
 		A5E5AF711B8321A900E413A9 /* RouteManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RouteManager.m; sourceTree = "<group>"; };
@@ -218,6 +246,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5E239601B8B93C500D83DC8 /* libz.dylib in Frameworks */,
 				A5B3EB101B8209FB003D5AE2 /* CoreLocation.framework in Frameworks */,
 				46927B891A7F976AAF1A51EC /* Pods_TurboMaps.framework in Frameworks */,
 			);
@@ -245,6 +274,7 @@
 		2C67C06F240F790A0786A0B3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A5E2395F1B8B93C500D83DC8 /* libz.dylib */,
 				A5B3EB0F1B8209FB003D5AE2 /* CoreLocation.framework */,
 				68E3FBE5E399854A55953C74 /* Pods_TurboMaps.framework */,
 			);
@@ -348,6 +378,7 @@
 		A5B3A78F1B8AE2FB00E447EE /* External frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A5E2394A1B8B936E00D83DC8 /* ZipArchive */,
 				A5B3A7901B8AE31F00E447EE /* AKPickerView */,
 			);
 			name = "External frameworks";
@@ -431,6 +462,8 @@
 		A5B3EAE71B810390003D5AE2 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				A5E239681B8C66EF00D83DC8 /* navArrow.png */,
+				A5E239691B8C66EF00D83DC8 /* navArrow@2x.png */,
 				A5B9922A1B892FB500DEFC07 /* shake.png */,
 				A545ADFF1B871837005928AC /* swap.png */,
 				A545ADF91B871706005928AC /* satellite.png */,
@@ -480,6 +513,8 @@
 				A5E5AF7B1B83AD3300E413A9 /* TurbulenceManager.m */,
 				A5B9920F1B88AE6700DEFC07 /* AccelerometerManager.h */,
 				A5B992101B88AE6700DEFC07 /* AccelerometerManager.m */,
+				A5E239611B8B997700D83DC8 /* DebugManager.h */,
+				A5E239621B8B997700D83DC8 /* DebugManager.m */,
 			);
 			name = Managers;
 			sourceTree = "<group>";
@@ -500,6 +535,34 @@
 				A5B9921D1B88C9A900DEFC07 /* testViewController.m */,
 			);
 			name = "Debug items";
+			sourceTree = "<group>";
+		};
+		A5E2394A1B8B936E00D83DC8 /* ZipArchive */ = {
+			isa = PBXGroup;
+			children = (
+				A5E2394B1B8B936E00D83DC8 /* Info.plist */,
+				A5E2394C1B8B936E00D83DC8 /* Main.h */,
+				A5E2394D1B8B936E00D83DC8 /* Main.m */,
+				A5E2394E1B8B936E00D83DC8 /* minizip */,
+				A5E239581B8B936E00D83DC8 /* ZipArchive.h */,
+			);
+			path = ZipArchive;
+			sourceTree = "<group>";
+		};
+		A5E2394E1B8B936E00D83DC8 /* minizip */ = {
+			isa = PBXGroup;
+			children = (
+				A5E2394F1B8B936E00D83DC8 /* crypt.h */,
+				A5E239501B8B936E00D83DC8 /* ioapi.c */,
+				A5E239511B8B936E00D83DC8 /* ioapi.h */,
+				A5E239521B8B936E00D83DC8 /* mztools.c */,
+				A5E239531B8B936E00D83DC8 /* mztools.h */,
+				A5E239541B8B936E00D83DC8 /* unzip.c */,
+				A5E239551B8B936E00D83DC8 /* unzip.h */,
+				A5E239561B8B936E00D83DC8 /* zip.c */,
+				A5E239571B8B936E00D83DC8 /* zip.h */,
+			);
+			path = minizip;
 			sourceTree = "<group>";
 		};
 		A5E5AF6D1B830B7900E413A9 /* Data Files */ = {
@@ -642,10 +705,13 @@
 				A545ADDC1B866669005928AC /* to.png in Resources */,
 				A5B9922B1B892FB500DEFC07 /* shake.png in Resources */,
 				A545ADE31B86A184005928AC /* earth-america-7.png in Resources */,
+				A5E2396B1B8C66EF00D83DC8 /* navArrow@2x.png in Resources */,
 				A545AE001B871837005928AC /* swap.png in Resources */,
 				A545ADFC1B871706005928AC /* satellite@2x.png in Resources */,
 				A5E5AF6F1B830BC700E413A9 /* airports.txt in Resources */,
 				A5B3EAF51B81B2CE003D5AE2 /* slider20.png in Resources */,
+				A5E239591B8B936E00D83DC8 /* Info.plist in Resources */,
+				A5E2396A1B8C66EF00D83DC8 /* navArrow.png in Resources */,
 				A545ADE01B866E26005928AC /* land.png in Resources */,
 				A59791E01B77ECE200AACC6F /* Main.storyboard in Resources */,
 				A545ADE11B866E26005928AC /* land@2x.png in Resources */,
@@ -724,6 +790,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A5E2395E1B8B936E00D83DC8 /* zip.c in Sources */,
 				A5B3EB131B820F29003D5AE2 /* LocationManager.m in Sources */,
 				A5B3EAF31B81A90B003D5AE2 /* BrightnessViewController.m in Sources */,
 				A5E5AF7C1B83AD3300E413A9 /* TurbulenceManager.m in Sources */,
@@ -733,25 +800,30 @@
 				A5E5AF821B8442CF00E413A9 /* AirportSearchViewController.m in Sources */,
 				A5E5AF721B8321A900E413A9 /* RouteManager.m in Sources */,
 				A5B3A78E1B8A48FF00E447EE /* FlightNumberViewController.m in Sources */,
+				A5E239631B8B997700D83DC8 /* DebugManager.m in Sources */,
 				A59791DA1B77ECE200AACC6F /* AppDelegate.m in Sources */,
 				A5B3EB191B82920B003D5AE2 /* LoginViewController.m in Sources */,
 				A5B9921E1B88C9A900DEFC07 /* testViewController.m in Sources */,
 				A5E7A0A91B7A418B00FD969C /* Helpers.m in Sources */,
 				A545ADCA1B8634B7005928AC /* Flight.m in Sources */,
+				A5E2395D1B8B936E00D83DC8 /* unzip.c in Sources */,
 				A5B3A7931B8AE31F00E447EE /* AKPickerView.m in Sources */,
 				A5B992141B88B41100DEFC07 /* TurbuFilter.m in Sources */,
 				A59791D71B77ECE200AACC6F /* main.m in Sources */,
 				A5B3EB011B81C9ED003D5AE2 /* PilotReportViewController.m in Sources */,
 				A5B3EB1C1B8295AD003D5AE2 /* AppStartViewController.m in Sources */,
 				A5B3EAE41B8100D0003D5AE2 /* RMTile.c in Sources */,
+				A5E2395A1B8B936E00D83DC8 /* Main.m in Sources */,
 				A5B3EAE61B8100D0003D5AE2 /* RMFoundation.c in Sources */,
 				A5B3EB161B8235D8003D5AE2 /* RecorderManager.m in Sources */,
 				A5B3EB051B81DAD0003D5AE2 /* AboutViewController.m in Sources */,
+				A5E2395B1B8B936E00D83DC8 /* ioapi.c in Sources */,
 				A5B9922E1B8936A900DEFC07 /* TurbulenceEvent.m in Sources */,
 				A5B992111B88AE6700DEFC07 /* AccelerometerManager.m in Sources */,
 				A5B3EAE51B8100D0003D5AE2 /* RMPixel.c in Sources */,
 				A5AE64AD1B77F05700677EA7 /* InitViewController.m in Sources */,
 				A5B992181B88B76500DEFC07 /* AccelerometerEvent.m in Sources */,
+				A5E2395C1B8B936E00D83DC8 /* mztools.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

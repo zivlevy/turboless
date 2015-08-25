@@ -35,6 +35,7 @@
 #define kNotification_LocationStatusChanged @"LocationStatusChanged"
 
 #define kNotification_TurbulenceEvent @"TurbulenceEvent"
+#define kNotification_TurbulenceEventWrittenToFile @"TurbulenceEventWrittenToFile"
 #define kNotification_DeviceInMotion @"DeviceInMotion"
 #define kNotification_DeviceInStatic @"DeviceInStatic"
 

@@ -93,7 +93,6 @@
     tile.y=tileY;
     tile.altitude = altitude;
     return tile;
-    
 }
 
 -(CLLocation *) getCurrentLocation
