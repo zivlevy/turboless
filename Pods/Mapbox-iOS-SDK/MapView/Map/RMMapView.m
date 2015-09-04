@@ -66,7 +66,7 @@
 #define kDefaultMaximumZoomLevel 25.0
 #define kDefaultInitialZoomLevel 11.0
 
-#define kSpeedCutOff 10
+#define kSpeedCutOff 0
 
 #pragma mark --- end constants ----
 
@@ -3274,7 +3274,7 @@
     {
         for (RMAnnotation *annotation in annotationsToRemove)
         {
-            if ( annotation.isUserLocationAnnotation)
+            if (! annotation.isUserLocationAnnotation)
             {
                 [_annotations removeObject:annotation];
                 [_visibleAnnotations removeObject:annotation];
@@ -3398,8 +3398,7 @@
         case RMUserTrackingModeNone:
         default:
         {
-            [_locationManager startUpdatingHeading];
-//            [_locationManager stopUpdatingHeading];
+            [_locationManager stopUpdatingHeading];
 
             [CATransaction setAnimationDuration:0.5];
             [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
@@ -3435,7 +3434,7 @@
         {
             self.showsUserLocation = YES;
 [_locationManager startUpdatingHeading];
-//            [_locationManager stopUpdatingHeading];
+            [_locationManager stopUpdatingHeading];
 
             if (self.userLocation)
                 #pragma clang diagnostic push
@@ -3527,8 +3526,8 @@
 ////
         
         
-        if (self.userTrackingMode != RMUserTrackingModeNone){
-        /////[CATransaction begin];
+        
+        [CATransaction begin];
         [CATransaction setAnimationDuration:0.5];
         [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
         
@@ -3575,7 +3574,7 @@
             if ( ! _showsUserLocation)
                 return;
         }
-    }
+    
 
     if (self.userTrackingMode != RMUserTrackingModeNone)
     {
@@ -3627,6 +3626,7 @@
         _accuracyCircleAnnotation.clusteringEnabled = NO;
         _accuracyCircleAnnotation.enabled = NO;
         _accuracyCircleAnnotation.layer = [[RMCircle alloc] initWithView:self radiusInMeters:newLocation.horizontalAccuracy];
+
         _accuracyCircleAnnotation.isUserLocationAnnotation = YES;
 
         ((RMCircle *)_accuracyCircleAnnotation.layer).lineColor = (RMPreVersion7 ? [UIColor colorWithRed:0.378 green:0.552 blue:0.827 alpha:0.7] : [UIColor clearColor]);
@@ -3728,6 +3728,8 @@
 
     if ( ! [_annotations containsObject:self.userLocation])
         [self addAnnotation:self.userLocation];
+    
+
 }
 
 - (BOOL)locationManagerShouldDisplayHeadingCalibration:(CLLocationManager *)manager

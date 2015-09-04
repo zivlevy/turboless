@@ -382,33 +382,7 @@
     
     
     if (annotation.isUserLocationAnnotation){
-        RMMapLayer * layer = [RMMapLayer new];
-        CGFloat whiteWidth = 24.0;
-        
-        CGRect rect = CGRectMake(0, 0, whiteWidth * 1.5, whiteWidth * 1.5);
-        
-        UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
-        CGContextRef context = UIGraphicsGetCurrentContext();
-        
-        CGContextSetShadow(context, CGSizeMake(0, 0), whiteWidth / 4.0);
-        
-        CGContextSetFillColorWithColor(context, [[UIColor whiteColor] CGColor]);
-        CGContextFillEllipseInRect(context, CGRectMake((rect.size.width - whiteWidth) / 2.0, (rect.size.height - whiteWidth) / 2.0, whiteWidth, whiteWidth));
-        UIImage *whiteBackground ;
-        if ([LocationManager sharedManager].isLocationGood) {
-            whiteBackground = [UIImage imageNamed:@"airplane.png"];
-        } else {
-            whiteBackground = [UIImage imageNamed:@"slider20.png"];
-            
-        }
-        
-        
-        UIGraphicsEndImageContext();
-        
-        layer = [[RMMarker alloc] initWithUIImage:whiteBackground];
-        
-
-        return layer;
+        return nil;
     }
     int  zoomLevelForAnnotation;
     switch ((int)mapView.zoom) {
@@ -841,15 +815,31 @@
 
 -(void) locationStatusChanged:(NSNotification *) notification {
     
-    NSNumber * isGoodLocation = notification.object;
+    NSString * str = notification.object;
+    bool isGoodLocation = [str boolValue];
     //location status changed so we ned to replace Icon
     if (isGoodLocation) {
         NSLog(@"good location");
     } else {
         NSLog(@"bad location");
     }
-    [_map removeAllAnnotations ];
-    [self addAnnotationsWithMap:_map];
+    for (RMAnnotation * annotation in _map.annotations) {
+        if (annotation.isUserLocationAnnotation) {
+            for (RMMapLayer * layer in annotation.layer.sublayers) {
+                if ([layer.name isEqualToString:@"airplane"]) {
+                    layer.opacity=0;
+                    if (isGoodLocation ) {
+                        layer.opacity =1;
+                    }
+                }
+               
+               
+                
+            }
+            
+        }
+    };
+    
  
 }
 

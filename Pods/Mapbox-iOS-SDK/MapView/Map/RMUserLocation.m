@@ -144,6 +144,14 @@
         [dotLayer addAnimation:animation forKey:@"animateTransform"];
 
         [super.layer addSublayer:dotLayer];
+        
+        //ziv added to include airplane in userLocation
+        whiteBackground = [UIImage imageNamed:@"airplane.png"];
+        RMMapLayer * layer1 = [[RMMarker alloc] initWithUIImage:whiteBackground];
+        layer1.position = CGPointMake(super.layer.bounds.size.width / 2.0, super.layer.bounds.size.height / 2.0);
+
+        [layer1 setName:@"airplane"];
+        [super.layer addSublayer:layer1];
     }
 }
 

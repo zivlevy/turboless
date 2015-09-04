@@ -63,6 +63,12 @@
         }
         self.isLocationGood = YES;
     }
+    
+    if ( !self.isLocationGood ||_currentLocation.course <0 ) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_LocationStatusChanged object:[NSNumber numberWithBool:NO]];
+    } else {
+        [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_LocationStatusChanged object:[NSNumber numberWithBool:YES]];
+    }
 }
 
 #pragma mark - CLLocationManagerDelegate
