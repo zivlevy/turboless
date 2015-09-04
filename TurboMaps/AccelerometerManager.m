@@ -88,10 +88,7 @@
                     }
                     
                 });
-                
             } else {
-                
-                
                 if (!_timerDeviceInMotionDelay && _isDeviceInMotion) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [_timerDeviceInMotionDelay invalidate];
@@ -102,8 +99,7 @@
                 }
                 
             }
-            
-            
+
         }];
     }
     
@@ -130,7 +126,7 @@
     {
         NSOperationQueue *queue = [[NSOperationQueue alloc] init];
         [self.motionManager startAccelerometerUpdatesToQueue:queue withHandler:^(CMAccelerometerData *accelerometerData, NSError *error) {
-            
+            _isRecordingInSession = false;
             AccelerometerEvent * accelerometerEvent = [AccelerometerEvent new];
             accelerometerEvent.x = accelerometerData.acceleration.x;
             accelerometerEvent.y = accelerometerData.acceleration.y;
@@ -141,7 +137,7 @@
             accelerometerEvent.location = [[LocationManager sharedManager] getCurrentLocation];
             if (DEBUG_MODE) {
                 if (!_isDeviceInMotion ){
-                    
+                    _isRecordingInSession = true;
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [_turboFilter proccesInput:accelerometerEvent];
                         [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_IOSAccelerometerDataRecieved object:accelerometerEvent];
@@ -150,7 +146,7 @@
                 }
             } else {
                 if (!_isDeviceInMotion && _isLocationValid && [[LocationManager sharedManager] getCurrentLocation].altitude * FEET_PER_METER >= kAltitude_Min * 1000) {
-                    
+                    _isRecordingInSession = true;
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [_turboFilter proccesInput:accelerometerEvent];
                         [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_IOSAccelerometerDataRecieved object:accelerometerEvent];

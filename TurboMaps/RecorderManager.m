@@ -9,11 +9,17 @@
 #import "RecorderManager.h"
 #import "Const.h"
 #import "AFNetworking.h"
+#import "AccelerometerManager.h"
+#import "LocationManager.h"
 
 @interface RecorderManager ()
 @property bool isReachableState;
 @property bool isFileTransferInProgress;
 @property (nonatomic,strong)NSTimer * timerTrySendData;
+
+@property (nonatomic,strong) NSMutableDictionary * dicVisitedTiles;
+@property ZLTile currentTile;
+
 @end
 
 @implementation RecorderManager
@@ -59,20 +65,32 @@
                 [self tryTransferFile];
             }
         }];
+        //set noftidications
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationChanged:) name:kNotification_NewGPSLocation object:nil];
         
         //set timer to try and send data
         _timerTrySendData = [NSTimer scheduledTimerWithTimeInterval:20.0 target:self
                                                 selector:@selector(sendDataTimer:) userInfo:nil repeats:YES];
+        
+        //init Visited Tiles Dictionary
+        _dicVisitedTiles = [NSMutableDictionary new];
+        _currentTile.x=0;
+        _currentTile.y=0;
+        _currentTile.altitude = 0;
     }
     return self;
 }
 
+-(void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
+}
 #pragma mark - event handeling
 
 -(void)writeTurbulenceEvent:(TurbulenceEvent *) event
 {
     //check that data is valid
-    bool isSeverityValid = (event.severity >0 && event.severity <=5);
+    bool isSeverityValid = (event.severity >=0 && event.severity <=5);
     bool isAltitudeValid = YES;//TODO return --> event.altitude >0 && event.altitude <=kAltitude_NumberOfSteps;
     bool isTileXValid = event.tileX >=0 && event.tileX <=2047;
     bool isTileYValid = event.tileY >=0 && event.tileY <=2047;
@@ -106,7 +124,11 @@
         [myHandle seekToEndOfFile];
         [myHandle writeData:[content dataUsingEncoding:NSUTF8StringEncoding]];
     }
+
+    //add the event to visited dictionary
+    [_dicVisitedTiles setObject:event forKey:[NSString stringWithFormat:@"%i,%i,%i",event.tileX,event.tileY  ,event.altitude]];
     
+    //notify that the event was added
     [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_TurbulenceEventWrittenToFile object:content userInfo:nil];
     
 }
@@ -266,6 +288,44 @@
     return _isReachableState;
 }
 
+
+#pragma mark - notification handlers
+-(void)locationChanged:(NSNotification*)notification {
+    
+    if (![AccelerometerManager sharedManager].isRecordingInSession) {
+        ZLTile tile = [[LocationManager sharedManager] getCurrentTile];
+        if (tile.x!=_currentTile.x || tile.y!= _currentTile.y || tile.altitude!=_currentTile.altitude) {
+           //we moved to new tile
+            if (_currentTile.x==0 && _currentTile.y==0 && _currentTile.altitude==0) {
+                //this is the first tile
+                _currentTile=tile;
+                return;
+            }
+            if (![_dicVisitedTiles objectForKey:[NSString stringWithFormat:@"%i,%i,%i",_currentTile.x,_currentTile.y,_currentTile.altitude]]){
+                
+                //no events in this tile so report Empty tile
+                TurbulenceEvent * event = [TurbulenceEvent new];
+                event.tileX=_currentTile.x;
+                event.tileY=_currentTile.y;
+                event.altitude=_currentTile.altitude;
+                event.severity = 0;
+                event.isPilotEvent = 0;
+                event.flightNumber = [[NSUserDefaults standardUserDefaults] objectForKey:@"flightNumber"];
+                NSDate * now = [NSDate date];
+                event.date = now;
+                event.userId = [[NSUserDefaults standardUserDefaults] objectForKey:@"userName"];
+                [self writeTurbulenceEvent:event ];
+                
+
+                
+            }
+            _currentTile=tile;
+            
+        }
+    }
+    
+    
+}
 
 
 @end

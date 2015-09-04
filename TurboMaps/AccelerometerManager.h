@@ -11,7 +11,7 @@
 @interface AccelerometerManager : NSObject
 
 + (AccelerometerManager *)sharedManager;
-
+@property bool isRecordingInSession;
 -(void)start;
 -(void)stop;
 @end

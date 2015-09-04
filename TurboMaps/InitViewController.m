@@ -249,7 +249,7 @@
 
     // set zoom
     self.map.zoom = 6;
-    self.map.maxZoom = 16;
+    self.map.maxZoom = 6;
     self.map.minZoom = 1;
     //    self.map.autoresizingMask =  UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight ;
     // set coordinates
@@ -413,6 +413,7 @@
     
     int zoomFactor = pow(2.0, zoomLevelForAnnotation);
     RMCircle *circle = [[RMCircle alloc] initWithView:mapView radiusInMeters:40075.016686*1000/zoomFactor/2];
+    UIColor * colorLevel0 = kColorNone;
     UIColor * colorLevel1 = kColorLight;
     UIColor * colorLevel2 = kColorLightModerate;
     UIColor * colorLevel3 = kColorModerate;
@@ -422,6 +423,9 @@
     NSNumber * turbulenceSavirity = annotation.userInfo;
     UIColor * annotationColor;
     switch ([turbulenceSavirity intValue]) {
+        case 0:
+            annotationColor =colorLevel0;
+            break;
         case 1:
             annotationColor =colorLevel1;
             break;
@@ -869,6 +873,9 @@
 {
     
     switch (severity) {
+        case 0:
+            return kColorNone;
+            break;
         case 1:
             return kColorLight;
             break;

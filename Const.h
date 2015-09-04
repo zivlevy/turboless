@@ -13,9 +13,9 @@
 #define DEBUG_MODE 0
 
 #define kBaseURL @"http://104.197.5.131:3000"
-//#define kBaseURL @"http://84.94.182.244:3000"
 #define FEET_PER_METER 3.28084
 
+#define kColorNone [Helpers r:255 g:255 b:255 alpha:0.8]
 #define kColorLight [Helpers r:2 g:115 b:1 alpha:1.0]
 #define kColorLightModerate [Helpers r:197 g:194 b:9 alpha:1.0]
 #define kColorModerate [Helpers r:190 g:73 b:2 alpha:1.0]
