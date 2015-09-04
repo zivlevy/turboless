@@ -34,7 +34,7 @@
 @property (nonatomic,strong) RMMapView * map;
 
 
-
+@property (nonatomic,strong)NSMutableDictionary * currentTileAnotations;
 
 //right menu bar
 @property (weak, nonatomic) IBOutlet UIView *viewRightMenu;
@@ -52,6 +52,7 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *barItemGPS;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *BarItemTitle;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *barItemUserLocation;
+
 
 //left menu bar
 @property (weak, nonatomic) IBOutlet UIView *viewLeftMenu;
@@ -122,7 +123,9 @@
 
 -(void)dealloc{
     NSLog(@"Dealloc initViewController");
+
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [_map removeObserver:self forKeyPath:@"userTrackingMode"];
 }
 
 - (void)viewDidLoad {
@@ -157,7 +160,9 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(flightNumberChanged:) name:kNotification_FlightNumberChanged object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationStatusChanged:) name:kNotification_LocationStatusChanged object:nil];
     
+
     [[RMConfiguration sharedInstance] setAccessToken:@"pk.eyJ1Ijoieml2bGV2eSIsImEiOiJwaEpQeUNRIn0.OZupy_Vjyl5eRCRlgV6otg"];
     
     
@@ -236,14 +241,16 @@
     //User location
     
     _map.showsUserLocation   = YES;
-    _map.userTrackingMode = RMUserTrackingModeFollowWithHeading | RMUserTrackingModeFollow;
+    _map.userTrackingMode = RMUserTrackingModeFollow;
+    _map.userTrackingMode = RMUserTrackingModeNone;
     _map.tintColor = [UIColor colorWithRed:0.5 green:0.6 blue:1.0 alpha:1];
-    
-    
+    //kvo observer
+    [_map addObserver:self forKeyPath:@"userTrackingMode"      options:NSKeyValueObservingOptionNew context:nil];
+
     // set zoom
     self.map.zoom = 6;
-    self.map.maxZoom = 6;
-    self.map.minZoom = 3;
+    self.map.maxZoom = 16;
+    self.map.minZoom = 1;
     //    self.map.autoresizingMask =  UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight ;
     // set coordinates
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake(33.5,32.0);
@@ -266,7 +273,7 @@
         
         
         
-        int minDownloadZoom = 3;
+        int minDownloadZoom = 1;
         int maxDownloadZoom = 6;
         
         CLLocationCoordinate2D southWest = CLLocationCoordinate2DMake(-85,-180);
@@ -367,13 +374,42 @@
     
     
 }
-
+-(void)mapView:(RMMapView *)mapView didSelectAnnotation:(RMAnnotation *)annotation{
+    NSLog(@"%@",annotation.title);
+}
 - (RMMapLayer *)mapView:(RMMapView *)mapView layerForAnnotation:(RMAnnotation *)annotation
 {
     
     
-    if (annotation.isUserLocationAnnotation)
-        return nil;
+    if (annotation.isUserLocationAnnotation){
+        RMMapLayer * layer = [RMMapLayer new];
+        CGFloat whiteWidth = 24.0;
+        
+        CGRect rect = CGRectMake(0, 0, whiteWidth * 1.5, whiteWidth * 1.5);
+        
+        UIGraphicsBeginImageContextWithOptions(rect.size, NO, [[UIScreen mainScreen] scale]);
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        
+        CGContextSetShadow(context, CGSizeMake(0, 0), whiteWidth / 4.0);
+        
+        CGContextSetFillColorWithColor(context, [[UIColor whiteColor] CGColor]);
+        CGContextFillEllipseInRect(context, CGRectMake((rect.size.width - whiteWidth) / 2.0, (rect.size.height - whiteWidth) / 2.0, whiteWidth, whiteWidth));
+        UIImage *whiteBackground ;
+        if ([LocationManager sharedManager].isLocationGood) {
+            whiteBackground = [UIImage imageNamed:@"airplane.png"];
+        } else {
+            whiteBackground = [UIImage imageNamed:@"slider20.png"];
+            
+        }
+        
+        
+        UIGraphicsEndImageContext();
+        
+        layer = [[RMMarker alloc] initWithUIImage:whiteBackground];
+        
+
+        return layer;
+    }
     int  zoomLevelForAnnotation;
     switch ((int)mapView.zoom) {
         case 6:
@@ -386,24 +422,23 @@
             zoomLevelForAnnotation =10;
             break;
         case 3:
-            zoomLevelForAnnotation =10;
+            zoomLevelForAnnotation =9;
             break;
         case 2:
-            zoomLevelForAnnotation =9;
+            zoomLevelForAnnotation =8;
             break;
         case 1:
         case 0:
-            zoomLevelForAnnotation =7;
+            zoomLevelForAnnotation =8;
             break;
         default:
             break;
     }
     
-    zoomLevelForAnnotation = 11;
+    //zoomLevelForAnnotation = 11;
     
     int zoomFactor = pow(2.0, zoomLevelForAnnotation);
     RMCircle *circle = [[RMCircle alloc] initWithView:mapView radiusInMeters:40075.016686*1000/zoomFactor/2];
-    
     UIColor * colorLevel1 = kColorLight;
     UIColor * colorLevel2 = kColorLightModerate;
     UIColor * colorLevel3 = kColorModerate;
@@ -482,23 +517,23 @@
             break;
         case 5:
             zoomLevelForAnnotation =@"11";
-            zoomFactor = pow(2,10);
+            zoomFactor = pow(2,11);
             break;
         case 4:
             zoomLevelForAnnotation =@"10";
             zoomFactor = pow(2,10);
             break;
         case 3:
-            zoomLevelForAnnotation =@"10";
-            zoomFactor = pow(2,9);
-            break;
-        case 2:
             zoomLevelForAnnotation =@"09";
             zoomFactor = pow(2,9);
             break;
+        case 2:
+            zoomLevelForAnnotation =@"08";
+            zoomFactor = pow(2,8);
+            break;
         case 1:
         case 0:
-            zoomLevelForAnnotation =@"07";
+            zoomLevelForAnnotation =@"08";
             zoomFactor = pow(2,8);
             break;
         default:
@@ -509,7 +544,38 @@
     NSMutableArray * arr = [NSMutableArray new];
     NSDictionary * dict = [[TurbulenceManager sharedManager]getTurbulanceDictionaryArLevel:self.selectedAltitudeLayer];
     
+    //holds annotations for tileXY for aggregation by zoom
+    _currentTileAnotations = [NSMutableDictionary new];
+    
     for ( Turbulence * turbulence in [dict allValues]) {
+        int x = turbulence.tileX;
+        int y = turbulence.tileY;
+
+        
+        
+        
+        NSString * tileAddress = [NSString stringWithFormat:@"%@%@%@",[MapUtils padInt:x padTo:4],[MapUtils padInt:y padTo:4],@"11"];
+        CLLocationCoordinate2D centerTileCoordinate = [MapUtils getCenterCoordinatesForTilePathForZoom:tileAddress];
+        NSString * tileAddressNew = [MapUtils transformWorldCoordinateToTilePathForZoom:(int)zoomLevelForAnnotation.integerValue fromLon:centerTileCoordinate.longitude fromLat:centerTileCoordinate.latitude];
+        centerTileCoordinate = [MapUtils getCenterCoordinatesForTilePathForZoom:tileAddressNew];
+        
+        //do aggergation of turbulence data
+        
+        Turbulence * turbulenceDataInLocation = [_currentTileAnotations objectForKey:tileAddressNew];
+        if (!turbulenceDataInLocation) {
+            [_currentTileAnotations setObject:turbulence forKey:tileAddressNew];
+            
+        }
+        else if (turbulenceDataInLocation.severity < turbulence.severity) {
+            [_currentTileAnotations setObject:turbulence forKey:tileAddressNew];
+            
+        }
+        
+        
+
+    }
+    
+    for ( Turbulence * turbulence in [_currentTileAnotations allValues]) {
         int x = turbulence.tileX;
         int y = turbulence.tileY;
         int value = turbulence.severity;
@@ -521,24 +587,26 @@
         NSString * tileAddressNew = [MapUtils transformWorldCoordinateToTilePathForZoom:(int)zoomLevelForAnnotation.integerValue fromLon:centerTileCoordinate.longitude fromLat:centerTileCoordinate.latitude];
         centerTileCoordinate = [MapUtils getCenterCoordinatesForTilePathForZoom:tileAddressNew];
         
-        
-        RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:self.map
-                                                              coordinate:centerTileCoordinate
-                                                                andTitle:@"Coverage Area"];
-        
-        
-        annotation.userInfo = [NSNumber numberWithInt:value];
-        
-        if (_pickerHistory.selectedItem+1 ==15) {
-            [arr addObject:annotation];
-        }
-        else if ([[NSDate date] timeIntervalSince1970] - turbulence.timestamp < (_pickerHistory.selectedItem+1) *6 * 3600) {
-            NSLog (@"%@ - %i",[NSDate dateWithTimeIntervalSince1970:turbulence.timestamp],turbulence.severity);
-            [arr addObject:annotation];
-        }
 
+            RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:self.map
+                                                                  coordinate:centerTileCoordinate
+                                                                    andTitle:[Helpers getGMTTimeString:[NSDate dateWithTimeIntervalSince1970:turbulence.timestamp] withFormat:@"dd/MM HH:mm" ]];
+            
+            
+            annotation.userInfo = [NSNumber numberWithInt:value];
+            
+            if (_pickerHistory.selectedItem+1 ==15) {
+                [arr addObject:annotation];
+            }
+            else if ([[NSDate date] timeIntervalSince1970] - turbulence.timestamp < (_pickerHistory.selectedItem+1) *6 * 3600) {
+                NSLog (@"%@ - %i",[NSDate dateWithTimeIntervalSince1970:turbulence.timestamp],turbulence.severity);
+                [arr addObject:annotation];
+            }
+        
+        
+        
     }
-    
+
     Airport * origin = [RouteManager sharedManager].currentFlight.originAirport;
     Airport * dest = [RouteManager sharedManager].currentFlight.destinationAirport;
     if (![origin.ICAO isEqualToString:dest.ICAO] && dest && origin) {
@@ -741,7 +809,6 @@
 #pragma mark - notification handling
 -(void)turbuleceUpdatedFromServer:(NSNotification*)notification
 {
-    NSLog(@"Server Updated");
     [_map removeAllAnnotations];
     [self addAnnotationsWithMap:_map];
 }
@@ -772,6 +839,33 @@
     [_btnFlightNumber setTitle:[[NSUserDefaults standardUserDefaults]objectForKey:@"flightNumber"]  forState:UIControlStateNormal]  ;
 }
 
+-(void) locationStatusChanged:(NSNotification *) notification {
+    
+    NSNumber * isGoodLocation = notification.object;
+    //location status changed so we ned to replace Icon
+    if (isGoodLocation) {
+        NSLog(@"good location");
+    } else {
+        NSLog(@"bad location");
+    }
+    [_map removeAllAnnotations ];
+    [self addAnnotationsWithMap:_map];
+ 
+}
+
+#pragma mark - UserLocation Icon change
+-(void) setUserLocationIcon {
+    //if bad gps or not in userLocation mode - remove user location icon
+    
+
+}
+
+#pragma mark -
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    [self userLocationModeChanged];
+}
 
 #pragma mark ------------------------
 
@@ -813,7 +907,6 @@
 
 #pragma mark - about view delegate
 -(void) logout {
-    NSLog (@"About logout");
     [_aboutPopover dismissPopoverAnimated:NO];
     _aboutPopover = nil;
     [self performSegueWithIdentifier:@"segueUnwind" sender:self];
@@ -841,7 +934,6 @@
 -(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
 {
     
-    
     self.map.autoresizingMask =  UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight ;
     [_map removeAllAnnotations];
     [self addAnnotationsWithMap:_map];
@@ -856,9 +948,28 @@
     
 }
 - (IBAction)btnUserLocation_Click:(UIBarButtonItem *)sender {
-    _map.userTrackingMode = RMUserTrackingModeFollow;
+    if (_map.userTrackingMode == RMUserTrackingModeFollow) {
+        [_map setUserTrackingMode:RMUserTrackingModeFollowWithHeading animated:YES] ;
+        
+    } else if (_map.userTrackingMode == RMUserTrackingModeFollowWithHeading){
+        [_map setUserTrackingMode:RMUserTrackingModeNone animated:YES] ;
+        
+    } else {
+        [_map setUserTrackingMode:RMUserTrackingModeFollow animated:YES] ;
+    }
+    [self userLocationModeChanged];
 }
 
+-(void) userLocationModeChanged {
+    if (_map.userTrackingMode == RMUserTrackingModeFollow) {
+        _barItemUserLocation.tintColor = [UIColor greenColor];
+    } else if (_map.userTrackingMode == RMUserTrackingModeFollowWithHeading){
+        _barItemUserLocation.tintColor = [UIColor orangeColor];
+    } else {
+        _barItemUserLocation.tintColor = [UIColor whiteColor];
+    }
+
+}
 
 
 #pragma mark - AKPickerViewDelegate
@@ -897,4 +1008,6 @@
     [_map removeAllAnnotations];
     [self addAnnotationsWithMap:_map];
 }
+
+
 @end

@@ -137,9 +137,10 @@
             accelerometerEvent.z = accelerometerData.acceleration.z;
             accelerometerEvent.g =sqrt(accelerometerEvent.x*accelerometerEvent.x+accelerometerEvent.y*accelerometerEvent.y+accelerometerEvent.z*accelerometerEvent.z);
             accelerometerEvent.timeStamp=[[NSDate date] timeIntervalSince1970];
+            accelerometerEvent.timeStampMiliseconds =[[NSDate date] timeIntervalSince1970]*1000;
             accelerometerEvent.location = [[LocationManager sharedManager] getCurrentLocation];
             if (DEBUG_MODE) {
-                if (!_isDeviceInMotion && _isLocationValid){
+                if (!_isDeviceInMotion ){
                     
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [_turboFilter proccesInput:accelerometerEvent];

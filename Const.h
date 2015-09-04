@@ -33,6 +33,7 @@
 #define kNotification_turbulenceServerNewFile @"turbulenceServerNewFile"
 #define kNotification_IOSAccelerometerDataRecieved @"IOSAccelerometerDataRecieved"
 #define kNotification_LocationStatusChanged @"LocationStatusChanged"
+#define kNotification_NewGPSLocation @"NewGPSLocation"
 
 #define kNotification_TurbulenceEvent @"TurbulenceEvent"
 #define kNotification_TurbulenceEventWrittenToFile @"TurbulenceEventWrittenToFile"

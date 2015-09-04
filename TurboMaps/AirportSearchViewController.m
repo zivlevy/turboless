@@ -101,7 +101,6 @@
         
     }
     [self.delegate airportSelected: selectedAirport toTargetControl:_taragetControl ];
-    NSLog(@"%@",selectedAirport.ICAO);
     
 }
 

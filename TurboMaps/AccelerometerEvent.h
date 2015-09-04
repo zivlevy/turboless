@@ -14,6 +14,7 @@
 @property double z;
 @property double g;
 @property long timeStamp;
+@property long timeStampMiliseconds;
 @property (nonatomic,strong) CLLocation * location;
 
 @end

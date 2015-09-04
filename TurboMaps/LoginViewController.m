@@ -35,7 +35,7 @@
 
 -(void)dealloc{
     
-    NSLog(@"dealloc");
+
 }
 -(void)viewWillAppear:(BOOL)animated
 {

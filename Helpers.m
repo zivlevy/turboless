@@ -72,7 +72,7 @@
 +(NSString *) getGMTTimeString:(NSDate *) dateValue withFormat:(NSString *) format
 {
     NSDateFormatter* df_local = [[NSDateFormatter alloc] init];
-    //[df_local setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]]; //ODO add Daytime saving support
+    [df_local setTimeZone:[NSTimeZone timeZoneWithAbbreviation:@"GMT"]]; //ODO add Daytime saving support
     [df_local setDateFormat:format];
     NSString * formatedDate = [df_local stringFromDate:dateValue];
     

@@ -106,7 +106,6 @@
 -(void)inCoolState
 {
     double pwr= _currentEvent.g;
-    //    NSLog(@"COOL state");
     if ([self isTurbulenceFilter:pwr]) {
         _inTurbulenceSuspect = true;
         _turbulenceSuspectCount=1;

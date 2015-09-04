@@ -139,18 +139,15 @@
     //if deliveryFile.txt exists send it
     if([fileManager fileExistsAtPath:filePathSrc])
     {
-        NSLog(@"Try to send file");
         [self sendFile];
     } else {
         //if fileData.txt exists copy it
         filePathSrc = [documentsDirectory stringByAppendingPathComponent:@"fileData.txt"];
         if([fileManager fileExistsAtPath:filePathSrc]){
             [self renameFileWithName:@"fileData.txt" toName:@"deliveryFile.txt"];
-            NSLog(@"file copied ok");
             _isFileTransferInProgress=NO;
             [self tryTransferFile];
         } else {
-            NSLog(@"nothing to do");
             _isFileTransferInProgress=NO;
         }
     }
@@ -203,8 +200,6 @@
     [manager POST:strURL parameters:JSON
           success:^(AFHTTPRequestOperation *operation, id responseObject)
     {
-        NSLog(@"JSON: %@", responseObject);
-        NSLog(@"file transfered ok");
         [fileManager removeItemAtPath:filePathSrc error:nil];
         _isFileTransferInProgress=NO;
         [self tryTransferFile];

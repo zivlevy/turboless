@@ -25,6 +25,8 @@
 		A59791E21B77ECE200AACC6F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A59791E11B77ECE200AACC6F /* Images.xcassets */; };
 		A59791E51B77ECE200AACC6F /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = A59791E31B77ECE200AACC6F /* LaunchScreen.xib */; };
 		A59791F11B77ECE200AACC6F /* TurboMapsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A59791F01B77ECE200AACC6F /* TurboMapsTests.m */; };
+		A5AE1A281B96A9AC00D6FF67 /* airplane.png in Resources */ = {isa = PBXBuildFile; fileRef = A5AE1A261B96A9AC00D6FF67 /* airplane.png */; };
+		A5AE1A291B96A9AC00D6FF67 /* airplane@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A5AE1A271B96A9AC00D6FF67 /* airplane@2x.png */; };
 		A5AE64AD1B77F05700677EA7 /* InitViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5AE64AC1B77F05700677EA7 /* InitViewController.m */; };
 		A5B3A78E1B8A48FF00E447EE /* FlightNumberViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3A78D1B8A48FF00E447EE /* FlightNumberViewController.m */; };
 		A5B3A7931B8AE31F00E447EE /* AKPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = A5B3A7921B8AE31F00E447EE /* AKPickerView.m */; };
@@ -106,6 +108,8 @@
 		A59791EA1B77ECE200AACC6F /* TurboMapsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TurboMapsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A59791EF1B77ECE200AACC6F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A59791F01B77ECE200AACC6F /* TurboMapsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TurboMapsTests.m; sourceTree = "<group>"; };
+		A5AE1A261B96A9AC00D6FF67 /* airplane.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = airplane.png; sourceTree = "<group>"; };
+		A5AE1A271B96A9AC00D6FF67 /* airplane@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "airplane@2x.png"; sourceTree = "<group>"; };
 		A5AE64AB1B77F05700677EA7 /* InitViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InitViewController.h; sourceTree = "<group>"; };
 		A5AE64AC1B77F05700677EA7 /* InitViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InitViewController.m; sourceTree = "<group>"; };
 		A5B3A78C1B8A48FF00E447EE /* FlightNumberViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FlightNumberViewController.h; sourceTree = "<group>"; };
@@ -462,6 +466,8 @@
 		A5B3EAE71B810390003D5AE2 /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				A5AE1A261B96A9AC00D6FF67 /* airplane.png */,
+				A5AE1A271B96A9AC00D6FF67 /* airplane@2x.png */,
 				A5E239681B8C66EF00D83DC8 /* navArrow.png */,
 				A5E239691B8C66EF00D83DC8 /* navArrow@2x.png */,
 				A5B9922A1B892FB500DEFC07 /* shake.png */,
@@ -705,6 +711,7 @@
 				A545ADDC1B866669005928AC /* to.png in Resources */,
 				A5B9922B1B892FB500DEFC07 /* shake.png in Resources */,
 				A545ADE31B86A184005928AC /* earth-america-7.png in Resources */,
+				A5AE1A291B96A9AC00D6FF67 /* airplane@2x.png in Resources */,
 				A5E2396B1B8C66EF00D83DC8 /* navArrow@2x.png in Resources */,
 				A545AE001B871837005928AC /* swap.png in Resources */,
 				A545ADFC1B871706005928AC /* satellite@2x.png in Resources */,
@@ -716,6 +723,7 @@
 				A59791E01B77ECE200AACC6F /* Main.storyboard in Resources */,
 				A545ADE11B866E26005928AC /* land@2x.png in Resources */,
 				A545ADFB1B871706005928AC /* satellite.png in Resources */,
+				A5AE1A281B96A9AC00D6FF67 /* airplane.png in Resources */,
 				A5B3EAF01B81062B003D5AE2 /* bright-7.png in Resources */,
 				A545ADDD1B866669005928AC /* to@2x.png in Resources */,
 				A5B3EB091B81E03B003D5AE2 /* appIcon.png in Resources */,

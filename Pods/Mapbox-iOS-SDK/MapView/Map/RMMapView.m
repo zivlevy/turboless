@@ -66,6 +66,8 @@
 #define kDefaultMaximumZoomLevel 25.0
 #define kDefaultInitialZoomLevel 11.0
 
+#define kSpeedCutOff 10
+
 #pragma mark --- end constants ----
 
 @interface RMMapView (PrivateMethods) <UIScrollViewDelegate,
@@ -3272,7 +3274,7 @@
     {
         for (RMAnnotation *annotation in annotationsToRemove)
         {
-            if ( ! annotation.isUserLocationAnnotation)
+            if ( annotation.isUserLocationAnnotation)
             {
                 [_annotations removeObject:annotation];
                 [_visibleAnnotations removeObject:annotation];
@@ -3396,7 +3398,8 @@
         case RMUserTrackingModeNone:
         default:
         {
-            [_locationManager stopUpdatingHeading];
+            [_locationManager startUpdatingHeading];
+//            [_locationManager stopUpdatingHeading];
 
             [CATransaction setAnimationDuration:0.5];
             [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
@@ -3431,8 +3434,8 @@
         case RMUserTrackingModeFollow:
         {
             self.showsUserLocation = YES;
-
-            [_locationManager stopUpdatingHeading];
+[_locationManager startUpdatingHeading];
+//            [_locationManager stopUpdatingHeading];
 
             if (self.userLocation)
                 #pragma clang diagnostic push
@@ -3521,7 +3524,50 @@
     if ([newLocation distanceFromLocation:oldLocation])
     {
         self.userLocation.location = newLocation;
-
+////
+        
+        
+        if (self.userTrackingMode != RMUserTrackingModeNone){
+        /////[CATransaction begin];
+        [CATransaction setAnimationDuration:0.5];
+        [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+        
+        [UIView animateWithDuration:0.5
+                              delay:0.0
+                            options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationCurveEaseInOut
+                         animations:^(void)
+         {
+             CGFloat angle;
+             if (_locationManager.location.course >0 && ([NSDate date ].timeIntervalSince1970 - _locationManager.location.timestamp.timeIntervalSince1970)<5 &&  _locationManager.location.speed > kSpeedCutOff){
+                 angle=(M_PI / -180) * newLocation.course;
+             } else {
+                 angle = 0;
+                 NSLog(@"not good%f",_locationManager.location.course);
+             }
+             
+             
+             _mapTransform = CGAffineTransformMakeRotation(angle);
+             _annotationTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeRotation(-angle));
+             //rotate all elements
+             if (self.userTrackingMode == RMUserTrackingModeFollowWithHeading) {
+                 _mapScrollView.transform = _mapTransform;
+                 _compassButton.transform = _mapTransform;
+                 _overlayView.transform   = _mapTransform;
+             }
+             
+             
+             //             _compassButton.alpha = 1.0;
+             [self correctPositionOfAllAnnotations];
+             for (RMAnnotation *annotation in _annotations)
+                 if ([annotation.layer isKindOfClass:[RMMarker class]])
+                     annotation.layer.transform = _annotationTransform;
+             
+             
+         }
+            completion:nil];
+        
+        [CATransaction commit];
+        }
         if (_delegateHasDidUpdateUserLocation)
         {
             [_delegate mapView:self didUpdateUserLocation:self.userLocation];
@@ -3694,6 +3740,7 @@
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)newHeading
 {
+    return;
     if ( ! _showsUserLocation || _mapScrollView.isDragging || newHeading.headingAccuracy < 0)
         return;
 
@@ -3713,8 +3760,8 @@
 
     if (headingDirection != 0 && self.userTrackingMode == RMUserTrackingModeFollowWithHeading)
     {
-        if (_userHeadingTrackingView.alpha < 1.0)
-            [UIView animateWithDuration:0.5 animations:^(void) { _userHeadingTrackingView.alpha = 1.0; }];
+//        if (_userHeadingTrackingView.alpha < 1.0)
+//            [UIView animateWithDuration:0.5 animations:^(void) { _userHeadingTrackingView.alpha = 1.0; }];
 
         [CATransaction begin];
         [CATransaction setAnimationDuration:0.5];
@@ -3725,8 +3772,13 @@
                             options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationCurveEaseInOut
                          animations:^(void)
                          {
-                             CGFloat angle = (M_PI / -180) * headingDirection;
-
+                             CGFloat angle;// = (M_PI / -180) * headingDirection;
+                             
+                             if (_locationManager.location.course >0 && ([NSDate date ].timeIntervalSince1970 - _locationManager.location.timestamp.timeIntervalSince1970)<5 &&  _locationManager.location.speed > kSpeedCutOff) {
+                                 NSLog(@"%f",_locationManager.location.course);
+                                 angle=(M_PI / -180) *_locationManager.location.course;
+                             }
+                             
                              _mapTransform = CGAffineTransformMakeRotation(angle);
                              _annotationTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeRotation(-angle));
 
@@ -3735,17 +3787,57 @@
                              _overlayView.transform   = _mapTransform;
 
                              _compassButton.alpha = 1.0;
-
+                             [self correctPositionOfAllAnnotations];
                              for (RMAnnotation *annotation in _annotations)
                                  if ([annotation.layer isKindOfClass:[RMMarker class]])
                                      annotation.layer.transform = _annotationTransform;
 
-                             [self correctPositionOfAllAnnotations];
+                             
                          }
                          completion:nil];
 
         [CATransaction commit];
+    } else if  (headingDirection != 0 && (self.userTrackingMode == RMUserTrackingModeFollow || self.userTrackingMode == RMUserTrackingModeNone))
+    {
+        //        if (_userHeadingTrackingView.alpha < 1.0)
+        //            [UIView animateWithDuration:0.5 animations:^(void) { _userHeadingTrackingView.alpha = 1.0; }];
+        
+        [CATransaction begin];
+        [CATransaction setAnimationDuration:0.5];
+        [CATransaction setAnimationTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+        
+        [UIView animateWithDuration:0.5
+                              delay:0.0
+                            options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationCurveEaseInOut
+                         animations:^(void)
+         {
+             CGFloat angle = (M_PI / -180) * headingDirection;
+             if (_locationManager.location.course >0 && ([NSDate date ].timeIntervalSince1970 - _locationManager.location.timestamp.timeIntervalSince1970)<5 &&  _locationManager.location.speed > kSpeedCutOff) {
+                 angle=(M_PI / -180) *_locationManager.location.course;
+             }
+             
+             
+             _mapTransform = CGAffineTransformMakeRotation(angle);
+             _annotationTransform = CATransform3DMakeAffineTransform(CGAffineTransformMakeRotation(-angle));
+             
+//             _mapScrollView.transform = _mapTransform;
+//             _compassButton.transform = _mapTransform;
+//             _overlayView.transform   = _mapTransform;
+             
+//             _compassButton.alpha = 1.0;
+             [self correctPositionOfAllAnnotations];
+             for (RMAnnotation *annotation in _annotations)
+                 if ([annotation.layer isKindOfClass:[RMMarker class]])
+                     annotation.layer.transform = _annotationTransform;
+             
+             
+         }
+                         completion:nil];
+        
+        [CATransaction commit];
     }
+
+    
 }
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status

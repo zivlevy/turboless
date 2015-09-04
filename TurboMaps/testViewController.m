@@ -159,7 +159,6 @@
 
 #pragma mark - debug manager delegate
 -(void)debugManagerSaveSuccess{
-    NSLog(@"download good");
     //report
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Upload completed succesfully." message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
@@ -174,11 +173,9 @@
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Couldn't upload.\nTry again later." message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
     [self inNormalState];
-    NSLog(@"download failed");
 }
 
 -(void)debugManagerSaveProgress:(float)precent  {
-    NSLog(@"download progress %f",precent);
     _lblSendingToServer.text =[NSString stringWithFormat:@"Uploading %i%% ,please wait.",(int)precent*100];
 }
 

@@ -27,7 +27,7 @@
 -(void)endRecording;
 
 -(NSArray *) getDebugFileList;
--(void)removeDebugFile;
+//-(void)removeDebugFile;
 -(void)sendDataFile:(NSString *) fileName;
 
 @end

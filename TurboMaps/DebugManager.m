@@ -26,6 +26,8 @@
 @interface DebugManager()
 @property (nonatomic,strong) NSString * dataFileName;
 @property (nonatomic,strong) NSString * turbulenceFileName;
+@property (nonatomic,strong) NSString * gpsFileName;
+@property (nonatomic,strong) NSString * locationChangeFileName;
 @end
 
 @implementation DebugManager
@@ -44,6 +46,10 @@
     if (self = [super init]) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(accelerometerEvent:) name:kNotification_IOSAccelerometerDataRecieved object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(turbulenceWriteToFile:) name:kNotification_TurbulenceEventWrittenToFile object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationStatusChanged:) name:kNotification_LocationStatusChanged object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(newGpsLocation:) name:kNotification_NewGPSLocation object:nil];
+
+        
     }
     return self;
 }
@@ -61,7 +67,7 @@
     
     AccelerometerEvent * event = notification.object;
     
-    NSString * content = [NSString stringWithFormat:@"%ld,%f,%f,%f,%f,%f,%f\n",event.timeStamp,event.x,event.y,event.z,event.g,event.location.coordinate.latitude,event.location.coordinate.longitude];
+    NSString * content = [NSString stringWithFormat:@"%ld,%f,%f,%f,%f\n",event.timeStampMiliseconds,event.x,event.y,event.z,event.g];
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if(![fileManager fileExistsAtPath:self.dataFileName])
@@ -103,6 +109,57 @@
     }
 }
 
+-(void) locationStatusChanged:(NSNotification *) notification {
+    if (!_isRecording) {
+        return;
+    }
+    
+    NSNumber *  data = notification.object;
+
+    long timestamp  = [[NSDate date] timeIntervalSince1970] *1000;
+    
+    NSString * content = [NSString stringWithFormat:@"%ld,%@,%i\n",timestamp,[Helpers  getGMTTimeString:[NSDate date] withFormat:@"dd/MM hh:mm"], [data boolValue]];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if(![fileManager fileExistsAtPath:_locationChangeFileName])
+    {
+        [content writeToFile:_locationChangeFileName
+                  atomically:NO
+                    encoding:NSStringEncodingConversionAllowLossy
+                       error:nil];
+    }
+    else
+    {
+        NSFileHandle *myHandle = [NSFileHandle fileHandleForWritingAtPath:_locationChangeFileName];
+        [myHandle seekToEndOfFile];
+        [myHandle writeData:[content dataUsingEncoding:NSUTF8StringEncoding]];
+    }
+}
+-(void) newGpsLocation:(NSNotification *) notification {
+    if (!_isRecording) {
+        return;
+    }
+    
+    CLLocation *  newLocation = notification.object;
+    
+    NSString * content = [NSString stringWithFormat:@"%@,%f,%f,%f,%f,%f\n", newLocation.timestamp, newLocation.coordinate.latitude,newLocation.coordinate.longitude,newLocation.altitude, newLocation.horizontalAccuracy,newLocation.verticalAccuracy];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if(![fileManager fileExistsAtPath:_gpsFileName])
+    {
+        [content writeToFile:_gpsFileName
+                  atomically:NO
+                    encoding:NSStringEncodingConversionAllowLossy
+                       error:nil];
+    }
+    else
+    {
+        NSFileHandle *myHandle = [NSFileHandle fileHandleForWritingAtPath:_gpsFileName];
+        [myHandle seekToEndOfFile];
+        [myHandle writeData:[content dataUsingEncoding:NSUTF8StringEncoding]];
+    }
+}
+
 
 #pragma mark - public functions
 -(void)startRecording:(NSString*) sessionName {
@@ -124,6 +181,10 @@
                      documentsDirectory, sessionName];
     _turbulenceFileName = [NSString stringWithFormat:@"%@/debugFiles/%@/turbulence.txt",
                      documentsDirectory, sessionName];
+    _locationChangeFileName= [NSString stringWithFormat:@"%@/debugFiles/%@/locationChanges.txt",
+                   documentsDirectory, sessionName];
+    _gpsFileName=[NSString stringWithFormat:@"%@/debugFiles/%@/gpsData.txt",
+                  documentsDirectory, sessionName];
 }
 
 -(void)endRecording {
@@ -199,7 +260,7 @@
     AFHTTPRequestOperation *operation =
     [manager HTTPRequestOperationWithRequest:request
                                      success:^(AFHTTPRequestOperation *operation, id responseObject) {
-                                         NSLog(@"Success %@", responseObject);
+                                         
                                          
                                          //delete original and zip files
                                          [fileManager removeItemAtPath:zipFileName error:nil];
@@ -218,7 +279,6 @@
                                         long long totalBytesExpectedToWrite) {
         //update delgate
         [_delegate debugManagerSaveProgress:totalBytesWritten/totalBytesExpectedToWrite ];
-        NSLog(@"Wrote %lld/%lld", totalBytesWritten, totalBytesExpectedToWrite);
     }];
     
     [operation start];

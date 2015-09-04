@@ -74,6 +74,7 @@
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
     _currentLocation = newLocation;
+    [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_NewGPSLocation object:newLocation];
     
 }
 
