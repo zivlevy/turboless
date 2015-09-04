@@ -27,12 +27,15 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [_btnSend setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     switch (_turbulenceLevel) {
         case 1:
             _btnSend.backgroundColor = kColorLight;
+            
             break;
         case 2:
             _btnSend.backgroundColor = kColorLightModerate;
+            [_btnSend setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
             break;
         case 3:
             _btnSend.backgroundColor = kColorModerate;
@@ -51,15 +54,15 @@
     [self dismissViewControllerAnimated:YES completion:^{
         
     }];
-
-
+    
+    
     //Check for valid gps fix
     if (![[LocationManager sharedManager] isLocationGood]) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"GPS fix is not available. \n Can't send information." message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
         return;
     }
-
+    
     TurbulenceEvent * event = [TurbulenceEvent new];
     
     // find current location
@@ -71,14 +74,14 @@
     //TODO
     // check for valid altitude
     if (event.altitude <=0 || event.altitude>kAltitude_NumberOfSteps) {
-//        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"GPS fix is not available. \n Can't send information." message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-//        [alert show];
-//        return;
+        //        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"GPS fix is not available. \n Can't send information." message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        //        [alert show];
+        //        return;
     }
     event.severity=(int)_turbulenceLevel;
     event.isPilotEvent = YES;
     
-
+    
     event.flightNumber = [[NSUserDefaults standardUserDefaults] objectForKey:@"flightNumber"];
     NSDate * now = [NSDate date];
     event.date = now;

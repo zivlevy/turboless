@@ -643,7 +643,7 @@
     label.textColor = [UIColor whiteColor];
     label.textAlignment= NSTextAlignmentCenter;
     label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:20];
-    label.text = [NSString stringWithFormat:@" %ld K", (kAltitude_Min+row * kAltitude_Step)];
+    label.text = [NSString stringWithFormat:@" %i K", (int)(kAltitude_Min+row * kAltitude_Step)];
     return label;
 }
 
@@ -989,7 +989,7 @@
     if (item+1==15) {
         return @"ALL";
     }
-    return [NSString stringWithFormat:@"%lih", 6 * (item+1)];
+    return [NSString stringWithFormat:@"%ih", (int)(6 * (item+1))];
 }
 
 /*

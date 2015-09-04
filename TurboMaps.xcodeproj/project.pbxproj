@@ -68,6 +68,7 @@
 		A5E5AF7C1B83AD3300E413A9 /* TurbulenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E5AF7B1B83AD3300E413A9 /* TurbulenceManager.m */; };
 		A5E5AF7F1B83B26E00E413A9 /* Turbulence.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E5AF7E1B83B26E00E413A9 /* Turbulence.m */; };
 		A5E5AF821B8442CF00E413A9 /* AirportSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E5AF811B8442CF00E413A9 /* AirportSearchViewController.m */; };
+		A5E626CB1B9A46E500454F59 /* skyPathRound.png in Resources */ = {isa = PBXBuildFile; fileRef = A5E626CA1B9A46E500454F59 /* skyPathRound.png */; };
 		A5E7A0A31B79105E00FD969C /* MapUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E7A0A21B79105E00FD969C /* MapUtils.m */; };
 		A5E7A0A51B7A0A9A00FD969C /* data.json in Resources */ = {isa = PBXBuildFile; fileRef = A5E7A0A41B7A0A9A00FD969C /* data.json */; };
 		A5E7A0A91B7A418B00FD969C /* Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = A5E7A0A81B7A418B00FD969C /* Helpers.m */; };
@@ -236,6 +237,7 @@
 		A5E5AF7E1B83B26E00E413A9 /* Turbulence.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Turbulence.m; sourceTree = "<group>"; };
 		A5E5AF801B8442CF00E413A9 /* AirportSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AirportSearchViewController.h; sourceTree = "<group>"; };
 		A5E5AF811B8442CF00E413A9 /* AirportSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AirportSearchViewController.m; sourceTree = "<group>"; };
+		A5E626CA1B9A46E500454F59 /* skyPathRound.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = skyPathRound.png; sourceTree = "<group>"; };
 		A5E7A0A11B79105E00FD969C /* MapUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapUtils.h; path = TurboMaps/MapUtils.h; sourceTree = "<group>"; };
 		A5E7A0A21B79105E00FD969C /* MapUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MapUtils.m; path = TurboMaps/MapUtils.m; sourceTree = "<group>"; };
 		A5E7A0A41B7A0A9A00FD969C /* data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = data.json; sourceTree = "<group>"; };
@@ -479,6 +481,7 @@
 				A545ADDE1B866E26005928AC /* land.png */,
 				A545ADDF1B866E26005928AC /* land@2x.png */,
 				A5B3EB081B81E03B003D5AE2 /* appIcon.png */,
+				A5E626CA1B9A46E500454F59 /* skyPathRound.png */,
 				A5B3EAFA1B81C4E3003D5AE2 /* small */,
 				A5B3EAE81B810398003D5AE2 /* Bar Icons */,
 			);
@@ -727,6 +730,7 @@
 				A5B3EAF01B81062B003D5AE2 /* bright-7.png in Resources */,
 				A545ADDD1B866669005928AC /* to@2x.png in Resources */,
 				A5B3EB091B81E03B003D5AE2 /* appIcon.png in Resources */,
+				A5E626CB1B9A46E500454F59 /* skyPathRound.png in Resources */,
 				A59791E51B77ECE200AACC6F /* LaunchScreen.xib in Resources */,
 				A59791E21B77ECE200AACC6F /* Images.xcassets in Resources */,
 				A545AE041B874002005928AC /* TrackingLocation@2x.png in Resources */,
