@@ -34,10 +34,11 @@
             
             break;
         case 2:
-            _btnSend.backgroundColor = kColorLightModerate;
+            
             [_btnSend setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
             break;
         case 3:
+            _btnSend.backgroundColor = kColorLightModerate;
             _btnSend.backgroundColor = kColorModerate;
             break;
         case 4:

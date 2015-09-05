@@ -116,6 +116,14 @@
 //timers
 @property (nonatomic,strong) NSTimer * timerGpsSignal;
 @property (nonatomic,strong) NSTimer * timerHideTurbulenceMarker;
+
+//auto altitude
+@property bool isAltitudeAutoMode;
+@property int currentAltitudeLevel;
+@property (nonatomic,strong) NSTimer * timerAltitudeReturnToAuto;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAltitudeAuto;
+
+
 @end
 
 @implementation InitViewController
@@ -126,6 +134,9 @@
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_map removeObserver:self forKeyPath:@"userTrackingMode"];
+    [_timerAltitudeReturnToAuto invalidate];
+    [_timerGpsSignal invalidate];
+    [_timerHideTurbulenceMarker  invalidate];
 }
 
 - (void)viewDidLoad {
@@ -217,6 +228,11 @@
         [UIApplication sharedApplication].idleTimerDisabled = NO;
     }
     
+    // altitude mode
+    _isAltitudeAutoMode = false;
+    [_switchAltitudeAuto setOn:NO];
+    _currentAltitudeLevel = 5;
+    
 }
 -(void)viewWillAppear:(BOOL)animated{
     [super viewWillAppear:animated];
@@ -296,7 +312,12 @@
     }
     
     //altitude init
-    _selectedAltitudeLayer = 5;
+    if (_isAltitudeAutoMode) {
+        _selectedAltitudeLayer = kAltitude_NumberOfSteps - 9;
+    } else {
+        _selectedAltitudeLayer = 9;
+    }
+    
     
     _pickerAltitude.delegate = self;
     _pickerAltitude.dataSource = self;
@@ -319,14 +340,9 @@
     _pickerHistory.fisheyeFactor = 0.005;
     _pickerHistory.pickerViewStyle = AKPickerViewStyle3D;
     _pickerHistory.maskDisabled = true;
-    
-    
-    
-    
+
     [_pickerHistory reloadData];
 
-    
-    
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
@@ -615,39 +631,6 @@
     }
 }
 
-#pragma mark - UIpicker
-// The number of columns of data
-- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
-{
-    return 1;
-}
-
-// The number of rows of data
-- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
-{
-    return 16  ;
-}
-
-
-// Catpure the picker view selection
-- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
-{
-    _selectedAltitudeLayer = (int)row;
-    [self.map removeAllAnnotations];
-    [self addAnnotationsWithMap:self.map];
-}
-- (UIView *)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row forComponent:(NSInteger)component reusingView:(UIView *)view{
-    
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, pickerView.frame.size.width, 20)];
-    label.backgroundColor = [UIColor grayColor];
-    label.textColor = [UIColor whiteColor];
-    label.textAlignment= NSTextAlignmentCenter;
-    label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:20];
-    label.text = [NSString stringWithFormat:@" %i K", (int)(kAltitude_Min+row * kAltitude_Step)];
-    return label;
-}
-
-
 
 #pragma mark - Popovers
 - (IBAction)btnBrightness_Clicked:(UIBarButtonItem *)sender {
@@ -822,11 +805,7 @@
     NSString * str = notification.object;
     bool isGoodLocation = [str boolValue];
     //location status changed so we ned to replace Icon
-    if (isGoodLocation) {
-        NSLog(@"good location");
-    } else {
-        NSLog(@"bad location");
-    }
+
     for (RMAnnotation * annotation in _map.annotations) {
         if (annotation.isUserLocationAnnotation) {
             for (RMMapLayer * layer in annotation.layer.sublayers) {
@@ -837,8 +816,6 @@
                     }
                 }
                
-               
-                
             }
             
         }
@@ -967,7 +944,99 @@
     }
 
 }
+#pragma mark - UIpicker
+// The number of columns of data
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
+{
+    return 1;
+}
 
+// The number of rows of data
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
+{
+//    if (_isAltitudeAutoMode) {
+//        if (_currentAltitudeLevel > 3 && _currentAltitudeLevel < kAltitude_NumberOfSteps - 3) {
+//            return 7;
+//        }
+//        else {
+//            if (_currentAltitudeLevel <= 3) {
+//                return _currentAltitudeLevel+3;
+//            } else {
+//                return kAltitude_NumberOfSteps - _currentAltitudeLevel + 3;
+//            }
+//        }
+//    } else {
+        return kAltitude_NumberOfSteps  ;
+//    }
+
+}
+
+
+// Catpure the picker view selection
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
+{
+    if (_isAltitudeAutoMode) {
+        _selectedAltitudeLayer = kAltitude_NumberOfSteps - (int)row;
+        
+        //set timer to return to auto hight in 3 minutes
+        [_timerAltitudeReturnToAuto invalidate];
+        _timerAltitudeReturnToAuto = [NSTimer scheduledTimerWithTimeInterval:3*60 target:self selector:@selector(returnToAutoAltitude:) userInfo:nil repeats:NO];
+    } else {
+        _selectedAltitudeLayer = (int)row;
+    }
+    [self.map removeAllAnnotations];
+    [self addAnnotationsWithMap:self.map];
+}
+- (UIView *)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row forComponent:(NSInteger)component reusingView:(UIView *)view{
+    
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, pickerView.frame.size.width, 20)];
+    label.backgroundColor = [UIColor grayColor];
+    label.textColor = [UIColor whiteColor];
+    label.textAlignment= NSTextAlignmentCenter;
+    label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:20];
+    if (!_isAltitudeAutoMode) {
+        label.text = [NSString stringWithFormat:@"%i-%i", (int)(kAltitude_Min+row * kAltitude_Step),(int)(kAltitude_Min+(row+1) * kAltitude_Step)];
+    } else {
+        row = kAltitude_NumberOfSteps - row;
+        long level = labs((_currentAltitudeLevel - row )* kAltitude_Step);
+        NSString * strlevel;
+        
+        if (row < _currentAltitudeLevel) {
+            strlevel = [NSString stringWithFormat:@"-%ld",level];
+        } else if (row > _currentAltitudeLevel) {
+            strlevel = [NSString stringWithFormat:@"+%ld",level];
+        } else {
+            strlevel = @"Auto";
+        }
+        
+        label.text = strlevel;
+    }
+
+
+    return label;
+}
+
+
+- (IBAction)switchAltitudeAuto_changed:(UISwitch *)sender {
+    _isAltitudeAutoMode = sender.isOn;
+    [_pickerAltitude reloadAllComponents];
+    if (sender.isOn) {
+         [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:NO];
+      
+    }else {
+        _selectedAltitudeLayer = _currentAltitudeLevel;
+         [_pickerAltitude selectRow:(_currentAltitudeLevel) inComponent:0 animated:NO];
+    }
+}
+
+-(void)returnToAutoAltitude:(NSTimer *) timer {
+    [_timerAltitudeReturnToAuto invalidate];
+    _timerAltitudeReturnToAuto = nil;
+    [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:YES];
+    _selectedAltitudeLayer =  _currentAltitudeLevel;
+    [_map removeAllAnnotations];
+    [self addAnnotationsWithMap:_map];
+}
 
 #pragma mark - AKPickerViewDelegate
 

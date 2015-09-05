@@ -17,8 +17,8 @@
 
 #define kColorNone [Helpers r:255 g:255 b:255 alpha:0.8]
 #define kColorLight [Helpers r:2 g:115 b:1 alpha:1.0]
-#define kColorLightModerate [Helpers r:251 g:230 b:0 alpha:1.0]
-#define kColorModerate [Helpers r:0 g:0 b:255 alpha:1.0]
+#define kColorLightModerate [Helpers r:34 g:127 b:255 alpha:1.0]
+#define kColorModerate  [Helpers r:251 g:230 b:0 alpha:1.0]
 #define kColorSevere [Helpers r:255 g:0 b:0 alpha:1.0]
 #define kColorExtream [Helpers r:0 g:0 b:0 alpha:1.0]
 
