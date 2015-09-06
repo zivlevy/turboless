@@ -114,14 +114,17 @@
 @property (nonatomic,strong) UIPopoverController * airportSearchPopover;
 
 //timers
-@property (nonatomic,strong) NSTimer * timerGpsSignal;
-@property (nonatomic,strong) NSTimer * timerHideTurbulenceMarker;
+@property (nonatomic,strong) NSTimer * timerGpsSignal; //check gps signal and location 
+@property (nonatomic,strong) NSTimer * timerHideTurbulenceMarker; //hide marker after showing new turbulence event
 
 //auto altitude
 @property bool isAltitudeAutoMode;
+@property bool isUserCanceledAutoMode;
+@property bool isUnderAltitudeAutoMode;
 @property int currentAltitudeLevel;
-@property (nonatomic,strong) NSTimer * timerAltitudeReturnToAuto;
+@property (nonatomic,strong) NSTimer * timerAltitudeReturnToAuto; //after user change altitude in auto mode, return to auto
 @property (weak, nonatomic) IBOutlet UISwitch *switchAltitudeAuto;
+@property (weak, nonatomic) IBOutlet UIView *viewAutoAltutude;
 
 
 @end
@@ -229,8 +232,11 @@
     }
     
     // altitude mode
+    _viewAutoAltutude.hidden=true; //start hidden
+    _isUnderAltitudeAutoMode = true; //start under the altitude
     _isAltitudeAutoMode = false;
-    [_switchAltitudeAuto setOn:NO];
+    _isUserCanceledAutoMode = false;
+    [self setAutoAltitudeMode:NO];
     _currentAltitudeLevel = 5;
     
 }
@@ -593,7 +599,7 @@
                 [arr addObject:annotation];
             }
             else if ([[NSDate date] timeIntervalSince1970] - turbulence.timestamp < (_pickerHistory.selectedItem+1) *6 * 3600) {
-                NSLog (@"%@ - %i",[NSDate dateWithTimeIntervalSince1970:turbulence.timestamp],turbulence.severity);
+            
                 [arr addObject:annotation];
             }
         
@@ -746,9 +752,9 @@
 
 - (void) checkGoodLocation:(NSTimer *)incomingTimer
 {
+
+    
     if ([LocationManager sharedManager].isLocationGood) {
-        
-        
         //update display
         _barItemGPS.tintColor = [UIColor whiteColor];
         CLLocation * currentLocation = [[LocationManager sharedManager] getCurrentLocation];
@@ -756,16 +762,45 @@
         int currentVerticalAccuracy = currentLocation.verticalAccuracy * FEET_PER_METER;
         _BarItemTitle.title = [NSString stringWithFormat:@"Alt: %i Feet / Accuracy: %i Feet",currentAltitude,currentVerticalAccuracy];
         
+        //check for climbing above altitude for Auto Altitude Mode
+        if ([[LocationManager sharedManager] getCurrentLocation].altitude * FEET_PER_METER >=kAltitude_MoveToAutoAltitudeMode * 1000  && _isUnderAltitudeAutoMode) {
+            // we crossed the auto altitude auto mode altitude - go to auto mode
+            _isUnderAltitudeAutoMode = false;
+            _viewAutoAltutude.hidden = false;
+            [self setAutoAltitudeMode:true];
+        } else if([[LocationManager sharedManager] getCurrentLocation].altitude * FEET_PER_METER < kAltitude_MoveToAutoAltitudeMode * 1000 - 100 && !_isUnderAltitudeAutoMode) {
+            //we are under the auto mode barrier switch it off
+            _isUnderAltitudeAutoMode = true;
+            _viewAutoAltutude.hidden = true;
+            [self setAutoAltitudeMode:false];
+        }
         
-        
-        
+        //set auto mode altitude
+        int altitude = [[LocationManager sharedManager] getCurrentTile].altitude;
+        if (altitude < 1) altitude = 9;
+        if (_isAltitudeAutoMode && !_isUserCanceledAutoMode && _currentAltitudeLevel != altitude) {
+        [self setAutoAltitude:altitude];
+        } else {
+            if ([[LocationManager sharedManager] getCurrentTile].altitude>0) {
+                _currentAltitudeLevel = [[LocationManager sharedManager] getCurrentTile].altitude;
+            }
+        }
     } else {
+        // turn auto altitude mode off
+        [self setAutoAltitudeMode:false];
+        //in order to return to auto mode when GPS returns ...
+        _isUnderAltitudeAutoMode = true;
+        
+        //hide the auto altitude switch
+        _viewAutoAltutude.hidden = true;
         
         //update display
         _barItemGPS.tintColor = [UIColor redColor];
-        _BarItemTitle.title =@"Turbuless";
+        _BarItemTitle.title =@"Skypath";
     }
 }
+
+
 
 #pragma mark - notification handling
 -(void)turbuleceUpdatedFromServer:(NSNotification*)notification
@@ -776,7 +811,6 @@
 
 -(void)newTurbulenceEvent:(NSNotification*)notification
 {
-    
     NSLog(@"New Turbulence event");
     Turbulence * turbulence = notification.object;
     _viewTurbulence.backgroundColor = [self getColorForSeverity:turbulence.severity];
@@ -820,16 +854,8 @@
             
         }
     };
-    
- 
 }
 
-#pragma mark - UserLocation Icon change
--(void) setUserLocationIcon {
-    //if bad gps or not in userLocation mode - remove user location icon
-    
-
-}
 
 #pragma mark -
 
@@ -1018,15 +1044,39 @@
 
 
 - (IBAction)switchAltitudeAuto_changed:(UISwitch *)sender {
-    _isAltitudeAutoMode = sender.isOn;
-    [_pickerAltitude reloadAllComponents];
-    if (sender.isOn) {
-         [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:NO];
-      
-    }else {
-        _selectedAltitudeLayer = _currentAltitudeLevel;
-         [_pickerAltitude selectRow:(_currentAltitudeLevel) inComponent:0 animated:NO];
+    [self setAutoAltitudeMode:sender.isOn];
+    
+    // reset user cancel auto mode
+    if (sender.isOn) _isUserCanceledAutoMode = false;
+
+    //reset timer if Auto mode is off
+    if (!sender.isOn){
+        [_timerAltitudeReturnToAuto invalidate];
+        _timerAltitudeReturnToAuto = nil;
+    };
+}
+
+-(void)setAutoAltitudeMode:(bool)isOn {
+    //check if user canceled auto mode
+    if (_isAltitudeAutoMode && !isOn) {
+        _isUserCanceledAutoMode = true;
     }
+        _isAltitudeAutoMode = isOn;
+        [_switchAltitudeAuto setOn:isOn];
+        [_pickerAltitude reloadAllComponents];
+        if (isOn) {
+            _selectedAltitudeLayer =  _currentAltitudeLevel;
+            [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:YES];
+
+        }else {
+            _selectedAltitudeLayer = _currentAltitudeLevel;
+            [_pickerAltitude selectRow:(_currentAltitudeLevel) inComponent:0 animated:YES];
+        }
+    
+    //redraw data
+    [_map removeAllAnnotations];
+    [self addAnnotationsWithMap:_map];
+
 }
 
 -(void)returnToAutoAltitude:(NSTimer *) timer {
@@ -1036,6 +1086,18 @@
     _selectedAltitudeLayer =  _currentAltitudeLevel;
     [_map removeAllAnnotations];
     [self addAnnotationsWithMap:_map];
+}
+
+-(void)setAutoAltitude:(int) altitudeLevel {
+    if (altitudeLevel!=_currentAltitudeLevel) {
+        _currentAltitudeLevel=altitudeLevel;
+        [_pickerAltitude reloadAllComponents];
+        [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:YES];
+        _selectedAltitudeLayer =  _currentAltitudeLevel;
+        [_map removeAllAnnotations];
+        [self addAnnotationsWithMap:_map];
+
+    }
 }
 
 #pragma mark - AKPickerViewDelegate

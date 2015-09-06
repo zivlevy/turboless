@@ -15,6 +15,8 @@
 @property(nonatomic)CLLocationManager *locationManager;
 @property (nonatomic,strong) CLLocation *  currentLocation;
 @property (nonatomic,strong) NSTimer * timer;
+
+@property int debugAlltitude;
 @end
 
 
@@ -39,7 +41,8 @@
         _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
         
         [self.locationManager startUpdatingLocation];
-        
+        //debug GPS
+        _debugAlltitude  = 1000;
         //set timer to watch for good location
         _timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
                                                selector:@selector(checkGoodLocation:) userInfo:nil repeats:YES];
@@ -80,7 +83,21 @@
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
     _currentLocation = newLocation;
-    [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_NewGPSLocation object:newLocation];
+    if (DEBUG_MODE) {
+        CLLocationCoordinate2D location;
+        location.latitude = 37.0;
+        location.longitude = 127.0;
+        
+        CLLocation *sampleLocation = [[CLLocation alloc] initWithCoordinate: location
+                                                                   altitude:_debugAlltitude /FEET_PER_METER
+                                                         horizontalAccuracy:100
+                                                           verticalAccuracy:100 
+                                                                  timestamp:[NSDate date]];
+        _currentLocation = sampleLocation;
+        _debugAlltitude+=500;
+        NSLog(@"%i",_debugAlltitude);
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_NewGPSLocation object:_currentLocation];
     
 }
 

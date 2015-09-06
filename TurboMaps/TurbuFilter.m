@@ -169,9 +169,7 @@
                     //TODO
                     // check for valid altitude
                     if (event.altitude <=0 || event.altitude>kAltitude_NumberOfSteps) {
-                        //        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"GPS fix is not available. \n Can't send information." message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                        //        [alert show];
-                        //        return;
+
                     }
                     event.severity=[self turbulenceLevel:_currentTurbulencePeak];
                     event.isPilotEvent = NO;

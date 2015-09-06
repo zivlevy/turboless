@@ -95,11 +95,8 @@
                         _timerDeviceInMotionDelay = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self
                                                                                    selector:@selector(inMotionDelayEnd:) userInfo:nil repeats:NO];
                     });
-                    
                 }
-                
             }
-
         }];
     }
     

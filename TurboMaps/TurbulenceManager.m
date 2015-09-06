@@ -64,7 +64,11 @@
     NSLog(@"Getting Turbulence from server");
     //get operation
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    
+    //add token
     manager.requestSerializer = [AFJSONRequestSerializer serializer];
+    NSString * token = [[NSUserDefaults standardUserDefaults] objectForKey:@"token"];
+    [manager.requestSerializer setValue:token forHTTPHeaderField:@"x-access-token"];
     
     NSString * strURL = [NSString stringWithFormat:@"%@/turbulence",kBaseURL];
     [manager GET:strURL parameters:nil
@@ -73,8 +77,6 @@
 
          NSString *archiveFileName = [Helpers getFilePathInDocuments:@"turbulence.dat"];
          
-         
-
          NSDictionary * dic = responseObject;
          
          long  lastServerUpdate = [[dic objectForKey:@"serverUpdate"] longValue];
@@ -132,7 +134,9 @@
             turbulence.timestamp = [[turbuDic objectForKey:@"ts"] longValue];
             
             if (turbulence.altitude < kAltitude_Min) turbulence.altitude = 1; //TODO change this protection to not allow ileagal info to penetrate
+            if (turbulence.altitude > kAltitude_NumberOfSteps) turbulence.altitude = kAltitude_NumberOfSteps;
             //add to relevant dictionary by x,y key
+            
             NSMutableDictionary * levelDic = _turbulenceLevels[turbulence.altitude-1];
             [levelDic setObject:turbulence forKey:[NSString stringWithFormat:@"%i,%i",turbulence.tileX,turbulence.tileY]];
             

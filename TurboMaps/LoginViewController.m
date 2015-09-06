@@ -8,6 +8,8 @@
 
 #import "LoginViewController.h"
 #import "Helpers.h"
+#import "AFNetworking.h"
+#import "Const.h"
 
 @interface LoginViewController()
 
@@ -50,7 +52,34 @@
         return;
     }
     [[NSUserDefaults standardUserDefaults] setObject:self.txtUserID.text forKey:@"userName"];
-    [self performSegueWithIdentifier:@"segueLoginToMainView" sender:self];
+    //call login
+    
+    //send
+    NSString * strURL = [NSString stringWithFormat:@"%@/login",kBaseURL];
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    NSDictionary *parameters = @{@"username": _txtUserID.text,@"password":_txtPassword.text};
+    [manager POST:strURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSLog(@"JSON: %@", responseObject);
+        NSDictionary * dict = operation.responseObject;
+        NSString *token = [dict objectForKey:@"token"];
+        if (token) {
+            [[NSUserDefaults standardUserDefaults] setObject:[dict objectForKey:@"token"] forKey:@"token"];
+            [self performSegueWithIdentifier:@"segueLoginToMainView" sender:self];
+        } else {
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"token"];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login failed" message:@"Try again later." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+        }
+
+
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"Error: %@", error);
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login failed" message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alert show];
+        return;
+    }];
+    
+
     
 }
 

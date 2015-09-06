@@ -91,7 +91,7 @@
 {
     //check that data is valid
     bool isSeverityValid = (event.severity >=0 && event.severity <=5);
-    bool isAltitudeValid = YES;//TODO return --> event.altitude >0 && event.altitude <=kAltitude_NumberOfSteps;
+    bool isAltitudeValid = event.altitude >0 &&  event.altitude <=kAltitude_NumberOfSteps;
     bool isTileXValid = event.tileX >=0 && event.tileX <=2047;
     bool isTileYValid = event.tileY >=0 && event.tileY <=2047;
     
