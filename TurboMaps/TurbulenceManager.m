@@ -99,7 +99,11 @@
      }
          failure:
      ^(AFHTTPRequestOperation *operation, NSError *error) {
-         NSLog(@"Error: %@", error);
+         NSInteger statusCode = operation.response.statusCode;
+         if(statusCode == 401) {
+             //tokwn ia invalid - logout
+             [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_InvalidToken object:nil];
+         }
          _isDownloadInProgress=false;
      }];
 
@@ -133,7 +137,7 @@
             turbulence.severity = [[turbuDic objectForKey:@"sev"] intValue];
             turbulence.timestamp = [[turbuDic objectForKey:@"ts"] longValue];
             
-            if (turbulence.altitude < kAltitude_Min) turbulence.altitude = 1; //TODO change this protection to not allow ileagal info to penetrate
+            if (turbulence.altitude < 1) turbulence.altitude = 1; //TODO change this protection to not allow ileagal info to penetrate
             if (turbulence.altitude > kAltitude_NumberOfSteps) turbulence.altitude = kAltitude_NumberOfSteps;
             //add to relevant dictionary by x,y key
             

@@ -12,7 +12,7 @@
 
 #define DEBUG_MODE 0
 
-#define kBaseURL @"http://104.197.5.131:3001"
+#define kBaseURL @"http://104.197.5.131:3000"
 #define FEET_PER_METER 3.28084
 
 #define kColorNone [Helpers r:255 g:255 b:255 alpha:0.8]
@@ -42,4 +42,6 @@
 #define kNotification_DeviceInStatic @"DeviceInStatic"
 
 #define kNotification_FlightNumberChanged @"FlightNumberChanged"
+
+#define kNotification_InvalidToken @"InvalidToken"
 #endif

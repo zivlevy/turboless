@@ -7,6 +7,7 @@
 //
 
 #import "AppStartViewController.h"
+#import "Const.h"
 
 @interface AppStartViewController ()
 
@@ -26,13 +27,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
 }
+
+
 
 -(void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    NSString * userName=[[NSUserDefaults standardUserDefaults] objectForKey:@"userName"];
+    NSString * userName=[[NSUserDefaults standardUserDefaults] objectForKey:@"token"];
     
     if (!userName) {
         [self performSegueWithIdentifier:@"segueLogin" sender:self];
@@ -51,6 +53,9 @@
     // Dispose of any resources that can be recreated.
 }
 -(IBAction)prepareForUnwind:(UIStoryboardSegue *)segue {
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"userName"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"token"];
 }
+
+
+
 @end

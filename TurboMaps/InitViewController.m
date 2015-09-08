@@ -176,6 +176,8 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationStatusChanged:) name:kNotification_LocationStatusChanged object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(invalidToken:) name:kNotification_InvalidToken object:nil];
+
 
     [[RMConfiguration sharedInstance] setAccessToken:@"pk.eyJ1Ijoieml2bGV2eSIsImEiOiJwaEpQeUNRIn0.OZupy_Vjyl5eRCRlgV6otg"];
     
@@ -236,8 +238,9 @@
     _isUnderAltitudeAutoMode = true; //start under the altitude
     _isAltitudeAutoMode = false;
     _isUserCanceledAutoMode = false;
-    [self setAutoAltitudeMode:NO];
+
     _currentAltitudeLevel = 5;
+    [self setAutoAltitudeMode:NO];
     
 }
 -(void)viewWillAppear:(BOOL)animated{
@@ -542,7 +545,7 @@
     
     
     NSMutableArray * arr = [NSMutableArray new];
-    NSDictionary * dict = [[TurbulenceManager sharedManager]getTurbulanceDictionaryArLevel:self.selectedAltitudeLayer];
+    NSDictionary * dict = [[TurbulenceManager sharedManager]getTurbulanceDictionaryArLevel:self.selectedAltitudeLayer-1];
     
     //holds annotations for tileXY for aggregation by zoom
     _currentTileAnotations = [NSMutableDictionary new];
@@ -779,7 +782,7 @@
         int altitude = [[LocationManager sharedManager] getCurrentTile].altitude;
         if (altitude < 1) altitude = 9;
         if (_isAltitudeAutoMode && !_isUserCanceledAutoMode && _currentAltitudeLevel != altitude) {
-        [self setAutoAltitude:altitude];
+            [self setAutoAltitude:altitude];
         } else {
             if ([[LocationManager sharedManager] getCurrentTile].altitude>0) {
                 _currentAltitudeLevel = [[LocationManager sharedManager] getCurrentTile].altitude;
@@ -787,9 +790,12 @@
         }
     } else {
         // turn auto altitude mode off
-        [self setAutoAltitudeMode:false];
-        //in order to return to auto mode when GPS returns ...
-        _isUnderAltitudeAutoMode = true;
+        if (_isAltitudeAutoMode) {
+            [self setAutoAltitudeMode:false];
+            //in order to return to auto mode when GPS returns ...
+            _isUnderAltitudeAutoMode = true;
+        }
+
         
         //hide the auto altitude switch
         _viewAutoAltutude.hidden = true;
@@ -856,6 +862,11 @@
     };
 }
 
+#pragma mark - notification handlers
+-(void)invalidToken:(NSNotification *) notification {
+    //bad token - logout
+    [self performSegueWithIdentifier:@"segueUnwind" sender:self];
+}
 
 #pragma mark -
 
@@ -1008,7 +1019,7 @@
         [_timerAltitudeReturnToAuto invalidate];
         _timerAltitudeReturnToAuto = [NSTimer scheduledTimerWithTimeInterval:3*60 target:self selector:@selector(returnToAutoAltitude:) userInfo:nil repeats:NO];
     } else {
-        _selectedAltitudeLayer = (int)row;
+        _selectedAltitudeLayer = (int)row +1;
     }
     [self.map removeAllAnnotations];
     [self addAnnotationsWithMap:self.map];
@@ -1070,7 +1081,7 @@
 
         }else {
             _selectedAltitudeLayer = _currentAltitudeLevel;
-            [_pickerAltitude selectRow:(_currentAltitudeLevel) inComponent:0 animated:YES];
+            [_pickerAltitude selectRow:(_currentAltitudeLevel-1) inComponent:0 animated:YES];
         }
     
     //redraw data

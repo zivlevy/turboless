@@ -73,9 +73,20 @@
 
 
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        NSLog(@"Error: %@", error);
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login failed" message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-        [alert show];
+        NSInteger statusCode = operation.response.statusCode;
+        if(statusCode == 401) {
+            //tokwn ia invalid - logout
+            NSDictionary * dict = operation.responseObject;
+            
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[dict objectForKey:@"message"]  message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+        } else {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Couldn't connect to the server.\n Try again later."  message:@"" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+        }
+
+
+
         return;
     }];
     

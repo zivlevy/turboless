@@ -196,7 +196,7 @@
             [eventDictionary setObject:eventData[0]  forKey:@"tileX"];
             [eventDictionary setObject:eventData[1]  forKey:@"tileY"];
             int alt = [eventData[2] intValue];
-            if (alt <kAltitude_Min) alt = kAltitude_Min; //TODO remove relese
+//            if (alt <0) alt = 0; //TODO remove relese
             NSString * strAlt = [NSString stringWithFormat:@"%i",alt]; //TODO change
             [eventDictionary setObject:strAlt  forKey:@"alt"];
             [eventDictionary setObject:eventData[3]  forKey:@"sev"];
@@ -217,7 +217,10 @@
 
     [theset addObject:@"text/plain"];
     manager.responseSerializer.acceptableContentTypes = [theset copy];
-   manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    NSString * token = [[NSUserDefaults standardUserDefaults] objectForKey:@"token"];
+    [manager.requestSerializer setValue:token forHTTPHeaderField:@"x-access-token"];
+    
     NSString * strURL = [NSString stringWithFormat:@"%@/reports",kBaseURL];
     [manager POST:strURL parameters:JSON
           success:^(AFHTTPRequestOperation *operation, id responseObject)
@@ -231,6 +234,11 @@
          NSLog(@"Error: %@", error);
          //if not ok - try again on next timer interval
          _isFileTransferInProgress=NO;
+         NSInteger statusCode = operation.response.statusCode;
+         if(statusCode == 401) {
+             //tokwn ia invalid - logout
+             [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_InvalidToken object:nil];
+         }
 
      }];
     
