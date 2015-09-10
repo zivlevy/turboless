@@ -61,6 +61,14 @@
     [manager POST:strURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSLog(@"JSON: %@", responseObject);
         NSDictionary * dict = operation.responseObject;
+        NSString *isDebug = [dict objectForKey:@"isDebug"];
+        bool debagger = [isDebug boolValue];
+        if (isDebug && debagger) {
+            [[NSUserDefaults standardUserDefaults] setObject:[dict objectForKey:@"isDebug"] forKey:@"isDebug"];
+        } else {
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"isDebug"];
+            
+        }
         NSString *token = [dict objectForKey:@"token"];
         if (token) {
             [[NSUserDefaults standardUserDefaults] setObject:[dict objectForKey:@"token"] forKey:@"token"];
@@ -70,6 +78,7 @@
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login failed" message:@"Try again later." delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [alert show];
         }
+
 
 
     } failure:^(AFHTTPRequestOperation *operation, NSError *error) {

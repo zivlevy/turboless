@@ -208,6 +208,12 @@
     [Helpers makeRound:_btnReport_Extreme borderWidth:1 borderColor:[UIColor whiteColor]];
     
     [Helpers makeRound:_btnDebug borderWidth:1 borderColor:[UIColor whiteColor]];
+    NSString * isDebug = [[NSUserDefaults standardUserDefaults] objectForKey:@"isDebug"];
+    if (isDebug) {
+        _btnDebug.hidden = false;
+    } else {
+        _btnDebug.hidden = true;
+    }
     //legend init
     _lblLegendLight.backgroundColor = kColorLight;
     _lblLegentLightModerate.backgroundColor = kColorLightModerate;
@@ -241,6 +247,8 @@
 
     _currentAltitudeLevel = 5;
     [self setAutoAltitudeMode:NO];
+    
+
     
 }
 -(void)viewWillAppear:(BOOL)animated{
@@ -780,12 +788,13 @@
         
         //set auto mode altitude
         int altitude = [[LocationManager sharedManager] getCurrentTile].altitude;
-        if (altitude < 1) altitude = 9;
+        if (altitude < 1) altitude = 1;
+        if (altitude >kAltitude_NumberOfSteps) altitude = kAltitude_NumberOfSteps;
         if (_isAltitudeAutoMode && !_isUserCanceledAutoMode && _currentAltitudeLevel != altitude) {
             [self setAutoAltitude:altitude];
         } else {
-            if ([[LocationManager sharedManager] getCurrentTile].altitude>0) {
-                _currentAltitudeLevel = [[LocationManager sharedManager] getCurrentTile].altitude;
+            if (altitude>0) {
+                _currentAltitudeLevel = altitude;
             }
         }
     } else {

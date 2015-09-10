@@ -11,6 +11,7 @@
 
 
 #define DEBUG_MODE 0
+//#define kBaseURL @"http://84.94.182.244:3000" //yuval home
 
 #define kBaseURL @"http://104.197.5.131:3000"
 #define FEET_PER_METER 3.28084
@@ -23,7 +24,7 @@
 #define kColorExtream [Helpers r:0 g:0 b:0 alpha:1.0]
 
 #define kAltitude_Min 10
-#define kAltitude_NumberOfSteps 15
+#define kAltitude_NumberOfSteps 16
 #define kAltitude_Step 2
 #define kAltitude_MoveToAutoAltitudeMode 20
 

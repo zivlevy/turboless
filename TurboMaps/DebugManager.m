@@ -244,7 +244,10 @@
     NSString * postURL = [NSString stringWithFormat:@"%@/raw-data",kBaseURL];
 
     AFHTTPRequestSerializer *serializer = [AFHTTPRequestSerializer serializer];
-
+    
+    //add token
+    NSString * token = [[NSUserDefaults standardUserDefaults] objectForKey:@"token"];
+    [serializer setValue:token forHTTPHeaderField:@"x-access-token"];
     NSMutableURLRequest *request =
     [serializer multipartFormRequestWithMethod:@"POST" URLString:postURL
                                     parameters:nil
@@ -257,6 +260,7 @@
     
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     manager.responseSerializer.acceptableContentTypes = [NSSet setWithObject:@"text/html"];
+    
     AFHTTPRequestOperation *operation =
     [manager HTTPRequestOperationWithRequest:request
                                      success:^(AFHTTPRequestOperation *operation, id responseObject) {
@@ -268,8 +272,12 @@
                                          //update delegate
                                          [_delegate debugManagerSaveSuccess];
                                      } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-                                         NSLog(@"Failure %@", error.description);
-                                         //update delegate
+
+                                         NSInteger statusCode = operation.response.statusCode;
+                                         if(statusCode == 401) {
+                                             //tokwn ia invalid - logout
+                                             [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_InvalidToken object:nil];
+                                         }
                                          [_delegate debugManagerSaveFail];
                                      }];
     

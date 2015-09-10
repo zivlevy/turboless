@@ -54,7 +54,6 @@
 # pragma mark - timer
 - (void) checkGoodLocation:(NSTimer *)incomingTimer
 {
-    NSLog(@"%f,%f",_currentLocation.horizontalAccuracy,_currentLocation.verticalAccuracy);
     if ([[NSDate date] timeIntervalSinceDate:_currentLocation.timestamp] > 5  || _currentLocation.horizontalAccuracy > 5000 || _currentLocation.verticalAccuracy > 2000) {
         if (_isLocationGood) {
             [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_LocationStatusChanged object:[NSNumber numberWithBool:NO]];
@@ -100,7 +99,7 @@
                                                                   timestamp:[NSDate date]];
         _currentLocation = sampleLocation;
         _debugAlltitude+=5000;
-        if (_debugAlltitude >34000) _debugAlltitude = 35000;
+        if (_debugAlltitude >34000) _debugAlltitude = 45000;
         NSLog(@"%i",_debugAlltitude);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////

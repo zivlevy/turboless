@@ -3541,7 +3541,6 @@
                  angle=(M_PI / -180) * newLocation.course;
              } else {
                  angle = 0;
-                 NSLog(@"not good%f",_locationManager.location.course);
              }
              
              
@@ -3777,7 +3776,7 @@
                              CGFloat angle;// = (M_PI / -180) * headingDirection;
                              
                              if (_locationManager.location.course >0 && ([NSDate date ].timeIntervalSince1970 - _locationManager.location.timestamp.timeIntervalSince1970)<5 &&  _locationManager.location.speed > kSpeedCutOff) {
-                                 NSLog(@"%f",_locationManager.location.course);
+                                
                                  angle=(M_PI / -180) *_locationManager.location.course;
                              }
                              
