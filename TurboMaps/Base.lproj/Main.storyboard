@@ -574,7 +574,7 @@
                                     </button>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VPR-2n-wNp">
                                         <rect key="frame" x="10" y="75" width="40" height="40"/>
-                                        <color key="backgroundColor" red="1" green="0.40000000600000002" blue="0.40000000600000002" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="backgroundColor" red="0.64383181053332472" green="1" blue="0.65342353158663258" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="40" id="M9J-ky-D7N"/>
                                             <constraint firstAttribute="height" constant="40" id="uD2-F9-gX6"/>

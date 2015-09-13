@@ -304,11 +304,13 @@
         ZLTile tile = [[LocationManager sharedManager] getCurrentTile];
         if (tile.x!=_currentTile.x || tile.y!= _currentTile.y || tile.altitude!=_currentTile.altitude) {
            //we moved to new tile
+            
+            //check if this is the first tile
             if (_currentTile.x==0 && _currentTile.y==0 && _currentTile.altitude==0) {
-                //this is the first tile
                 _currentTile=tile;
                 return;
             }
+            
             if (![_dicVisitedTiles objectForKey:[NSString stringWithFormat:@"%i,%i,%i",_currentTile.x,_currentTile.y,_currentTile.altitude]]){
                 
                 //no events in this tile so report Empty tile

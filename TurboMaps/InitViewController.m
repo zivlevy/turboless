@@ -178,6 +178,8 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(invalidToken:) name:kNotification_InvalidToken object:nil];
 
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationChanged:) name:kNotification_NewGPSLocation object:nil];
+    
 
     [[RMConfiguration sharedInstance] setAccessToken:@"pk.eyJ1Ijoieml2bGV2eSIsImEiOiJwaEpQeUNRIn0.OZupy_Vjyl5eRCRlgV6otg"];
     
@@ -245,7 +247,7 @@
     _isAltitudeAutoMode = false;
     _isUserCanceledAutoMode = false;
 
-    _currentAltitudeLevel = 5;
+    _currentAltitudeLevel = 1;
     [self setAutoAltitudeMode:NO];
     
 
@@ -329,16 +331,14 @@
     }
     
     //altitude init
-    if (_isAltitudeAutoMode) {
-        _selectedAltitudeLayer = kAltitude_NumberOfSteps - 9;
-    } else {
-        _selectedAltitudeLayer = 9;
-    }
+
+    _selectedAltitudeLayer = (kAltitude_InitialAltitudeForPicker - kAltitude_Min)  / kAltitude_Step +1;
+
     
     
     _pickerAltitude.delegate = self;
     _pickerAltitude.dataSource = self;
-    [_pickerAltitude selectRow:_selectedAltitudeLayer inComponent:0 animated:NO];
+    [_pickerAltitude selectRow:_selectedAltitudeLayer-1 inComponent:0 animated:NO];
     
     //history init
     
@@ -794,7 +794,7 @@
             [self setAutoAltitude:altitude];
         } else {
             if (altitude>0) {
-                _currentAltitudeLevel = altitude;
+//                _currentAltitudeLevel = altitude;
             }
         }
     } else {
@@ -871,6 +871,9 @@
     };
 }
 
+-(void)locationChanged:(NSNotification *)notification {
+    NSLog(@"location changed");
+}
 #pragma mark - notification handlers
 -(void)invalidToken:(NSNotification *) notification {
     //bad token - logout
@@ -1110,6 +1113,7 @@
 
 -(void)setAutoAltitude:(int) altitudeLevel {
     if (altitudeLevel!=_currentAltitudeLevel) {
+        NSLog(@"Chhainging current altitude to:%i",altitudeLevel);
         _currentAltitudeLevel=altitudeLevel;
         [_pickerAltitude reloadAllComponents];
         [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:YES];

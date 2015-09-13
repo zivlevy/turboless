@@ -43,7 +43,7 @@
         
         [self.locationManager startUpdatingLocation];
         //debug GPS
-        _debugAlltitude  = 1000;
+        _debugAlltitude  = 120;
         //set timer to watch for good location
         _timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
                                                selector:@selector(checkGoodLocation:) userInfo:nil repeats:YES];
@@ -57,7 +57,6 @@
     if ([[NSDate date] timeIntervalSinceDate:_currentLocation.timestamp] > 5  || _currentLocation.horizontalAccuracy > 5000 || _currentLocation.verticalAccuracy > 2000) {
         if (_isLocationGood) {
             [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_LocationStatusChanged object:[NSNumber numberWithBool:NO]];
-            
         }
         self.isLocationGood = NO;
     } else {
@@ -68,7 +67,7 @@
         self.isLocationGood = YES;
     }
     
-    if ( !self.isLocationGood ||_currentLocation.course <0 ) {
+    if ( !self.isLocationGood || _currentLocation.course <0 ) {
         [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_LocationStatusChanged object:[NSNumber numberWithBool:NO]];
     } else {
         [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_LocationStatusChanged object:[NSNumber numberWithBool:YES]];
@@ -98,8 +97,8 @@
                                                            verticalAccuracy:100 
                                                                   timestamp:[NSDate date]];
         _currentLocation = sampleLocation;
-        _debugAlltitude+=5000;
-        if (_debugAlltitude >34000) _debugAlltitude = 45000;
+        _debugAlltitude+=1000;
+        if (_debugAlltitude >42000) _debugAlltitude = 45000;
         NSLog(@"%i",_debugAlltitude);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////

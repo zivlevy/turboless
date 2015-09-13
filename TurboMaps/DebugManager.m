@@ -109,6 +109,7 @@
     }
 }
 
+
 -(void) locationStatusChanged:(NSNotification *) notification {
     if (!_isRecording) {
         return;
