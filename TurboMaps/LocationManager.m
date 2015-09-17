@@ -43,7 +43,7 @@
         
         [self.locationManager startUpdatingLocation];
         //debug GPS
-        _debugAlltitude  = 120;
+        _debugAlltitude  = 19500;
         //set timer to watch for good location
         _timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
                                                selector:@selector(checkGoodLocation:) userInfo:nil repeats:YES];
@@ -54,6 +54,8 @@
 # pragma mark - timer
 - (void) checkGoodLocation:(NSTimer *)incomingTimer
 {
+    
+    // location
     if ([[NSDate date] timeIntervalSinceDate:_currentLocation.timestamp] > 5  || _currentLocation.horizontalAccuracy > 5000 || _currentLocation.verticalAccuracy > 2000) {
         if (_isLocationGood) {
             [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_LocationStatusChanged object:[NSNumber numberWithBool:NO]];
@@ -67,11 +69,20 @@
         self.isLocationGood = YES;
     }
     
-    if ( !self.isLocationGood || _currentLocation.course <0 ) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_LocationStatusChanged object:[NSNumber numberWithBool:NO]];
+    //heading
+    if ( _currentLocation.course <0) {
+        if (_isHeadingGood) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_HeadingStatusChanged object:[NSNumber numberWithBool:NO]];
+        }
+        _isHeadingGood = NO;
     } else {
-        [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_LocationStatusChanged object:[NSNumber numberWithBool:YES]];
+        if (!_isHeadingGood) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_HeadingStatusChanged object:[NSNumber numberWithBool:YES]];
+            
+        }
+        _isHeadingGood = YES;
     }
+    
 }
 
 #pragma mark - CLLocationManagerDelegate
@@ -88,7 +99,7 @@
         _debugCoordinateDelta +=0.1;
         CLLocationCoordinate2D location;
         location=newLocation.coordinate;
-        location.latitude = location.latitude + _debugCoordinateDelta;
+//        location.latitude = location.latitude + _debugCoordinateDelta;
 //        location.longitude = 127.0;
         
         CLLocation *sampleLocation = [[CLLocation alloc] initWithCoordinate: location
@@ -97,8 +108,8 @@
                                                            verticalAccuracy:100 
                                                                   timestamp:[NSDate date]];
         _currentLocation = sampleLocation;
-        _debugAlltitude+=1000;
-        if (_debugAlltitude >42000) _debugAlltitude = 45000;
+        _debugAlltitude+=200;
+        if (_debugAlltitude >24000) _debugAlltitude = 21000;
         NSLog(@"%i",_debugAlltitude);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -139,7 +150,7 @@
     int tileY = (int)(floor((1.0 - log( tan(lat * M_PI/180.0) + 1.0 / cos(lat * M_PI/180.0)) / M_PI) / 2.0 * pow(2.0, zoom)));
     
     //calculate altitude slot
-    int alt = _currentLocation.altitude * FEET_PER_METER / 1000;
+    int alt = location.altitude * FEET_PER_METER / 1000;
     int altitude = (alt -kAltitude_Min) / kAltitude_Step ;
     tile.x = tileX;
     tile.y=tileY;

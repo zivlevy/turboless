@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Const.h"
+#import "Turbulence.h"
 
 @interface TurbulenceManager : NSObject
 + (TurbulenceManager *)sharedManager;
@@ -14,4 +16,5 @@
 //public
 -(NSDictionary *) getTurbulanceDictionaryArLevel:(int)level;
 -(long long) getSavedServerUpdateSince1970;
+-(Turbulence *) getTurbulanceAtTile:(ZLTile)tile;
 @end

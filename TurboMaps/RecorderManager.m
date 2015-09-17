@@ -300,10 +300,12 @@
 #pragma mark - notification handlers
 -(void)locationChanged:(NSNotification*)notification {
     
-    if (![AccelerometerManager sharedManager].isRecordingInSession) {
-        ZLTile tile = [[LocationManager sharedManager] getCurrentTile];
+
+    ZLTile tile = [[LocationManager sharedManager] getCurrentTile];
+    if (tile.altitude>0) {
+        //if we moved to new tile
         if (tile.x!=_currentTile.x || tile.y!= _currentTile.y || tile.altitude!=_currentTile.altitude) {
-           //we moved to new tile
+           
             
             //check if this is the first tile
             if (_currentTile.x==0 && _currentTile.y==0 && _currentTile.altitude==0) {

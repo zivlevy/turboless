@@ -15,4 +15,8 @@
 +(NSString*) transformWorldCoordinateToTilePathForZoom:(int)zoom fromLon:(double) lon  fromLat:(double) lat;
 
 +(NSString *) padInt:(int) number padTo:(int)padTo;
+
++ (CLLocationCoordinate2D) NewLocationFrom:(CLLocationCoordinate2D)startingPoint
+                         atDistanceInMiles:(float)distanceInMiles
+                     alongBearingInDegrees:(double)bearingInDegrees;
 @end

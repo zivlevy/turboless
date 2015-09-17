@@ -25,6 +25,7 @@
 #import "TurbulenceManager.h"
 #import "AccelerometerManager.h"
 #import "DebugManager.h"
+#import "AlertsManager.h"
 
 #import "AKPickerView.h"
 
@@ -163,6 +164,9 @@
     //init debug manager
     [DebugManager sharedManager];
     
+    //init alert manager
+    [AlertsManager sharedManager];
+    
     //notifications observers
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(turbuleceUpdatedFromServer:) name:kNotification_turbulenceServerNewFile object:nil];
     
@@ -175,6 +179,8 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(flightNumberChanged:) name:kNotification_FlightNumberChanged object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationStatusChanged:) name:kNotification_LocationStatusChanged object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(headingStatusChanged:) name:kNotification_HeadingStatusChanged object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(invalidToken:) name:kNotification_InvalidToken object:nil];
 
@@ -200,8 +206,8 @@
     _btnReport_light.backgroundColor = kColorLight;
     _btnReport_lightModerate.backgroundColor = kColorLightModerate;
     _btnReport_moderate.backgroundColor = kColorModerate;
-    _btnReport_severe.backgroundColor = kColorSevere;
-    _btnReport_Extreme.backgroundColor = kColorExtream;
+    _btnReport_severe.backgroundColor = kColorModerateSevere;
+    _btnReport_Extreme.backgroundColor = kColorSevere;
     
     [Helpers makeRound:_btnReport_light borderWidth:1 borderColor:[UIColor whiteColor]];
     [Helpers makeRound:_btnReport_lightModerate borderWidth:1 borderColor:[UIColor whiteColor]];
@@ -220,8 +226,8 @@
     _lblLegendLight.backgroundColor = kColorLight;
     _lblLegentLightModerate.backgroundColor = kColorLightModerate;
     _lblLegentModerate.backgroundColor = kColorModerate;
-    _lblLegentSevere.backgroundColor = kColorSevere;
-    _lblLegentExtream.backgroundColor = kColorExtream;
+    _lblLegentSevere.backgroundColor = kColorModerateSevere;
+    _lblLegentExtream.backgroundColor = kColorSevere;
     
     //airports init
     _lblTakoff.text = [RouteManager sharedManager].currentFlight.originAirport.ICAO;
@@ -257,7 +263,7 @@
     [super viewWillAppear:animated];
     
     //set timer to watch for good location
-    _timerGpsSignal = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
+    _timerGpsSignal = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self
                                                      selector:@selector(checkGoodLocation:) userInfo:nil repeats:YES];
     
     // configure map tile source based on previous metadata if available
@@ -417,6 +423,22 @@
     if (annotation.isUserLocationAnnotation){
         return nil;
     }
+    
+    // Alert Zone Border
+    if (([annotation.title isEqualToString:@"AlertZoneBorder"])) {
+        RMShape *shape = [[RMShape alloc] initWithView:mapView];
+        
+        // set line color and width
+        shape.lineColor = [UIColor colorWithRed:0.224 green:0.671 blue:0.780 alpha:1.000];
+        shape.lineWidth = 1.0;
+        
+        for (CLLocation *location in (NSArray *)annotation.userInfo)
+            [shape addLineToCoordinate:location.coordinate];
+        
+        return shape;
+    }
+    
+    ///////////// rest of annotations
     int  zoomLevelForAnnotation;
     switch ((int)mapView.zoom) {
         case 6:
@@ -450,8 +472,8 @@
     UIColor * colorLevel1 = kColorLight;
     UIColor * colorLevel2 = kColorLightModerate;
     UIColor * colorLevel3 = kColorModerate;
-    UIColor * colorLevel4 = kColorSevere;
-    UIColor * colorLevel5 = kColorExtream;
+    UIColor * colorLevel4 = kColorModerateSevere;
+    UIColor * colorLevel5 = kColorSevere;
     
     NSNumber * turbulenceSavirity = annotation.userInfo;
     UIColor * annotationColor;
@@ -581,8 +603,6 @@
             [_currentTileAnotations setObject:turbulence forKey:tileAddressNew];
             
         }
-        
-        
 
     }
     
@@ -635,8 +655,7 @@
         [arr addObject:GC];
         
         [self.map addAnnotations:arr];
-        
-        
+ 
     }
     
     //update last server update
@@ -764,7 +783,6 @@
 - (void) checkGoodLocation:(NSTimer *)incomingTimer
 {
 
-    
     if ([LocationManager sharedManager].isLocationGood) {
         //update display
         _barItemGPS.tintColor = [UIColor whiteColor];
@@ -772,6 +790,11 @@
         int currentAltitude = currentLocation.altitude * FEET_PER_METER;
         int currentVerticalAccuracy = currentLocation.verticalAccuracy * FEET_PER_METER;
         _BarItemTitle.title = [NSString stringWithFormat:@"Alt: %i Feet / Accuracy: %i Feet",currentAltitude,currentVerticalAccuracy];
+        
+        // if there is a valid course - draw Alert zone borders
+        if (currentLocation.course >0) {
+            [self drawAlertZoneBorders];
+        }
         
         //check for climbing above altitude for Auto Altitude Mode
         if ([[LocationManager sharedManager] getCurrentLocation].altitude * FEET_PER_METER >=kAltitude_MoveToAutoAltitudeMode * 1000  && _isUnderAltitudeAutoMode) {
@@ -790,13 +813,14 @@
         int altitude = [[LocationManager sharedManager] getCurrentTile].altitude;
         if (altitude < 1) altitude = 1;
         if (altitude >kAltitude_NumberOfSteps) altitude = kAltitude_NumberOfSteps;
-        if (_isAltitudeAutoMode && !_isUserCanceledAutoMode && _currentAltitudeLevel != altitude) {
-            [self setAutoAltitude:altitude];
-        } else {
-            if (altitude>0) {
-//                _currentAltitudeLevel = altitude;
-            }
-        }
+        [self setAutoAltitude:altitude];
+//        if (_isAltitudeAutoMode && !_isUserCanceledAutoMode && _currentAltitudeLevel != altitude) {
+//            [self setAutoAltitude:altitude];
+//        } else {
+//            if (altitude>0) {
+//                [self setAutoAltitude:altitude];
+//            }
+//        }
     } else {
         // turn auto altitude mode off
         if (_isAltitudeAutoMode) {
@@ -868,17 +892,96 @@
             }
             
         }
+        if ([annotation.title isEqualToString:@"AlertZoneBorder"]) {
+            if (!isGoodLocation ) [_map removeAnnotation:annotation];
+        }
+    };
+}
+
+-(void) headingStatusChanged:(NSNotification *) notification {
+    NSString * str = notification.object;
+    bool isGoodLocation = [str boolValue];
+    //heading status changed so we need to replace Icon
+    
+    for (RMAnnotation * annotation in _map.annotations) {
+        if (annotation.isUserLocationAnnotation) {
+            for (RMMapLayer * layer in annotation.layer.sublayers) {
+                if ([layer.name isEqualToString:@"airplane"]) {
+                    layer.opacity=0;
+                    if (isGoodLocation ) {
+                        layer.opacity =1;
+                    }
+                }
+                
+            }
+            
+        }
+        if ([annotation.title isEqualToString:@"AlertZoneBorder"]) {
+            if (!isGoodLocation ) [_map removeAnnotation:annotation];
+        }
     };
 }
 
 -(void)locationChanged:(NSNotification *)notification {
-    NSLog(@"location changed");
+
 }
-#pragma mark - notification handlers
+
 -(void)invalidToken:(NSNotification *) notification {
     //bad token - logout
     [self performSegueWithIdentifier:@"segueUnwind" sender:self];
 }
+
+#pragma mark - Alert Zone
+-(void)drawAlertZoneBorders {
+    CLLocation * currentLocation = [[LocationManager sharedManager] getCurrentLocation];
+
+    float rightAngle = currentLocation.course + kAlertAngle;
+    if (rightAngle >= 360) {
+        rightAngle = rightAngle -360;
+    }
+    float leftAngle = currentLocation.course - kAlertAngle;
+    if (leftAngle < 0) {
+        leftAngle = 360 + leftAngle;
+    }
+    CLLocationCoordinate2D milesRight = [MapUtils NewLocationFrom:currentLocation.coordinate atDistanceInMiles:kAlertRange alongBearingInDegrees:rightAngle];
+    CLLocationCoordinate2D milesLeft = [MapUtils NewLocationFrom:currentLocation.coordinate atDistanceInMiles:kAlertRange alongBearingInDegrees:leftAngle];
+    
+    //remove old Alert Zone Border annotations
+    [self removeAlertZoneBorderAnnotations];
+    
+    
+    //add new Alert Zone Border annotations
+    // Create a coordinates array to all of the coordinates for our shape.
+    NSArray *locations = [NSArray arrayWithObjects:
+                          currentLocation,
+                          [[CLLocation alloc] initWithLatitude:milesLeft.latitude longitude:milesLeft.longitude],
+                          [[CLLocation alloc] initWithLatitude:milesRight.latitude longitude:milesRight.longitude],
+                          currentLocation,nil];
+    
+
+    
+    // Create our shape with the formatted coordinates array
+    RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:_map
+                                                          coordinate:currentLocation.coordinate
+                                                            andTitle:@"AlertZoneBorder"];
+    
+    annotation.userInfo = locations;
+    [annotation setBoundingBoxFromLocations:locations];
+    
+    // Add the shape to the map
+    [_map addAnnotation:annotation];
+}
+
+-(void) removeAlertZoneBorderAnnotations {
+    for (RMAnnotation * annotation in _map.annotations) {
+        if ([annotation.title isEqualToString:@"AlertZoneBorder"]) {
+            [_map removeAnnotation:annotation];
+        }
+    };
+}
+
+
+
 
 #pragma mark -
 
@@ -912,10 +1015,10 @@
             return kColorModerate;
             break;
         case 4:
-            return kColorSevere;
+            return kColorModerateSevere;
             break;
         case 5:
-            return kColorExtream;
+            return kColorSevere;
             break;
         default:
             return nil;
@@ -1003,21 +1106,7 @@
 // The number of rows of data
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
 {
-//    if (_isAltitudeAutoMode) {
-//        if (_currentAltitudeLevel > 3 && _currentAltitudeLevel < kAltitude_NumberOfSteps - 3) {
-//            return 7;
-//        }
-//        else {
-//            if (_currentAltitudeLevel <= 3) {
-//                return _currentAltitudeLevel+3;
-//            } else {
-//                return kAltitude_NumberOfSteps - _currentAltitudeLevel + 3;
-//            }
-//        }
-//    } else {
-        return kAltitude_NumberOfSteps  ;
-//    }
-
+    return kAltitude_NumberOfSteps  ;
 }
 
 
@@ -1076,6 +1165,7 @@
     if (!sender.isOn){
         [_timerAltitudeReturnToAuto invalidate];
         _timerAltitudeReturnToAuto = nil;
+
     };
 }
 
@@ -1113,7 +1203,7 @@
 
 -(void)setAutoAltitude:(int) altitudeLevel {
     if (altitudeLevel!=_currentAltitudeLevel) {
-        NSLog(@"Chhainging current altitude to:%i",altitudeLevel);
+        NSLog(@"Chainging current altitude to:%i",altitudeLevel);
         _currentAltitudeLevel=altitudeLevel;
         [_pickerAltitude reloadAllComponents];
         [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:YES];

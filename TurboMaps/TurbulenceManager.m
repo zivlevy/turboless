@@ -8,9 +8,8 @@
 
 #import "TurbulenceManager.h"
 #import "AFNetworking.h"
-#import "Const.h"
 #import "Helpers.h"
-#import "Turbulence.h"
+
 
 @interface TurbulenceManager()
 //turbulenceLevels holds dictionary of tiles for each altitude level
@@ -180,6 +179,18 @@
         return 0;
     }
     
+}
+
+-(Turbulence *) getTurbulanceAtTile:(ZLTile)tile
+{
+    
+    //check that the tile is leagal
+    if (tile.altitude <1 || tile.altitude > kAltitude_NumberOfSteps) {
+        return nil;
+    }
+    
+    Turbulence * turbulence = [_turbulenceLevels[tile.altitude -1] objectForKey:[NSString stringWithFormat:@"%i,%i",tile.x,tile.y ]];
+    return turbulence;
 }
 
 

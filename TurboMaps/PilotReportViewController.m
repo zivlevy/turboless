@@ -31,22 +31,25 @@
     switch (_turbulenceLevel) {
         case 1:
             _btnSend.backgroundColor = kColorLight;
-            
+            [_btnSend setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
             break;
         case 2:
              _btnSend.backgroundColor = kColorLightModerate;
-
+            [_btnSend setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
             break;
         case 3:
 
             _btnSend.backgroundColor = kColorModerate;
-                        [_btnSend setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
             break;
         case 4:
-            _btnSend.backgroundColor = kColorSevere;
+            _btnSend.backgroundColor =kColorModerateSevere ;
+
+
             break;
         case 5:
-            _btnSend.backgroundColor = kColorExtream;
+            _btnSend.backgroundColor = kColorSevere;
+
+
             break;
         default:
             break;

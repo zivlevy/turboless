@@ -8,15 +8,12 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
-typedef struct {
-    int x;
-    int y;
-    int altitude;
-} ZLTile;
+#import "Const.h"
 
 @interface LocationManager : NSObject
 
 @property bool isLocationGood;
+@property bool isHeadingGood;
 
 + (LocationManager *)sharedManager;
 -(ZLTile)getCurrentTile;

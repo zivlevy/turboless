@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		46927B891A7F976AAF1A51EC /* Pods_TurboMaps.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68E3FBE5E399854A55953C74 /* Pods_TurboMaps.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		A530E2831BA77635001856CF /* AlertsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = A530E2821BA77635001856CF /* AlertsManager.m */; };
 		A545ADCA1B8634B7005928AC /* Flight.m in Sources */ = {isa = PBXBuildFile; fileRef = A545ADC91B8634B7005928AC /* Flight.m */; };
 		A545ADDC1B866669005928AC /* to.png in Resources */ = {isa = PBXBuildFile; fileRef = A545ADDA1B866669005928AC /* to.png */; };
 		A545ADDD1B866669005928AC /* to@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A545ADDB1B866669005928AC /* to@2x.png */; };
@@ -86,6 +87,8 @@
 
 /* Begin PBXFileReference section */
 		68E3FBE5E399854A55953C74 /* Pods_TurboMaps.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TurboMaps.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A530E2811BA77635001856CF /* AlertsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertsManager.h; sourceTree = "<group>"; };
+		A530E2821BA77635001856CF /* AlertsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertsManager.m; sourceTree = "<group>"; };
 		A545ADC81B8634B7005928AC /* Flight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Flight.h; sourceTree = "<group>"; };
 		A545ADC91B8634B7005928AC /* Flight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Flight.m; sourceTree = "<group>"; };
 		A545ADDA1B866669005928AC /* to.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = to.png; sourceTree = "<group>"; };
@@ -524,6 +527,8 @@
 				A5B992101B88AE6700DEFC07 /* AccelerometerManager.m */,
 				A5E239611B8B997700D83DC8 /* DebugManager.h */,
 				A5E239621B8B997700D83DC8 /* DebugManager.m */,
+				A530E2811BA77635001856CF /* AlertsManager.h */,
+				A530E2821BA77635001856CF /* AlertsManager.m */,
 			);
 			name = Managers;
 			sourceTree = "<group>";
@@ -816,6 +821,7 @@
 				A59791DA1B77ECE200AACC6F /* AppDelegate.m in Sources */,
 				A5B3EB191B82920B003D5AE2 /* LoginViewController.m in Sources */,
 				A5B9921E1B88C9A900DEFC07 /* testViewController.m in Sources */,
+				A530E2831BA77635001856CF /* AlertsManager.m in Sources */,
 				A5E7A0A91B7A418B00FD969C /* Helpers.m in Sources */,
 				A545ADCA1B8634B7005928AC /* Flight.m in Sources */,
 				A5E2395D1B8B936E00D83DC8 /* unzip.c in Sources */,
