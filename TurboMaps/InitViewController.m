@@ -29,6 +29,13 @@
 
 #import "AKPickerView.h"
 
+typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
+    ZLAltitudeModeManual          = 0,
+    ZLAltitudeModeAuto     = 1,
+    ZLAltitudeModeAutoSuspended = 2,
+    ZLAltitudeModeAutoUserSuspended = 3,
+    ZLAltitudeModeAutoUserSuspendedBadGps = 4,
+};
 
 
 @interface InitViewController ()<AboutViewDelegate,RMTileCacheBackgroundDelegate,RMMapViewDelegate,UIPickerViewDataSource,UIPickerViewDelegate,AirportSearchDelegate,AKPickerViewDataSource,AKPickerViewDelegate>
@@ -82,6 +89,8 @@
 
 //holds the current altitude layer to be displayed
 @property int selectedAltitudeLayer;
+//holds the differance the user scrolled to 0=Auto 2,4,6... -2,-4,-6...
+@property int selectedALtitudeDelta;
 
 
 
@@ -115,11 +124,14 @@
 @property (nonatomic,strong) UIPopoverController * airportSearchPopover;
 
 //timers
-@property (nonatomic,strong) NSTimer * timerGpsSignal; //check gps signal and location 
+@property (nonatomic,strong) NSTimer * timerGpsSignal; //check gps signal and location
 @property (nonatomic,strong) NSTimer * timerHideTurbulenceMarker; //hide marker after showing new turbulence event
 
 //auto altitude
-@property bool isAltitudeAutoMode;
+@property ZLAltitudeModeState altitudeModeState;
+
+@property bool isShouldShowAutoScroll;
+
 @property bool isUserCanceledAutoMode;
 @property bool isUnderAltitudeAutoMode;
 @property int currentAltitudeLevel;
@@ -135,7 +147,7 @@
 
 -(void)dealloc{
     NSLog(@"Dealloc initViewController");
-
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_map removeObserver:self forKeyPath:@"userTrackingMode"];
     [_timerAltitudeReturnToAuto invalidate];
@@ -183,10 +195,10 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(headingStatusChanged:) name:kNotification_HeadingStatusChanged object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(invalidToken:) name:kNotification_InvalidToken object:nil];
-
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationChanged:) name:kNotification_NewGPSLocation object:nil];
     
-
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(locationChanged:) name:kNotification_NewGPSLocation object:nil];
+    
+    
     [[RMConfiguration sharedInstance] setAccessToken:@"pk.eyJ1Ijoieml2bGV2eSIsImEiOiJwaEpQeUNRIn0.OZupy_Vjyl5eRCRlgV6otg"];
     
     
@@ -250,13 +262,13 @@
     // altitude mode
     _viewAutoAltutude.hidden=true; //start hidden
     _isUnderAltitudeAutoMode = true; //start under the altitude
-    _isAltitudeAutoMode = false;
+    _isShouldShowAutoScroll = false;
     _isUserCanceledAutoMode = false;
-
-    _currentAltitudeLevel = 1;
-    [self setAutoAltitudeMode:NO];
     
-
+    _currentAltitudeLevel = 1;
+    [self setManualMode];
+    
+    
     
 }
 -(void)viewWillAppear:(BOOL)animated{
@@ -287,7 +299,7 @@
     _map.tintColor = [UIColor colorWithRed:0.5 green:0.6 blue:1.0 alpha:1];
     //kvo observer
     [_map addObserver:self forKeyPath:@"userTrackingMode"      options:NSKeyValueObservingOptionNew context:nil];
-
+    
     // set zoom
     self.map.zoom = 6;
     self.map.maxZoom = 6;
@@ -337,9 +349,9 @@
     }
     
     //altitude init
-
+    
     _selectedAltitudeLayer = (kAltitude_InitialAltitudeForPicker - kAltitude_Min)  / kAltitude_Step +1;
-
+    
     
     
     _pickerAltitude.delegate = self;
@@ -363,9 +375,9 @@
     _pickerHistory.fisheyeFactor = 0.005;
     _pickerHistory.pickerViewStyle = AKPickerViewStyle3D;
     _pickerHistory.maskDisabled = true;
-
+    
     [_pickerHistory reloadData];
-
+    
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
@@ -539,7 +551,7 @@
 
 #pragma mark - logic functions
 -(void) addAnnotationsWithMap:(RMMapView *)map {
-
+    
     
     NSString *  zoomLevelForAnnotation;
     int zoomFactor;
@@ -583,7 +595,7 @@
     for ( Turbulence * turbulence in [dict allValues]) {
         int x = turbulence.tileX;
         int y = turbulence.tileY;
-
+        
         
         
         
@@ -603,7 +615,7 @@
             [_currentTileAnotations setObject:turbulence forKey:tileAddressNew];
             
         }
-
+        
     }
     
     for ( Turbulence * turbulence in [_currentTileAnotations allValues]) {
@@ -618,26 +630,26 @@
         NSString * tileAddressNew = [MapUtils transformWorldCoordinateToTilePathForZoom:(int)zoomLevelForAnnotation.integerValue fromLon:centerTileCoordinate.longitude fromLat:centerTileCoordinate.latitude];
         centerTileCoordinate = [MapUtils getCenterCoordinatesForTilePathForZoom:tileAddressNew];
         
-
-            RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:self.map
-                                                                  coordinate:centerTileCoordinate
-                                                                    andTitle:[Helpers getGMTTimeString:[NSDate dateWithTimeIntervalSince1970:turbulence.timestamp] withFormat:@"dd/MM HH:mm" ]];
+        
+        RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:self.map
+                                                              coordinate:centerTileCoordinate
+                                                                andTitle:[Helpers getGMTTimeString:[NSDate dateWithTimeIntervalSince1970:turbulence.timestamp] withFormat:@"dd/MM HH:mm" ]];
+        
+        
+        annotation.userInfo = [NSNumber numberWithInt:value];
+        
+        if (_pickerHistory.selectedItem+1 ==15) {
+            [arr addObject:annotation];
+        }
+        else if ([[NSDate date] timeIntervalSince1970] - turbulence.timestamp < (_pickerHistory.selectedItem+1) *6 * 3600) {
             
-            
-            annotation.userInfo = [NSNumber numberWithInt:value];
-            
-            if (_pickerHistory.selectedItem+1 ==15) {
-                [arr addObject:annotation];
-            }
-            else if ([[NSDate date] timeIntervalSince1970] - turbulence.timestamp < (_pickerHistory.selectedItem+1) *6 * 3600) {
-            
-                [arr addObject:annotation];
-            }
+            [arr addObject:annotation];
+        }
         
         
         
     }
-
+    
     Airport * origin = [RouteManager sharedManager].currentFlight.originAirport;
     Airport * dest = [RouteManager sharedManager].currentFlight.destinationAirport;
     if (![origin.ICAO isEqualToString:dest.ICAO] && dest && origin) {
@@ -655,7 +667,7 @@
         [arr addObject:GC];
         
         [self.map addAnnotations:arr];
- 
+        
     }
     
     //update last server update
@@ -782,7 +794,7 @@
 
 - (void) checkGoodLocation:(NSTimer *)incomingTimer
 {
-
+    [self altitudeModeCycle];
     if ([LocationManager sharedManager].isLocationGood) {
         //update display
         _barItemGPS.tintColor = [UIColor whiteColor];
@@ -792,47 +804,11 @@
         _BarItemTitle.title = [NSString stringWithFormat:@"Alt: %i Feet / Accuracy: %i Feet",currentAltitude,currentVerticalAccuracy];
         
         // if there is a valid course - draw Alert zone borders
-        if (currentLocation.course >0) {
+        if (currentLocation.course >0) { //TODO add good location handling
             [self drawAlertZoneBorders];
         }
-        
-        //check for climbing above altitude for Auto Altitude Mode
-        if ([[LocationManager sharedManager] getCurrentLocation].altitude * FEET_PER_METER >=kAltitude_MoveToAutoAltitudeMode * 1000  && _isUnderAltitudeAutoMode) {
-            // we crossed the auto altitude auto mode altitude - go to auto mode
-            _isUnderAltitudeAutoMode = false;
-            _viewAutoAltutude.hidden = false;
-            [self setAutoAltitudeMode:true];
-        } else if([[LocationManager sharedManager] getCurrentLocation].altitude * FEET_PER_METER < kAltitude_MoveToAutoAltitudeMode * 1000 - 100 && !_isUnderAltitudeAutoMode) {
-            //we are under the auto mode barrier switch it off
-            _isUnderAltitudeAutoMode = true;
-            _viewAutoAltutude.hidden = true;
-            [self setAutoAltitudeMode:false];
-        }
-        
-        //set auto mode altitude
-        int altitude = [[LocationManager sharedManager] getCurrentTile].altitude;
-        if (altitude < 1) altitude = 1;
-        if (altitude >kAltitude_NumberOfSteps) altitude = kAltitude_NumberOfSteps;
-        [self setAutoAltitude:altitude];
-//        if (_isAltitudeAutoMode && !_isUserCanceledAutoMode && _currentAltitudeLevel != altitude) {
-//            [self setAutoAltitude:altitude];
-//        } else {
-//            if (altitude>0) {
-//                [self setAutoAltitude:altitude];
-//            }
-//        }
     } else {
-        // turn auto altitude mode off
-        if (_isAltitudeAutoMode) {
-            [self setAutoAltitudeMode:false];
-            //in order to return to auto mode when GPS returns ...
-            _isUnderAltitudeAutoMode = true;
-        }
 
-        
-        //hide the auto altitude switch
-        _viewAutoAltutude.hidden = true;
-        
         //update display
         _barItemGPS.tintColor = [UIColor redColor];
         _BarItemTitle.title =@"Skypath";
@@ -878,7 +854,7 @@
     NSString * str = notification.object;
     bool isGoodLocation = [str boolValue];
     //location status changed so we ned to replace Icon
-
+    
     for (RMAnnotation * annotation in _map.annotations) {
         if (annotation.isUserLocationAnnotation) {
             for (RMMapLayer * layer in annotation.layer.sublayers) {
@@ -888,7 +864,7 @@
                         layer.opacity =1;
                     }
                 }
-               
+                
             }
             
         }
@@ -923,7 +899,7 @@
 }
 
 -(void)locationChanged:(NSNotification *)notification {
-
+    
 }
 
 -(void)invalidToken:(NSNotification *) notification {
@@ -934,7 +910,7 @@
 #pragma mark - Alert Zone
 -(void)drawAlertZoneBorders {
     CLLocation * currentLocation = [[LocationManager sharedManager] getCurrentLocation];
-
+    
     float rightAngle = currentLocation.course + kAlertAngle;
     if (rightAngle >= 360) {
         rightAngle = rightAngle -360;
@@ -958,7 +934,7 @@
                           [[CLLocation alloc] initWithLatitude:milesRight.latitude longitude:milesRight.longitude],
                           currentLocation,nil];
     
-
+    
     
     // Create our shape with the formatted coordinates array
     RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:_map
@@ -1094,7 +1070,7 @@
     } else {
         _barItemUserLocation.tintColor = [UIColor whiteColor];
     }
-
+    
 }
 #pragma mark - UIpicker
 // The number of columns of data
@@ -1113,9 +1089,10 @@
 // Catpure the picker view selection
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
-    if (_isAltitudeAutoMode) {
+    if (_isShouldShowAutoScroll) {
         _selectedAltitudeLayer = kAltitude_NumberOfSteps - (int)row;
-        
+        _selectedALtitudeDelta =  _selectedAltitudeLayer -_currentAltitudeLevel;
+
         //set timer to return to auto hight in 3 minutes
         [_timerAltitudeReturnToAuto invalidate];
         _timerAltitudeReturnToAuto = [NSTimer scheduledTimerWithTimeInterval:3*60 target:self selector:@selector(returnToAutoAltitude:) userInfo:nil repeats:NO];
@@ -1132,7 +1109,7 @@
     label.textColor = [UIColor whiteColor];
     label.textAlignment= NSTextAlignmentCenter;
     label.font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:20];
-    if (!_isAltitudeAutoMode) {
+    if (!_isShouldShowAutoScroll) {
         label.text = [NSString stringWithFormat:@"%i-%i", (int)(kAltitude_Min+row * kAltitude_Step),(int)(kAltitude_Min+(row+1) * kAltitude_Step)];
     } else {
         row = kAltitude_NumberOfSteps - row;
@@ -1149,70 +1126,28 @@
         
         label.text = strlevel;
     }
-
-
+    
+    
     return label;
 }
 
 
 - (IBAction)switchAltitudeAuto_changed:(UISwitch *)sender {
-    [self setAutoAltitudeMode:sender.isOn];
-    
-    // reset user cancel auto mode
-    if (sender.isOn) _isUserCanceledAutoMode = false;
-
-    //reset timer if Auto mode is off
-    if (!sender.isOn){
-        [_timerAltitudeReturnToAuto invalidate];
-        _timerAltitudeReturnToAuto = nil;
-
-    };
+    [self altitudeModeCycle];
 }
 
--(void)setAutoAltitudeMode:(bool)isOn {
-    //check if user canceled auto mode
-    if (_isAltitudeAutoMode && !isOn) {
-        _isUserCanceledAutoMode = true;
-    }
-        _isAltitudeAutoMode = isOn;
-        [_switchAltitudeAuto setOn:isOn];
-        [_pickerAltitude reloadAllComponents];
-        if (isOn) {
-            _selectedAltitudeLayer =  _currentAltitudeLevel;
-            [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:YES];
 
-        }else {
-            _selectedAltitudeLayer = _currentAltitudeLevel;
-            [_pickerAltitude selectRow:(_currentAltitudeLevel-1) inComponent:0 animated:YES];
-        }
-    
-    //redraw data
-    [_map removeAllAnnotations];
-    [self addAnnotationsWithMap:_map];
-
-}
 
 -(void)returnToAutoAltitude:(NSTimer *) timer {
     [_timerAltitudeReturnToAuto invalidate];
     _timerAltitudeReturnToAuto = nil;
+    _selectedALtitudeDelta=0;
     [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:YES];
     _selectedAltitudeLayer =  _currentAltitudeLevel;
     [_map removeAllAnnotations];
     [self addAnnotationsWithMap:_map];
 }
 
--(void)setAutoAltitude:(int) altitudeLevel {
-    if (altitudeLevel!=_currentAltitudeLevel) {
-        NSLog(@"Chainging current altitude to:%i",altitudeLevel);
-        _currentAltitudeLevel=altitudeLevel;
-        [_pickerAltitude reloadAllComponents];
-        [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:YES];
-        _selectedAltitudeLayer =  _currentAltitudeLevel;
-        [_map removeAllAnnotations];
-        [self addAnnotationsWithMap:_map];
-
-    }
-}
 
 #pragma mark - AKPickerViewDelegate
 
@@ -1251,5 +1186,224 @@
     [self addAnnotationsWithMap:_map];
 }
 
+#pragma mark - scroll states
+-(void) setManualMode {
+    _altitudeModeState=ZLAltitudeModeManual;
+    NSLog(@"set manual mode");
+    float alt = [[LocationManager sharedManager] getCurrentLocation].altitude * FEET_PER_METER;
+    NSLog(@"%f",alt);
+    _currentAltitudeLevel = [[LocationManager sharedManager] getCurrentTile].altitude;
+    _selectedAltitudeLayer =  _currentAltitudeLevel;
+    
+    //hide auto scroll and set switch to off
+    _viewAutoAltutude.hidden = true;
+    [_switchAltitudeAuto setOn:false];
+    
+    //if we moved from state that showed auto scroll then switch to manual scroll
+    if (_isShouldShowAutoScroll) {
+        //set manual scroll view is needed
+        _isShouldShowAutoScroll=false;
+        
+        //build scroller and set its auto to current level
+        [_pickerAltitude reloadAllComponents];
+        [_pickerAltitude selectRow:_currentAltitudeLevel-1 inComponent:0 animated:YES];
+        
+        //reload view
+        [_map removeAllAnnotations];
+        [self addAnnotationsWithMap:_map];
+    }
+    
+    
+}
+-(void) setAutoMode {
+    NSLog(@"set auto mode");
+    _altitudeModeState=ZLAltitudeModeAuto;
+    _currentAltitudeLevel = [[LocationManager sharedManager] getCurrentTile].altitude;
+    _selectedAltitudeLayer =  _currentAltitudeLevel;
+    
+    //show auto scroll and set switch to on
+    _viewAutoAltutude.hidden = false;
+    [_switchAltitudeAuto setOn:true];
+    
+    //set auto scroll view is needed
+    _isShouldShowAutoScroll=true;
+    
+    //build scroller and set its auto to current level
+    [_pickerAltitude reloadAllComponents];
+    int rowToShow = kAltitude_NumberOfSteps - (_currentAltitudeLevel +_selectedALtitudeDelta);
+    if (rowToShow <0) rowToShow =  0;
+    if (rowToShow > kAltitude_NumberOfSteps) rowToShow =  kAltitude_NumberOfSteps;
+//    [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:YES];
+    [_pickerAltitude selectRow:rowToShow inComponent:0 animated:YES];
+    //reload view
+    [_map removeAllAnnotations];
+    [self addAnnotationsWithMap:_map];
+    
+    
+}
+-(void) setAutoSuspendedMode {
+    _altitudeModeState = ZLAltitudeModeAutoSuspended;
+    NSLog(@"set auto suspended mode");
+    
+    _currentAltitudeLevel = [[LocationManager sharedManager] getCurrentTile].altitude;
+    _selectedAltitudeLayer =  _currentAltitudeLevel;
+    
+    //hide auto scroll
+    _viewAutoAltutude.hidden = true;
+    
+    //set manual scroll view is needed
+    _isShouldShowAutoScroll=false;
+    
+    //build scroller and set its auto to current level
+    [_pickerAltitude reloadAllComponents];
+    [_pickerAltitude selectRow:_currentAltitudeLevel-1 inComponent:0 animated:YES];
+    
+    //reload view
+    [_map removeAllAnnotations];
+    [self addAnnotationsWithMap:_map];
+    
+    //invalidate timer
+    [_timerAltitudeReturnToAuto invalidate];
+    
+}
+-(void) setAutoUserSuspendedMode {
+    NSLog(@"set autoUser suspended mode");
+    _altitudeModeState = ZLAltitudeModeAutoUserSuspended;
+    
+    _currentAltitudeLevel = [[LocationManager sharedManager] getCurrentTile].altitude;
+    _selectedAltitudeLayer =  _currentAltitudeLevel;
+    
+    //show auto scroll
+    _viewAutoAltutude.hidden = false;
+    
+    if (_isShouldShowAutoScroll) {
+        
+        //set manual scroll view is needed
+        _isShouldShowAutoScroll=false;
+        
+        //build scroller and set its auto to current level
+        [_pickerAltitude reloadAllComponents];
+        [_pickerAltitude selectRow:_currentAltitudeLevel-1 inComponent:0 animated:YES];
+        
+        //reload view
+        [_map removeAllAnnotations];
+        [self addAnnotationsWithMap:_map];
+        
+        //invalidate timer
+        [_timerAltitudeReturnToAuto invalidate];
+        
+    }
+}
+-(void) setAutoUserSuspendedBadGpsMode {
+    NSLog(@"set autoUser suspended bad Gps mode");
+    _altitudeModeState = ZLAltitudeModeAutoUserSuspendedBadGps;
+    
+    //hide auto scroll
+    _viewAutoAltutude.hidden = true;
+    
+}
+
+
+
+-(void)altitudeModeCycle {
+    int altitudeLevel = [[LocationManager sharedManager] getCurrentTile].altitude ;
+    bool isGoodLocation = [LocationManager sharedManager].isLocationGood ;
+    float altitude = [[LocationManager sharedManager] getCurrentLocation].altitude * FEET_PER_METER;
+    
+    
+    switch (_altitudeModeState) {
+            
+        case ZLAltitudeModeManual:
+            //if altitude above kAltitude_MoveToAutoAltitudeMode - switch to auto alt mode
+            if (altitude > kAltitude_MoveToAutoAltitudeMode * 1000) {
+                [self setAutoMode];
+                return;
+            }
+            
+            break;
+            
+        case ZLAltitudeModeAuto:
+            //if altitude below kAltitude_MoveToAutoAltitudeMode - switch to manual alt mode
+            if (altitude < kAltitude_MoveToAutoAltitudeMode * 1000 - 100) {
+                _selectedALtitudeDelta=0;
+                [self setManualMode];
+                return;
+            }
+            //if user switch off - switch to auto USER suspended mode
+            if (!_switchAltitudeAuto.isOn) {
+                _selectedALtitudeDelta=0;
+                [self setAutoUserSuspendedMode];
+                return;
+            }
+            //if bad GPS  switch to auto suspended mode
+            if (!isGoodLocation) {
+                [self setAutoSuspendedMode];
+                return;
+            }
+            
+            //if no state change
+            //if level changed
+            if (_currentAltitudeLevel!=altitudeLevel) {
+                //set new level
+                _currentAltitudeLevel = altitudeLevel;
+                
+                //build scroller and set its auto to current level
+                [_pickerAltitude reloadAllComponents];
+                int rowToShow = kAltitude_NumberOfSteps - (_currentAltitudeLevel +_selectedALtitudeDelta);
+                if (rowToShow <0) rowToShow =  0;
+                if (rowToShow > kAltitude_NumberOfSteps) rowToShow =  kAltitude_NumberOfSteps;
+
+               
+                [_pickerAltitude selectRow:rowToShow inComponent:0 animated:YES];
+            }
+            
+            
+            break;
+        case ZLAltitudeModeAutoSuspended:
+            //if altitude above kAltitude_MoveToAutoAltitudeMode and GOOD GPS- switch to auto mode
+            if ((altitude > kAltitude_MoveToAutoAltitudeMode * 1000) && isGoodLocation ) {
+                [self setAutoMode];
+            }
+            //if altitude below kAltitude_MoveToAutoAltitudeMode - switch to manual mode
+            if (altitude < kAltitude_MoveToAutoAltitudeMode * 1000 - 100 ) {
+                [self setManualMode];
+            }
+            //if bad GPS stay in auto suspended - nothing to do
+            
+            break;
+            
+
+        case ZLAltitudeModeAutoUserSuspended:
+            //if altitude below kAltitude_MoveToAutoAltitudeMode - switch to manual mode
+            if (altitude < kAltitude_MoveToAutoAltitudeMode * 1000 - 100 ) {
+                [self setManualMode];
+            }
+            //if user switch on and good gps - switch to auto mode
+            if (_switchAltitudeAuto.isOn && isGoodLocation) {
+                [self setAutoMode];
+            }
+            //if bad gps - switch to auto suspended mode
+            if (!isGoodLocation) {
+                [self setAutoUserSuspendedBadGpsMode];
+            }
+            
+            break;
+            
+        case ZLAltitudeModeAutoUserSuspendedBadGps:
+            //if altitude below kAltitude_MoveToAutoAltitudeMode - switch to manual mode
+            if (altitude < kAltitude_MoveToAutoAltitudeMode * 1000 - 100 ) {
+                [self setManualMode];
+            }
+            //if good gps - switch to auto Suspended mode
+            if ( isGoodLocation) {
+                [self setAutoUserSuspendedMode];
+            }
+
+            
+            break;
+        default:
+            break;
+    }
+}
 
 @end
