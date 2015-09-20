@@ -154,6 +154,65 @@
                                     </mask>
                                 </variation>
                             </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sQM-ap-bJE" userLabel="Turbulence Alert View">
+                                <rect key="frame" x="274" y="90" width="167" height="149"/>
+                                <color key="backgroundColor" red="0.77095513250000003" green="0.76215666989999997" blue="0.033407998279999997" alpha="1" colorSpace="calibratedRGB"/>
+                            </view>
+                            <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lOF-1L-yeF" userLabel="Alert view">
+                                <rect key="frame" x="245" y="100" width="238" height="130"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QZl-el-UDW">
+                                        <rect key="frame" x="88" y="36" width="50" height="20"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    </view>
+                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nUr-D0-aG0">
+                                        <rect key="frame" x="88" y="66" width="50" height="20"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    </view>
+                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E78-sW-nzM">
+                                        <rect key="frame" x="88" y="96" width="50" height="20"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    </view>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="+2" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gZr-Au-geV">
+                                        <rect key="frame" x="38" y="35" width="20" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="-2" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kDw-eG-ouR">
+                                        <rect key="frame" x="39" y="95" width="17" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="airplaneSide.png" translatesAutoresizingMaskIntoConstraints="NO" id="9hS-dw-0l2">
+                                        <rect key="frame" x="15" y="52" width="64" height="48"/>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Turbulence Ahead" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0ER-0v-ILc">
+                                        <rect key="frame" x="0.0" y="2" width="238" height="21"/>
+                                        <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="deviceRGB"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="z0S-sj-5C9">
+                                        <rect key="frame" x="163" y="46" width="60" height="60"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                                        <state key="normal" title="Silence">
+                                            <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="btnSilence_Clicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="kap-so-xTl"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="238" id="kV8-qv-Leg"/>
+                                    <constraint firstAttribute="height" constant="130" id="ntS-uo-nEl"/>
+                                </constraints>
+                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eAY-9d-ppL">
                                 <rect key="frame" x="0.0" y="718" width="728" height="50"/>
                                 <subviews>
@@ -967,6 +1026,7 @@
                             <constraint firstAttribute="trailingMargin" secondItem="Fv6-bv-mPQ" secondAttribute="trailing" constant="-25" id="3ez-qe-rA4"/>
                             <constraint firstItem="Fv6-bv-mPQ" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-25" id="5VE-cO-l0j"/>
                             <constraint firstItem="Lod-dz-4Rd" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-25" id="8AG-A9-Yun"/>
+                            <constraint firstItem="lOF-1L-yeF" firstAttribute="top" secondItem="Fv6-bv-mPQ" secondAttribute="bottom" constant="34" id="JYv-oM-NZF"/>
                             <constraint firstAttribute="centerY" secondItem="Zh9-yw-Xy9" secondAttribute="centerY" id="LuQ-nO-5PX"/>
                             <constraint firstItem="Lod-dz-4Rd" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="MI0-7Q-hIj"/>
                             <constraint firstAttribute="trailingMargin" secondItem="Zh9-yw-Xy9" secondAttribute="trailing" constant="-20" id="MNz-ht-H3c"/>
@@ -977,10 +1037,14 @@
                             <constraint firstAttribute="trailingMargin" secondItem="Lod-dz-4Rd" secondAttribute="trailing" constant="-25" id="bht-xu-cSt"/>
                             <constraint firstItem="Fv6-bv-mPQ" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="topMargin" id="eWb-Le-CWq"/>
                             <constraint firstAttribute="trailingMargin" secondItem="eAY-9d-ppL" secondAttribute="trailing" constant="-16" id="rUc-sY-QQl"/>
+                            <constraint firstAttribute="centerX" secondItem="lOF-1L-yeF" secondAttribute="centerX" id="s3Q-wa-eiF"/>
                             <constraint firstItem="eAY-9d-ppL" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" constant="-16" id="wGp-q6-fjo"/>
                             <constraint firstItem="eAY-9d-ppL" firstAttribute="top" secondItem="Lod-dz-4Rd" secondAttribute="bottom" id="xII-F7-rq0"/>
                         </constraints>
                         <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="sQM-ap-bJE"/>
+                            </mask>
                             <mask key="constraints">
                                 <exclude reference="MI0-7Q-hIj"/>
                                 <exclude reference="PVz-G4-dBp"/>
@@ -994,6 +1058,7 @@
                         <outlet property="BarItemTitle" destination="VDL-NR-2C9" id="pmP-VY-6D5"/>
                         <outlet property="barItemGPS" destination="025-UM-zvO" id="XNW-dA-bnD"/>
                         <outlet property="barItemUserLocation" destination="dEF-8c-vN3" id="RQb-ht-lGn"/>
+                        <outlet property="btnAlertSilence" destination="z0S-sj-5C9" id="SVe-jY-Tc5"/>
                         <outlet property="btnDebug" destination="vW6-PC-9ye" id="ndK-AQ-GFc"/>
                         <outlet property="btnFlightNumber" destination="LPI-FO-LK7" id="spG-or-KvE"/>
                         <outlet property="btnLand" destination="dnb-1q-9lh" id="Xcn-vE-EZG"/>
@@ -1004,6 +1069,7 @@
                         <outlet property="btnReport_severe" destination="RrH-vi-hoz" id="WG9-xr-ea5"/>
                         <outlet property="btnTakoff" destination="B6c-A5-uhk" id="8Ib-gR-nWL"/>
                         <outlet property="imageShake" destination="zFF-N5-2Dh" id="74K-wx-7FK"/>
+                        <outlet property="lblAlertViewHeader" destination="0ER-0v-ILc" id="yyO-Z1-ZJL"/>
                         <outlet property="lblLand" destination="dHR-Vj-S3j" id="wnn-Lc-cIJ"/>
                         <outlet property="lblLastUpdate" destination="jbq-jN-mBr" id="czl-1u-lfz"/>
                         <outlet property="lblLegendLight" destination="XMw-mv-cJR" id="F9x-GQ-5u7"/>
@@ -1016,6 +1082,10 @@
                         <outlet property="pickerAltitude" destination="OzG-zh-K8M" id="bOQ-JY-fh1"/>
                         <outlet property="progressBar" destination="hrF-mE-faJ" id="krT-mu-XP8"/>
                         <outlet property="switchAltitudeAuto" destination="jQf-Re-her" id="9Sb-NJ-HcR"/>
+                        <outlet property="viewAlertAbove" destination="QZl-el-UDW" id="VVE-lR-Ig3"/>
+                        <outlet property="viewAlertBelow" destination="E78-sW-nzM" id="zns-xc-3ep"/>
+                        <outlet property="viewAlertCurrentAlt" destination="nUr-D0-aG0" id="15h-Xb-J61"/>
+                        <outlet property="viewAlertView" destination="lOF-1L-yeF" id="eY8-BY-mV2"/>
                         <outlet property="viewAutoAltutude" destination="MWt-sa-xq0" id="LTU-pa-swx"/>
                         <outlet property="viewBottomBar" destination="eAY-9d-ppL" id="yTc-QC-nhk"/>
                         <outlet property="viewDownload" destination="Jjc-Ep-NaG" id="7r1-Tv-N9B"/>
@@ -1574,6 +1644,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="airplaneSide.png" width="64" height="64"/>
         <image name="appIcon.png" width="152" height="152"/>
         <image name="bright-7.png" width="29" height="30"/>
         <image name="brightnessBigWhite.png" width="32" height="32"/>

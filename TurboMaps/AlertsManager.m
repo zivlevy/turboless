@@ -15,9 +15,18 @@
 
 
 
-
 @interface AlertsManager()
+
 @property (nonatomic,strong) NSTimer * timer;
+
+@property (nonatomic,strong) NSArray * arrTurbelenceBelow;
+@property (nonatomic,strong) NSArray * arrTurbelenceAt;
+@property (nonatomic,strong) NSArray * arrTurbelenceAbove;
+
+@property bool isUserAccepted;
+@property bool isUserReset;
+
+@property (nonatomic)  long cutOffTime ;//what is the oldest turbulence leagal for alert
 @end
 
 
@@ -33,83 +42,276 @@
 
 - (id)init {
     if (self = [super init]) {
-        //set timer to watch for alerts
+        //init with no allert state
+        [self setState_NoAlert];
+        
+        _isUserAccepted = false;
+        _isUserReset = false;
+        _cutOffTime = 0;
+
         _timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
-                                                selector:@selector(checkAlerts:) userInfo:nil repeats:YES];
+                                                selector:@selector(timerTick:) userInfo:nil repeats:YES];
     }
     return self;
 }
 
-# pragma mark - timer
-- (void) checkAlerts:(NSTimer *)incomingTimer
-{
-    [self tilesInAlertArea];
+
+#pragma mark - timer 
+-(void) timerTick:(NSTimer *) timer {
+    [self alertCycle];
 }
-
-
 # pragma mark - logic
--(NSArray *) tilesInAlertArea
+-(void) tilesInAlertAreaWithLocation:(CLLocation *) location
 {
     
-    NSMutableDictionary * tilesInRigion = [NSMutableDictionary new];
+    NSMutableDictionary * tilesInRigionBelow = [NSMutableDictionary new];
+    NSMutableDictionary * tilesInRigionAt = [NSMutableDictionary new];
+    NSMutableDictionary * tilesInRigionAbove = [NSMutableDictionary new];
     
-    //current location and course
-    CLLocation * currentLocation = [[LocationManager sharedManager] getCurrentLocation];
-    bool isAltitudeLeagal = DEBUG_MODE ? true : currentLocation.altitude > kAltitude_Min * FEET_PER_METER ;
+    bool isAltitudeLeagal = DEBUG_MODE ? true : location.altitude > kAltitude_Min * FEET_PER_METER ;
+    
+    bool isGoodLocation = [LocationManager sharedManager].isLocationGood ;
+    bool isGoodCourse = [LocationManager sharedManager].isHeadingGood;
+    
+    if (DEBUG_MODE) {
+        isGoodCourse = true;
+    }
+    
     //if we are above min altitude and there is leagal course
-    if ( isAltitudeLeagal && currentLocation.course >0) {
-
-        //step every 5 miles to make sure we cover all tiles in range
-        for (float i=0; i<kAlertRange; i+=5) {
-            //get cordinate
-            CLLocationCoordinate2D stepWP = [MapUtils NewLocationFrom:currentLocation.coordinate atDistanceInMiles:i alongBearingInDegrees:325];//currentLocation.course];
-            //convert to location
-            CLLocation * stepLocation = [[CLLocation alloc] initWithCoordinate:stepWP altitude:currentLocation.altitude horizontalAccuracy:0 verticalAccuracy:0 timestamp:nil];
-            //get the tile at that location
-            ZLTile tile = [[LocationManager sharedManager] getTileForLocation:stepLocation];
-            tile.altitude=15;
-            //get turbulence info at tile
-            Turbulence * turbulence = [[TurbulenceManager sharedManager] getTurbulanceAtTile:tile];
-            //insert tile to collection if above moderate severity
-            if (turbulence.severity >0 ) {
-                [tilesInRigion setObject:turbulence forKey:[NSString stringWithFormat:@"%i,%i,%i",turbulence.tileX,turbulence.tileY,turbulence.altitude]];
-            }
+    if ( isAltitudeLeagal && isGoodCourse && isGoodLocation) {
+        for (int az = -kAlertAngle; az <=kAlertAngle; az+=5) {
+            double currentCalcCourse =location.course + az;
             
-            //get the tile above
-            if (tile.altitude<kAltitude_NumberOfSteps){
-                ZLTile tileAbove = tile;
-                tileAbove.altitude=tile.altitude+1;
+            //correct to 0-359
+            if (currentCalcCourse >=360) currentCalcCourse -= 360;
+            if (currentCalcCourse <=0) currentCalcCourse=360 + currentCalcCourse;
+            //step every 5 miles to make sure we cover all tiles in range
+            for (float i=0; i<=kAlertRange; i+=5) {
+                //get cordinate
+                CLLocationCoordinate2D stepWP = [MapUtils NewLocationFrom:location.coordinate atDistanceInMiles:i alongBearingInDegrees:currentCalcCourse];//currentLocation.course];
+                //convert to location
+                CLLocation * stepLocation = [[CLLocation alloc] initWithCoordinate:stepWP altitude:location.altitude horizontalAccuracy:0 verticalAccuracy:0 timestamp:nil];
                 
-                turbulence = [[TurbulenceManager sharedManager] getTurbulanceAtTile:tileAbove];
-                if (turbulence.severity > 2) {
-                    [tilesInRigion setObject:turbulence forKey:[NSString stringWithFormat:@"%i,%i,%i",turbulence.tileX,turbulence.tileY,turbulence.altitude]];
+                //get the tile at that location
+                ZLTile tile = [[LocationManager sharedManager] getTileForLocation:stepLocation];
+                
+                //get turbulence info at tile
+                Turbulence * turbulence = [[TurbulenceManager sharedManager] getTurbulanceAtTile:tile];
+                //if there is no turbelence at that tile of the turbulence is too old insert blank turbulence
+                if (!turbulence || [[NSDate date] timeIntervalSince1970] - turbulence.timestamp > _cutOffTime) {
+                    turbulence = [Turbulence new];
+                    turbulence.tileX=tile.x;
+                    turbulence.tileY=tile.y;
+                    turbulence.altitude = tile.altitude;
+                    turbulence.severity = 0;
+                    turbulence.timestamp = 0;
+                    
                 }
-            }
-
-            
-            //get the tile below
-            if (tile.altitude>1){
-                ZLTile tileBelow = tile;
-                tileBelow.altitude=tile.altitude-1;
                 
-                turbulence = [[TurbulenceManager sharedManager] getTurbulanceAtTile:tileBelow];
-                if (turbulence.severity > 2) {
-                    [tilesInRigion setObject:turbulence forKey:[NSString stringWithFormat:@"%i,%i,%i",turbulence.tileX,turbulence.tileY,turbulence.altitude]];
+                [tilesInRigionAt setObject:turbulence forKey:[NSString stringWithFormat:@"%i,%i,%i",turbulence.tileX,turbulence.tileY,turbulence.altitude]];
+                
+                //find tiles above and below
+                int currentTileAltitude = tile.altitude;
+                
+                // ---------  tiles below --------------------
+                if (currentTileAltitude>1) {
+                    tile.altitude = currentTileAltitude -1;
+                    //get turbulence info at tile
+                    Turbulence * turbulence = [[TurbulenceManager sharedManager] getTurbulanceAtTile:tile];
+                    
+                    //if there is no turbelence at that tile of the turbulence is too old insert blank turbulence
+                    if (!turbulence || [[NSDate date] timeIntervalSince1970] - turbulence.timestamp > _cutOffTime) {
+                        turbulence = [Turbulence new];
+                        turbulence.tileX=tile.x;
+                        turbulence.tileY=tile.y;
+                        turbulence.altitude = tile.altitude;
+                        turbulence.severity = 0;
+                        turbulence.timestamp = 0;
+                        
+                    }
+                    
+                    [tilesInRigionBelow setObject:turbulence forKey:[NSString stringWithFormat:@"%i,%i,%i",turbulence.tileX,turbulence.tileY,turbulence.altitude]];
+                }
+                
+                // ---------  tiles above --------------------
+                if (currentTileAltitude<kAltitude_NumberOfSteps) {
+                    tile.altitude = currentTileAltitude +1;
+                    //get turbulence info at tile
+                    Turbulence * turbulence = [[TurbulenceManager sharedManager] getTurbulanceAtTile:tile];
+                    //if there is no turbelence at that tile of the turbulence is too old insert blank turbulence
+                    if (!turbulence || [[NSDate date] timeIntervalSince1970] - turbulence.timestamp > _cutOffTime) {
+                        turbulence = [Turbulence new];
+                        turbulence.tileX=tile.x;
+                        turbulence.tileY=tile.y;
+                        turbulence.altitude = tile.altitude;
+                        turbulence.severity = 0;
+                        turbulence.timestamp = 0;
+                        
+                    }
+                    
+                    [tilesInRigionAbove setObject:turbulence forKey:[NSString stringWithFormat:@"%i,%i,%i",turbulence.tileX,turbulence.tileY,turbulence.altitude]];
                 }
             }
         }
-       
+        
     }
     
-    //get rigion borders
     
-
     
-    NSArray * result = [tilesInRigion allValues];
-//     NSLog(@"%lu", (unsigned long)result.count);
-    return result;
+    _arrTurbelenceBelow = [tilesInRigionBelow allValues];
+    _arrTurbelenceAt = [tilesInRigionAt allValues];
+    _arrTurbelenceAbove = [tilesInRigionAbove allValues];
+    
+    _altBelowAlert = [self getMaxSeverityInAlertZonelevel:_arrTurbelenceBelow];
+    _altCurrentAlert = [self getMaxSeverityInAlertZonelevel:_arrTurbelenceAt];
+    _altAboveAlert = [self getMaxSeverityInAlertZonelevel:_arrTurbelenceAbove];
+    
+    
+    
 }
 
+-(int) getMaxSeverityInAlertZonelevel:(NSArray *) arrAtLevel
+{
+    int maxSeverity = 0;
+    for (Turbulence * turbulence in arrAtLevel) {
 
+        if (turbulence.severity >= kAlertSeverityForAlert) {
+            if (turbulence.severity > maxSeverity) {
+                maxSeverity = turbulence.severity;
+            };
+        }
+    }
+    return maxSeverity;
+}
+
+#pragma mark - Alert states
+-(void) setState_NoAlert {
+    _alertState = ZLAlert_NoAlerts;
+    NSLog(@"ZLAlert_NoAlerts");
+}
+
+-(void) setState_NewAlert {
+    _alertState = ZLAlert_NewAlert;
+        NSLog(@"ZLAlert_NewAlert");
+}
+
+-(void) setState_NewAlertNoGPS {
+    _alertState = ZLAlert_NewAlertNoGPS;
+        NSLog(@"ZLAlert_NewAlertNoGPS");
+}
+
+-(void) setState_UserAccepted {
+    _alertState = ZLAlert_UserAccepted;
+        NSLog(@"ZLAlert_UserAccepted");
+}
+
+-(void) setState_UserAcceptedNoGPS {
+    _alertState = ZLAlert_UserAcceptedNoGPS;
+        NSLog(@"ZLAlert_UserAcceptedNoGPS");
+}
+
+-(void)alertCycle {
+    CLLocation * currentLocation = [[LocationManager sharedManager] getCurrentLocation];
+
+    bool isGoodLocation = [LocationManager sharedManager].isLocationGood ;
+    bool isGoodCourse = [LocationManager sharedManager].isHeadingGood;
+    
+    if (DEBUG_MODE) {
+        isGoodCourse = true;
+    }
+
+    
+    //calculate alert zone @ levels
+    if (isGoodCourse && isGoodLocation) {
+            [self tilesInAlertAreaWithLocation:currentLocation];
+    }
+
+
+    bool isAlertInZone = (_altAboveAlert + _altCurrentAlert + _altBelowAlert > 0);
+    
+    //save current alert state
+    ZLAlertState oldAlertState = _alertState;
+    
+    switch (_alertState) {
+            
+        case ZLAlert_NoAlerts:
+            //if there is new alert go to new alert state
+            if (isAlertInZone && isGoodCourse && isGoodLocation) {
+                [self setState_NewAlert];
+            }
+            
+            break;
+        case ZLAlert_NewAlert:
+            //if no alerts in zone go to no alert State
+            if (!isAlertInZone) [self setState_NoAlert];
+            
+            //if no gps or course go to New Alert No GPS state
+            if (!isGoodCourse || !isGoodLocation) [self setState_NewAlertNoGPS];
+            
+            //if user accepted go to user accepted state
+            if (_isUserAccepted ) {
+                _isUserAccepted = false;
+                [self setState_UserAccepted];
+            }
+            
+            break;
+        case ZLAlert_NewAlertNoGPS:
+            //if good gps and good course go back to to New Alert  state
+            if (isGoodCourse && isGoodLocation) [self setState_NewAlert];
+            
+            //if user accepted go to user accepted  NO GPS state
+            if (_isUserAccepted ) {
+                _isUserAccepted = false;
+                [self setState_UserAcceptedNoGPS];
+            }
+            
+            //if user reset go to user accepted  NO alert state
+            if (_isUserReset ) {
+                _isUserReset = false;
+                [self setState_NoAlert];
+            }
+            break;
+        case ZLAlert_UserAccepted:
+            //if no alerts in zone go to no alert State
+            if (!isAlertInZone) [self setState_NoAlert];
+            
+            //if no gps or course go to User Accepted No GPS state
+            if (!isGoodCourse || !isGoodLocation) [self setState_UserAcceptedNoGPS];
+            
+            
+            break;
+        case ZLAlert_UserAcceptedNoGPS:
+            //if good gps and good course go back to to User Accepted  state
+            if (isGoodCourse && isGoodLocation) [self setState_UserAccepted];
+            
+            //if user reset go to user accepted  NO alert state
+            if (_isUserReset ) {
+                _isUserReset = false;
+                [self setState_NoAlert];
+            }
+            
+            break;
+        default:
+            break;
+    }
+    if (_alertState!=oldAlertState) {
+        [_delegate alertStateChanged:_alertState];
+    }
+}
+
+#pragma mark - user actions
+-(void) userAccepted {
+    _isUserAccepted = true;
+    [self alertCycle];
+}
+-(void) userReset{
+    _isUserReset = true;
+    [self alertCycle];
+}
+
+-(void) setCutOffTime:(long)timeInterval {
+    _cutOffTime = timeInterval;
+    [self alertCycle];
+}
 
 @end

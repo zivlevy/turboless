@@ -15,7 +15,7 @@ typedef struct {
     int altitude;
 } ZLTile;
 
-#define DEBUG_MODE 1
+#define DEBUG_MODE 0
 //#define kBaseURL @"http://84.94.182.244:3000" //yuval home
 
 #define kBaseURL @"http://104.197.5.131:3000"
@@ -56,6 +56,7 @@ typedef struct {
 #define kNotification_InvalidToken @"InvalidToken"
 
 //Alert
-#define kAlertRange 120
+#define kAlertRange 100
 #define kAlertAngle 15
+#define kAlertSeverityForAlert 3 //start alerting from moderate
 #endif

@@ -28,6 +28,7 @@
 #import "AlertsManager.h"
 
 #import "AKPickerView.h"
+#import <AVFoundation/AVFoundation.h>
 
 typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     ZLAltitudeModeManual          = 0,
@@ -38,7 +39,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 };
 
 
-@interface InitViewController ()<AboutViewDelegate,RMTileCacheBackgroundDelegate,RMMapViewDelegate,UIPickerViewDataSource,UIPickerViewDelegate,AirportSearchDelegate,AKPickerViewDataSource,AKPickerViewDelegate>
+@interface InitViewController ()<AboutViewDelegate,RMTileCacheBackgroundDelegate,RMMapViewDelegate,UIPickerViewDataSource,UIPickerViewDelegate,AirportSearchDelegate,AKPickerViewDataSource,AKPickerViewDelegate,AlertsManagerDelegate>
 @property (nonatomic,strong) RMMapView * map;
 
 
@@ -129,17 +130,23 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 
 //auto altitude
 @property ZLAltitudeModeState altitudeModeState;
-
 @property bool isShouldShowAutoScroll;
-
-@property bool isUserCanceledAutoMode;
-@property bool isUnderAltitudeAutoMode;
 @property int currentAltitudeLevel;
 @property (nonatomic,strong) NSTimer * timerAltitudeReturnToAuto; //after user change altitude in auto mode, return to auto
 @property (weak, nonatomic) IBOutlet UISwitch *switchAltitudeAuto;
 @property (weak, nonatomic) IBOutlet UIView *viewAutoAltutude;
 
+//Alert View
+@property (weak, nonatomic) IBOutlet UIView *viewAlertView;
+@property (weak, nonatomic) IBOutlet UIButton *btnAlertSilence;
+@property (weak, nonatomic) IBOutlet UIView *viewAlertAbove;
+@property (weak, nonatomic) IBOutlet UIView *viewAlertBelow;
+@property (weak, nonatomic) IBOutlet UIView *viewAlertCurrentAlt;
+@property (weak, nonatomic) IBOutlet UILabel *lblAlertViewHeader;
 
+//Alert sound
+@property (nonatomic,strong) AVAudioPlayer *avSound;
+@property (nonatomic,strong) NSTimer * timerAlertSound;
 @end
 
 @implementation InitViewController
@@ -152,6 +159,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     [_map removeObserver:self forKeyPath:@"userTrackingMode"];
     [_timerAltitudeReturnToAuto invalidate];
     [_timerGpsSignal invalidate];
+    [_timerAlertSound invalidate];
     [_timerHideTurbulenceMarker  invalidate];
 }
 
@@ -177,7 +185,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     [DebugManager sharedManager];
     
     //init alert manager
-    [AlertsManager sharedManager];
+    [AlertsManager sharedManager].delegate = self;
     
     //notifications observers
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(turbuleceUpdatedFromServer:) name:kNotification_turbulenceServerNewFile object:nil];
@@ -261,9 +269,8 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     
     // altitude mode
     _viewAutoAltutude.hidden=true; //start hidden
-    _isUnderAltitudeAutoMode = true; //start under the altitude
     _isShouldShowAutoScroll = false;
-    _isUserCanceledAutoMode = false;
+    
     
     _currentAltitudeLevel = 1;
     [self setManualMode];
@@ -375,9 +382,25 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     _pickerHistory.fisheyeFactor = 0.005;
     _pickerHistory.pickerViewStyle = AKPickerViewStyle3D;
     _pickerHistory.maskDisabled = true;
-    
+
     [_pickerHistory reloadData];
     
+    //Alert init
+    [[AlertsManager sharedManager] setCutOffTime:6 * 3600];
+    [self alertStateChanged:ZLAlert_NoAlerts];
+    [Helpers makeRoundCorners:_viewAlertView radius:10 borderWidth:1 borderColor:[UIColor whiteColor]];
+    [Helpers makeRoundCorners:_viewAlertAbove radius:5 borderWidth:1 borderColor:[UIColor whiteColor]];
+    [Helpers makeRoundCorners:_viewAlertCurrentAlt radius:5 borderWidth:1 borderColor:[UIColor whiteColor]];
+    [Helpers makeRoundCorners:_viewAlertBelow radius:5 borderWidth:1 borderColor:[UIColor whiteColor]];
+    [Helpers makeRound:_btnAlertSilence borderWidth:1 borderColor:[UIColor whiteColor]];
+    
+    //Alert Sound init
+    NSURL *soundURL = [[NSBundle mainBundle] URLForResource:@"sound"
+                                              withExtension:@"wav"];
+    
+
+    _avSound = [[AVAudioPlayer alloc] initWithContentsOfURL:soundURL error:nil];
+
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
@@ -794,24 +817,106 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 
 - (void) checkGoodLocation:(NSTimer *)incomingTimer
 {
+    //handle altitude scroller
     [self altitudeModeCycle];
+    
+    
+    //update alertView
+    [self setAlertViewAlerts];
+    
+    
+    //    //remove old annotations
+    //    for (RMAnnotation * annotation in _map.annotations) {
+    //        if ([annotation.title isEqualToString:@"test"]) {
+    //            [_map removeAnnotation:annotation];
+    //        }
+    //    }
+    //
+    //    NSString *  zoomLevelForAnnotation;
+    //    int zoomFactor;
+    //    switch ((int)_map.zoom) {
+    //        case 6:
+    //            zoomLevelForAnnotation =@"11";
+    //            zoomFactor = pow(2,11);
+    //            break;
+    //        case 5:
+    //            zoomLevelForAnnotation =@"11";
+    //            zoomFactor = pow(2,11);
+    //            break;
+    //        case 4:
+    //            zoomLevelForAnnotation =@"10";
+    //            zoomFactor = pow(2,10);
+    //            break;
+    //        case 3:
+    //            zoomLevelForAnnotation =@"09";
+    //            zoomFactor = pow(2,9);
+    //            break;
+    //        case 2:
+    //            zoomLevelForAnnotation =@"08";
+    //            zoomFactor = pow(2,8);
+    //            break;
+    //        case 1:
+    //        case 0:
+    //            zoomLevelForAnnotation =@"08";
+    //            zoomFactor = pow(2,8);
+    //            break;
+    //        default:
+    //            break;
+    //    }
+    //
+    //    for ( Turbulence * turbulence in array) {
+    //        int x = turbulence.tileX;
+    //        int y = turbulence.tileY;
+    //        int value = 5;
+    //
+    //
+    //
+    //        NSString * tileAddress = [NSString stringWithFormat:@"%@%@%@",[MapUtils padInt:x padTo:4],[MapUtils padInt:y padTo:4],@"11"];
+    //        CLLocationCoordinate2D centerTileCoordinate = [MapUtils getCenterCoordinatesForTilePathForZoom:tileAddress];
+    //        NSString * tileAddressNew = [MapUtils transformWorldCoordinateToTilePathForZoom:(int)zoomLevelForAnnotation.integerValue fromLon:centerTileCoordinate.longitude fromLat:centerTileCoordinate.latitude];
+    //        centerTileCoordinate = [MapUtils getCenterCoordinatesForTilePathForZoom:tileAddressNew];
+    //
+    //
+    //        RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:self.map
+    //                                                              coordinate:centerTileCoordinate
+    //                                                                andTitle:[Helpers getGMTTimeString:[NSDate dateWithTimeIntervalSince1970:turbulence.timestamp] withFormat:@"dd/MM HH:mm" ]];
+    //
+    //
+    //        annotation.userInfo = [NSNumber numberWithInt:value];
+    //
+    //
+    //
+    //        annotation.title = @"test";
+    //
+    //
+    //
+    //        [self.map addAnnotation:annotation];
+    //    }
+    ///////////
     if ([LocationManager sharedManager].isLocationGood) {
         //update display
         _barItemGPS.tintColor = [UIColor whiteColor];
         CLLocation * currentLocation = [[LocationManager sharedManager] getCurrentLocation];
+        bool isGoodGPS = [LocationManager sharedManager].isLocationGood;
+        bool isGoodCourse = [LocationManager sharedManager].isHeadingGood;
         int currentAltitude = currentLocation.altitude * FEET_PER_METER;
         int currentVerticalAccuracy = currentLocation.verticalAccuracy * FEET_PER_METER;
         _BarItemTitle.title = [NSString stringWithFormat:@"Alt: %i Feet / Accuracy: %i Feet",currentAltitude,currentVerticalAccuracy];
         
         // if there is a valid course - draw Alert zone borders
-        if (currentLocation.course >0) { //TODO add good location handling
+        if ((isGoodCourse && isGoodGPS) || DEBUG_MODE) {
             [self drawAlertZoneBorders];
+        } else {
+            [self removeAlertZoneBorderAnnotations];
         }
     } else {
-
+        
         //update display
         _barItemGPS.tintColor = [UIColor redColor];
         _BarItemTitle.title =@"Skypath";
+        
+        //remove alert zone border
+        [self removeAlertZoneBorderAnnotations];
     }
 }
 
@@ -905,47 +1010,52 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 -(void)invalidToken:(NSNotification *) notification {
     //bad token - logout
     [self performSegueWithIdentifier:@"segueUnwind" sender:self];
+
 }
 
-#pragma mark - Alert Zone
+#pragma mark - Alert Zone Border
 -(void)drawAlertZoneBorders {
     CLLocation * currentLocation = [[LocationManager sharedManager] getCurrentLocation];
-    
-    float rightAngle = currentLocation.course + kAlertAngle;
-    if (rightAngle >= 360) {
-        rightAngle = rightAngle -360;
+    if (currentLocation) {
+        
+        
+        NSMutableArray * locations =[NSMutableArray new];
+        [locations addObject:currentLocation];
+        
+        for (int az = -kAlertAngle; az<=kAlertAngle; az+=5) {
+            double currentCalcCourse =currentLocation.course + az;
+            //correct to 0-359
+            if (currentCalcCourse >=360) currentCalcCourse -= 360;
+            if (currentCalcCourse <=0) currentCalcCourse=360 + currentCalcCourse;
+            CLLocationCoordinate2D coord = [MapUtils NewLocationFrom:currentLocation.coordinate atDistanceInMiles:kAlertRange alongBearingInDegrees:currentCalcCourse];
+            // Create a coordinates array to all of the coordinates for our shape.
+            [locations addObject: [[CLLocation alloc] initWithLatitude:coord.latitude longitude:coord.longitude]];
+            
+        }
+        [locations addObject:currentLocation];
+        
+        
+        
+        //remove old Alert Zone Border annotations
+        [self removeAlertZoneBorderAnnotations];
+        
+        
+        //add new Alert Zone Border annotations
+        
+        
+        
+        
+        // Create our shape with the formatted coordinates array
+        RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:_map
+                                                              coordinate:currentLocation.coordinate
+                                                                andTitle:@"AlertZoneBorder"];
+        
+        annotation.userInfo = locations;
+        [annotation setBoundingBoxFromLocations:locations];
+        
+        // Add the shape to the map
+        [_map addAnnotation:annotation];
     }
-    float leftAngle = currentLocation.course - kAlertAngle;
-    if (leftAngle < 0) {
-        leftAngle = 360 + leftAngle;
-    }
-    CLLocationCoordinate2D milesRight = [MapUtils NewLocationFrom:currentLocation.coordinate atDistanceInMiles:kAlertRange alongBearingInDegrees:rightAngle];
-    CLLocationCoordinate2D milesLeft = [MapUtils NewLocationFrom:currentLocation.coordinate atDistanceInMiles:kAlertRange alongBearingInDegrees:leftAngle];
-    
-    //remove old Alert Zone Border annotations
-    [self removeAlertZoneBorderAnnotations];
-    
-    
-    //add new Alert Zone Border annotations
-    // Create a coordinates array to all of the coordinates for our shape.
-    NSArray *locations = [NSArray arrayWithObjects:
-                          currentLocation,
-                          [[CLLocation alloc] initWithLatitude:milesLeft.latitude longitude:milesLeft.longitude],
-                          [[CLLocation alloc] initWithLatitude:milesRight.latitude longitude:milesRight.longitude],
-                          currentLocation,nil];
-    
-    
-    
-    // Create our shape with the formatted coordinates array
-    RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:_map
-                                                          coordinate:currentLocation.coordinate
-                                                            andTitle:@"AlertZoneBorder"];
-    
-    annotation.userInfo = locations;
-    [annotation setBoundingBoxFromLocations:locations];
-    
-    // Add the shape to the map
-    [_map addAnnotation:annotation];
 }
 
 -(void) removeAlertZoneBorderAnnotations {
@@ -1011,6 +1121,14 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 -(void) logout {
     [_aboutPopover dismissPopoverAnimated:NO];
     _aboutPopover = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [_map removeObserver:self forKeyPath:@"userTrackingMode"];
+    [_timerAltitudeReturnToAuto invalidate];
+    [_timerGpsSignal invalidate];
+    [_timerAlertSound invalidate];
+    [_timerHideTurbulenceMarker  invalidate];
+    _pickerHistory = nil;
+    _avSound =nil;
     [self performSegueWithIdentifier:@"segueUnwind" sender:self];
 }
 
@@ -1092,7 +1210,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     if (_isShouldShowAutoScroll) {
         _selectedAltitudeLayer = kAltitude_NumberOfSteps - (int)row;
         _selectedALtitudeDelta =  _selectedAltitudeLayer -_currentAltitudeLevel;
-
+        
         //set timer to return to auto hight in 3 minutes
         [_timerAltitudeReturnToAuto invalidate];
         _timerAltitudeReturnToAuto = [NSTimer scheduledTimerWithTimeInterval:3*60 target:self selector:@selector(returnToAutoAltitude:) userInfo:nil repeats:NO];
@@ -1184,6 +1302,15 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 {
     [_map removeAllAnnotations];
     [self addAnnotationsWithMap:_map];
+    
+    //set alert cutoff time
+    if (_pickerHistory.selectedItem+1 ==15) {
+        [[AlertsManager sharedManager] setCutOffTime:24000 * 3600];
+    }
+    else  {
+        [[AlertsManager sharedManager] setCutOffTime:(_pickerHistory.selectedItem+1) *6 * 3600];
+    }
+    
 }
 
 #pragma mark - scroll states
@@ -1233,7 +1360,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     int rowToShow = kAltitude_NumberOfSteps - (_currentAltitudeLevel +_selectedALtitudeDelta);
     if (rowToShow <0) rowToShow =  0;
     if (rowToShow > kAltitude_NumberOfSteps) rowToShow =  kAltitude_NumberOfSteps;
-//    [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:YES];
+    //    [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:YES];
     [_pickerAltitude selectRow:rowToShow inComponent:0 animated:YES];
     //reload view
     [_map removeAllAnnotations];
@@ -1352,8 +1479,8 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
                 int rowToShow = kAltitude_NumberOfSteps - (_currentAltitudeLevel +_selectedALtitudeDelta);
                 if (rowToShow <0) rowToShow =  0;
                 if (rowToShow > kAltitude_NumberOfSteps) rowToShow =  kAltitude_NumberOfSteps;
-
-               
+                
+                
                 [_pickerAltitude selectRow:rowToShow inComponent:0 animated:YES];
             }
             
@@ -1372,7 +1499,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
             
             break;
             
-
+            
         case ZLAltitudeModeAutoUserSuspended:
             //if altitude below kAltitude_MoveToAutoAltitudeMode - switch to manual mode
             if (altitude < kAltitude_MoveToAutoAltitudeMode * 1000 - 100 ) {
@@ -1398,12 +1525,121 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
             if ( isGoodLocation) {
                 [self setAutoUserSuspendedMode];
             }
-
+            
             
             break;
         default:
             break;
     }
 }
+
+#pragma mark - Alert Delagate and alert methodes
+-(void)alertStateChanged:(ZLAlertState)newState {
+    switch (newState) {
+        case ZLAlert_NoAlerts:
+            _viewAlertView.hidden = true;
+            _btnAlertSilence.hidden =true;
+            [self blinkAlertView];
+            break;
+            
+        case ZLAlert_NewAlert:
+            _viewAlertView.hidden = false;
+            [_btnAlertSilence setTitle:@"Silence" forState:UIControlStateNormal];
+            _btnAlertSilence.hidden =false;
+            _btnAlertSilence.enabled =true;
+            _lblAlertViewHeader.text = @"Turbulence Ahead";
+            _lblAlertViewHeader.textColor = [UIColor whiteColor] ;
+            [self blinkAlertView];
+            [_avSound play];
+            [self timerAlertSoundStart:nil];
+            
+
+            break;
+        case  ZLAlert_NewAlertNoGPS:
+            _viewAlertView.hidden = false;
+            [_btnAlertSilence setTitle:@"Reset" forState:UIControlStateNormal];
+            _btnAlertSilence.hidden =false;
+            _btnAlertSilence.enabled =true;
+            _lblAlertViewHeader.text = @"No GPS - showing last date";
+            _lblAlertViewHeader.textColor = [UIColor redColor] ;
+            break;
+            
+        case ZLAlert_UserAccepted:
+            _viewAlertView.hidden = false;
+            _btnAlertSilence.hidden =true;
+            _lblAlertViewHeader.text = @"Turbulence Ahead";
+             _lblAlertViewHeader.textColor = [UIColor whiteColor] ;
+            [self unBlinkAlertView];
+            [_avSound stop];
+            [_timerAlertSound invalidate];
+\
+            break;
+        case ZLAlert_UserAcceptedNoGPS:
+            _viewAlertView.hidden = false;
+            [_btnAlertSilence setTitle:@"Reset" forState:UIControlStateNormal];
+            _btnAlertSilence.hidden =false;
+            _btnAlertSilence.enabled =true;
+            _lblAlertViewHeader.text = @"No GPS - showing last date";
+            _lblAlertViewHeader.textColor = [UIColor redColor] ;
+            break;
+        default:
+            break;
+    }
+    [self setAlertViewAlerts];
+}
+
+-(void) setAlertViewAlerts {
+    
+    _viewAlertAbove.backgroundColor = [self getColorForSeverity:[AlertsManager sharedManager].altAboveAlert];
+    _viewAlertCurrentAlt.backgroundColor = [self getColorForSeverity:[AlertsManager sharedManager].altCurrentAlert];
+    _viewAlertBelow.backgroundColor = [self getColorForSeverity:[AlertsManager sharedManager].altBelowAlert];
+}
+
+- (IBAction)btnSilence_Clicked:(id)sender {
+    if ([_btnAlertSilence.titleLabel.text isEqualToString:@"Silence"]) {
+        [[AlertsManager sharedManager] userAccepted];
+    } else {
+        [[AlertsManager sharedManager] userReset];
+    }
+    
+}
+
+-(void) blinkAlertView {
+    CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+    [animation setFromValue:[NSNumber numberWithFloat:1.0]];
+    [animation setToValue:[NSNumber numberWithFloat:0.5]];
+    [animation setDuration:0.5f];
+    [animation setTimingFunction:[CAMediaTimingFunction
+                                  functionWithName:kCAMediaTimingFunctionLinear]];
+    [animation setAutoreverses:YES];
+    [animation setRepeatCount:20000];
+    [[_viewAlertView layer] addAnimation:animation forKey:@"opacity"];
+}
+-(void) unBlinkAlertView {
+    [[_viewAlertView layer] removeAllAnimations];
+}
+
+-(void) timerAlertSoundStart:(NSTimer *) timer {
+    [self registerLocalPush];
+    [self sendAlertNotification];
+    _timerAlertSound = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self
+                                                     selector:@selector(timerAlertSoundStart:) userInfo:nil repeats:NO];
+    [_avSound play];
+}
+
+-(void) registerLocalPush {
+    UIUserNotificationType types = UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert;
+    UIUserNotificationSettings *mySettings = [UIUserNotificationSettings settingsForTypes:types categories:nil];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:mySettings];
+}
+
+-(void)sendAlertNotification {
+    UILocalNotification* localNotification = [[UILocalNotification alloc] init];
+    localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:0];
+    localNotification.alertBody = @"Turbulence Ahead ! \n Coution !";
+    localNotification.timeZone = [NSTimeZone defaultTimeZone];
+    [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+}
+
 
 @end

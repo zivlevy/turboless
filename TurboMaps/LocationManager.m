@@ -43,7 +43,7 @@
         
         [self.locationManager startUpdatingLocation];
         //debug GPS
-        _debugAlltitude  = 21000;
+        _debugAlltitude  = 10100;
         //set timer to watch for good location
         _timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
                                                selector:@selector(checkGoodLocation:) userInfo:nil repeats:YES];
@@ -94,13 +94,13 @@
 - (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
     _currentLocation = newLocation;
-    //////////////// Debug ///////////////////////////////////////////////////////////////////////
+    ////////////// Debug ///////////////////////////////////////////////////////////////////////
     if (DEBUG_MODE) {
         _debugCoordinateDelta +=0.1;
         CLLocationCoordinate2D location;
         location=newLocation.coordinate;
-//        location.latitude = location.latitude + _debugCoordinateDelta;
-//        location.longitude = 127.0;
+        location.latitude = 31.5;
+        location.longitude = 34.3;
         
         CLLocation *sampleLocation = [[CLLocation alloc] initWithCoordinate: location
                                                                    altitude:_debugAlltitude /FEET_PER_METER
@@ -108,10 +108,12 @@
                                                            verticalAccuracy:100 
                                                                   timestamp:[NSDate date]];
         _currentLocation = sampleLocation;
-        _debugAlltitude-=200;
-        if (_debugAlltitude >40000) _debugAlltitude = 40000;
-        if (_debugAlltitude <1000) _debugAlltitude = 1000;
-        NSLog(@"%i",_debugAlltitude);
+//        _debugAlltitude-=200;
+//        if (_debugAlltitude >40000) _debugAlltitude = 40000;
+//        if (_debugAlltitude <1000) _debugAlltitude = 1000;
+//        NSLog(@"%i",_debugAlltitude);
+        
+
     }
     ///////////////////////////////////////////////////////////////////////////////////////////////
     [[NSNotificationCenter defaultCenter] postNotificationName:kNotification_NewGPSLocation object:_currentLocation];
@@ -151,8 +153,8 @@
     int tileY = (int)(floor((1.0 - log( tan(lat * M_PI/180.0) + 1.0 / cos(lat * M_PI/180.0)) / M_PI) / 2.0 * pow(2.0, zoom)));
     
     //calculate altitude slot
-    int alt = location.altitude * FEET_PER_METER / 1000;
-    int altitude = (alt -kAltitude_Min) / kAltitude_Step ;
+    float alt = location.altitude * FEET_PER_METER / 1000;
+    int altitude =ceil( (alt -kAltitude_Min) / kAltitude_Step );
     tile.x = tileX;
     tile.y=tileY;
     tile.altitude = altitude;
