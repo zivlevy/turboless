@@ -382,7 +382,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     _pickerHistory.fisheyeFactor = 0.005;
     _pickerHistory.pickerViewStyle = AKPickerViewStyle3D;
     _pickerHistory.maskDisabled = true;
-
+    
     [_pickerHistory reloadData];
     
     //Alert init
@@ -398,9 +398,9 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     NSURL *soundURL = [[NSBundle mainBundle] URLForResource:@"sound"
                                               withExtension:@"wav"];
     
-
+    
     _avSound = [[AVAudioPlayer alloc] initWithContentsOfURL:soundURL error:nil];
-
+    
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
@@ -574,8 +574,8 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 
 #pragma mark - logic functions
 -(void) addAnnotationsWithMap:(RMMapView *)map {
-    
-    
+    long start = [[NSDate date] timeIntervalSince1970];
+    NSLog(@"Start - %ld",start);
     NSString *  zoomLevelForAnnotation;
     int zoomFactor;
     switch ((int)map.zoom) {
@@ -640,39 +640,45 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
         }
         
     }
+    long a = [[NSDate date] timeIntervalSince1970];
+    NSLog(@"a - %ld",a - start);
+    int x1 = 0;
+    int y1 = 0;
     
     for ( Turbulence * turbulence in [_currentTileAnotations allValues]) {
-        int x = turbulence.tileX;
-        int y = turbulence.tileY;
-        int value = turbulence.severity;
-        
-        
-        
-        NSString * tileAddress = [NSString stringWithFormat:@"%@%@%@",[MapUtils padInt:x padTo:4],[MapUtils padInt:y padTo:4],@"11"];
-        CLLocationCoordinate2D centerTileCoordinate = [MapUtils getCenterCoordinatesForTilePathForZoom:tileAddress];
-        NSString * tileAddressNew = [MapUtils transformWorldCoordinateToTilePathForZoom:(int)zoomLevelForAnnotation.integerValue fromLon:centerTileCoordinate.longitude fromLat:centerTileCoordinate.latitude];
-        centerTileCoordinate = [MapUtils getCenterCoordinatesForTilePathForZoom:tileAddressNew];
-        
-        
-        RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:self.map
-                                                              coordinate:centerTileCoordinate
-                                                                andTitle:[Helpers getGMTTimeString:[NSDate dateWithTimeIntervalSince1970:turbulence.timestamp] withFormat:@"dd/MM HH:mm" ]];
-        
-        
-        annotation.userInfo = [NSNumber numberWithInt:value];
-        
-        if (_pickerHistory.selectedItem+1 ==15) {
-            [arr addObject:annotation];
-        }
-        else if ([[NSDate date] timeIntervalSince1970] - turbulence.timestamp < (_pickerHistory.selectedItem+1) *6 * 3600) {
+        x1++;
+
+
+        if (_pickerHistory.selectedItem+1 ==15 || [[NSDate date] timeIntervalSince1970] - turbulence.timestamp < (_pickerHistory.selectedItem+1) *6 * 3600) {
             
+            
+            
+            
+            int x = turbulence.tileX;
+            int y = turbulence.tileY;
+            int value = turbulence.severity;
+            
+            
+            
+            NSString * tileAddress = [NSString stringWithFormat:@"%@%@%@",[MapUtils padInt:x padTo:4],[MapUtils padInt:y padTo:4],@"11"];
+            CLLocationCoordinate2D centerTileCoordinate = [MapUtils getCenterCoordinatesForTilePathForZoom:tileAddress];
+            NSString * tileAddressNew = [MapUtils transformWorldCoordinateToTilePathForZoom:(int)zoomLevelForAnnotation.integerValue fromLon:centerTileCoordinate.longitude fromLat:centerTileCoordinate.latitude];
+            centerTileCoordinate = [MapUtils getCenterCoordinatesForTilePathForZoom:tileAddressNew];
+            
+            
+            y1++;
+            RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:self.map
+                                                                  coordinate:centerTileCoordinate
+                                                                    andTitle:@"turbulence"];
+            
+            annotation.userInfo = [NSNumber numberWithInt:value];
             [arr addObject:annotation];
         }
-        
-        
         
     }
-    
+    NSLog(@"%i/%i",y1,x1);
+    long b = [[NSDate date] timeIntervalSince1970];
+    NSLog(@"b - %ld",b - start);
     Airport * origin = [RouteManager sharedManager].currentFlight.originAirport;
     Airport * dest = [RouteManager sharedManager].currentFlight.destinationAirport;
     if (![origin.ICAO isEqualToString:dest.ICAO] && dest && origin) {
@@ -689,17 +695,24 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
         RMAnnotation * GC = [[RMGreatCircleAnnotation alloc] initWithMapView:_map coordinate1:start coordinate2:end];
         [arr addObject:GC];
         
+        
+        
+        
         [self.map addAnnotations:arr];
+        //update last server update
+        long lastTurbulenceUpdateDate = (long)[[TurbulenceManager sharedManager]getSavedServerUpdateSince1970];
+        if (lastTurbulenceUpdateDate == 0) {
+            _lblLastUpdate.text =@"No data is available";
+        } else {
+            _lblLastUpdate.text =[NSString stringWithFormat:@"Updated @ %@",[Helpers getGMTTimeString:[NSDate dateWithTimeIntervalSince1970:lastTurbulenceUpdateDate] withFormat:@"dd/MM HH:mm"]];
+        }
         
     }
     
-    //update last server update
-    long lastTurbulenceUpdateDate = (long)[[TurbulenceManager sharedManager]getSavedServerUpdateSince1970];
-    if (lastTurbulenceUpdateDate == 0) {
-        _lblLastUpdate.text =@"No data is available";
-    } else {
-        _lblLastUpdate.text =[NSString stringWithFormat:@"Updated @ %@",[Helpers getGMTTimeString:[NSDate dateWithTimeIntervalSince1970:lastTurbulenceUpdateDate] withFormat:@"dd/MM HH:mm"]];
-    }
+    
+    long end = [[NSDate date] timeIntervalSince1970];
+    NSLog(@"end - %ld",end - start);
+    
 }
 
 
@@ -1010,7 +1023,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 -(void)invalidToken:(NSNotification *) notification {
     //bad token - logout
     [self performSegueWithIdentifier:@"segueUnwind" sender:self];
-
+    
 }
 
 #pragma mark - Alert Zone Border
@@ -1207,18 +1220,30 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 // Catpure the picker view selection
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
+    bool isNewPick = false;
     if (_isShouldShowAutoScroll) {
-        _selectedAltitudeLayer = kAltitude_NumberOfSteps - (int)row;
-        _selectedALtitudeDelta =  _selectedAltitudeLayer -_currentAltitudeLevel;
-        
-        //set timer to return to auto hight in 3 minutes
-        [_timerAltitudeReturnToAuto invalidate];
-        _timerAltitudeReturnToAuto = [NSTimer scheduledTimerWithTimeInterval:3*60 target:self selector:@selector(returnToAutoAltitude:) userInfo:nil repeats:NO];
+        if (_selectedAltitudeLayer !=kAltitude_NumberOfSteps - (int)row) {
+            _selectedAltitudeLayer = kAltitude_NumberOfSteps - (int)row;
+            _selectedALtitudeDelta =  _selectedAltitudeLayer -_currentAltitudeLevel;
+            
+            //set timer to return to auto hight in 3 minutes
+            [_timerAltitudeReturnToAuto invalidate];
+            _timerAltitudeReturnToAuto = [NSTimer scheduledTimerWithTimeInterval:3*60 target:self selector:@selector(returnToAutoAltitude:) userInfo:nil repeats:NO];
+            isNewPick=true;
+        }
+
     } else {
-        _selectedAltitudeLayer = (int)row +1;
+        if (_selectedAltitudeLayer !=(int)row +1) {
+            _selectedAltitudeLayer = (int)row +1;
+            isNewPick=true;
+        }
+        
     }
-    [self.map removeAllAnnotations];
-    [self addAnnotationsWithMap:self.map];
+    if (isNewPick) {
+        [self.map removeAllAnnotations];
+        [self addAnnotationsWithMap:self.map];
+    }
+
 }
 - (UIView *)pickerView:(UIPickerView *)pickerView viewForRow:(NSInteger)row forComponent:(NSInteger)component reusingView:(UIView *)view{
     
@@ -1362,6 +1387,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     if (rowToShow > kAltitude_NumberOfSteps) rowToShow =  kAltitude_NumberOfSteps;
     //    [_pickerAltitude selectRow:(kAltitude_NumberOfSteps - _currentAltitudeLevel) inComponent:0 animated:YES];
     [_pickerAltitude selectRow:rowToShow inComponent:0 animated:YES];
+    
     //reload view
     [_map removeAllAnnotations];
     [self addAnnotationsWithMap:_map];
@@ -1473,6 +1499,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
             if (_currentAltitudeLevel!=altitudeLevel) {
                 //set new level
                 _currentAltitudeLevel = altitudeLevel;
+                _selectedAltitudeLayer =  _currentAltitudeLevel;
                 
                 //build scroller and set its auto to current level
                 [_pickerAltitude reloadAllComponents];
@@ -1482,6 +1509,10 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
                 
                 
                 [_pickerAltitude selectRow:rowToShow inComponent:0 animated:YES];
+                
+                //reload view
+                [_map removeAllAnnotations];
+                [self addAnnotationsWithMap:_map];
             }
             
             
@@ -1539,7 +1570,12 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
         case ZLAlert_NoAlerts:
             _viewAlertView.hidden = true;
             _btnAlertSilence.hidden =true;
-            [self blinkAlertView];
+            [self unBlinkAlertView];
+            [_avSound stop];
+            if (_timerAlertSound) {
+                [_timerAlertSound invalidate];
+            }
+            
             break;
             
         case ZLAlert_NewAlert:
@@ -1553,7 +1589,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
             [_avSound play];
             [self timerAlertSoundStart:nil];
             
-
+            
             break;
         case  ZLAlert_NewAlertNoGPS:
             _viewAlertView.hidden = false;
@@ -1568,11 +1604,11 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
             _viewAlertView.hidden = false;
             _btnAlertSilence.hidden =true;
             _lblAlertViewHeader.text = @"Turbulence Ahead";
-             _lblAlertViewHeader.textColor = [UIColor whiteColor] ;
+            _lblAlertViewHeader.textColor = [UIColor whiteColor] ;
             [self unBlinkAlertView];
             [_avSound stop];
             [_timerAlertSound invalidate];
-\
+            \
             break;
         case ZLAlert_UserAcceptedNoGPS:
             _viewAlertView.hidden = false;
@@ -1623,7 +1659,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     [self registerLocalPush];
     [self sendAlertNotification];
     _timerAlertSound = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self
-                                                     selector:@selector(timerAlertSoundStart:) userInfo:nil repeats:NO];
+                                                      selector:@selector(timerAlertSoundStart:) userInfo:nil repeats:NO];
     [_avSound play];
 }
 
@@ -1636,7 +1672,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 -(void)sendAlertNotification {
     UILocalNotification* localNotification = [[UILocalNotification alloc] init];
     localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:0];
-    localNotification.alertBody = @"Turbulence Ahead ! \n Coution !";
+    localNotification.alertBody = @"Turbulence Ahead ! \n Caution !";
     localNotification.timeZone = [NSTimeZone defaultTimeZone];
     [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
 }

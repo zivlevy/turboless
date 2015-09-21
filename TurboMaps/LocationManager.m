@@ -43,7 +43,7 @@
         
         [self.locationManager startUpdatingLocation];
         //debug GPS
-        _debugAlltitude  = 10100;
+        _debugAlltitude  = 22000;
         //set timer to watch for good location
         _timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
                                                selector:@selector(checkGoodLocation:) userInfo:nil repeats:YES];
@@ -108,7 +108,7 @@
                                                            verticalAccuracy:100 
                                                                   timestamp:[NSDate date]];
         _currentLocation = sampleLocation;
-//        _debugAlltitude-=200;
+        _debugAlltitude+=200;
 //        if (_debugAlltitude >40000) _debugAlltitude = 40000;
 //        if (_debugAlltitude <1000) _debugAlltitude = 1000;
 //        NSLog(@"%i",_debugAlltitude);

@@ -110,7 +110,9 @@
 
 -(void) buildTurbulenceFromFile
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+   dispatch_queue_t backgroundQueue = dispatch_queue_create("com.razeware.imagegrabber.bgqueue", NULL);
+    dispatch_async(backgroundQueue, ^{
+        NSLog(@"Running on %@ thread", [NSThread currentThread]);
         NSString *archiveFileName = [Helpers getFilePathInDocuments:@"turbulence.dat"];
         NSDictionary * dic = [NSDictionary dictionaryWithContentsOfFile:archiveFileName];
         //get last server update
@@ -185,7 +187,7 @@
 {
     
     //check that the tile is leagal
-    if (tile.altitude <1 || tile.altitude > kAltitude_NumberOfSteps) {
+    if (_turbulenceLevels.count==0 || tile.altitude <1 || tile.altitude > kAltitude_NumberOfSteps) {
         return nil;
     }
     
