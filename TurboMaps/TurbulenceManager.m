@@ -110,9 +110,9 @@
 
 -(void) buildTurbulenceFromFile
 {
-   dispatch_queue_t backgroundQueue = dispatch_queue_create("com.razeware.imagegrabber.bgqueue", NULL);
+   dispatch_queue_t backgroundQueue = dispatch_queue_create("com.zl.turbulence", NULL);
     dispatch_async(backgroundQueue, ^{
-        NSLog(@"Running on %@ thread", [NSThread currentThread]);
+
         NSString *archiveFileName = [Helpers getFilePathInDocuments:@"turbulence.dat"];
         NSDictionary * dic = [NSDictionary dictionaryWithContentsOfFile:archiveFileName];
         //get last server update

@@ -147,6 +147,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 //Alert sound
 @property (nonatomic,strong) AVAudioPlayer *avSound;
 @property (nonatomic,strong) NSTimer * timerAlertSound;
+@property (nonatomic,strong) NSTimer * timerAlertLocalPushShow;
 @end
 
 @implementation InitViewController
@@ -160,6 +161,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     [_timerAltitudeReturnToAuto invalidate];
     [_timerGpsSignal invalidate];
     [_timerAlertSound invalidate];
+    [_timerAlertLocalPushShow invalidate];
     [_timerHideTurbulenceMarker  invalidate];
 }
 
@@ -1055,14 +1057,11 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
         
         //add new Alert Zone Border annotations
         
-        
-        
-        
+
         // Create our shape with the formatted coordinates array
         RMAnnotation *annotation = [[RMAnnotation alloc] initWithMapView:_map
                                                               coordinate:currentLocation.coordinate
                                                                 andTitle:@"AlertZoneBorder"];
-        
         annotation.userInfo = locations;
         [annotation setBoundingBoxFromLocations:locations];
         
@@ -1139,6 +1138,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     [_timerAltitudeReturnToAuto invalidate];
     [_timerGpsSignal invalidate];
     [_timerAlertSound invalidate];
+    [_timerAlertLocalPushShow invalidate];
     [_timerHideTurbulenceMarker  invalidate];
     _pickerHistory = nil;
     _avSound =nil;
@@ -1574,6 +1574,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
             [_avSound stop];
             if (_timerAlertSound) {
                 [_timerAlertSound invalidate];
+                [_timerAlertLocalPushShow invalidate];
             }
             
             break;
@@ -1588,6 +1589,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
             [self blinkAlertView];
             [_avSound play];
             [self timerAlertSoundStart:nil];
+            [self timerAlertLocalPushShowStart:nil];
             
             
             break;
@@ -1608,6 +1610,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
             [self unBlinkAlertView];
             [_avSound stop];
             [_timerAlertSound invalidate];
+            [_timerAlertLocalPushShow invalidate];
             \
             break;
         case ZLAlert_UserAcceptedNoGPS:
@@ -1656,11 +1659,18 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 }
 
 -(void) timerAlertSoundStart:(NSTimer *) timer {
-    [self registerLocalPush];
-    [self sendAlertNotification];
+
     _timerAlertSound = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self
                                                       selector:@selector(timerAlertSoundStart:) userInfo:nil repeats:NO];
     [_avSound play];
+}
+
+-(void) timerAlertLocalPushShowStart:(NSTimer *) timer {
+    [self registerLocalPush];
+    [self sendAlertNotification];
+    _timerAlertLocalPushShow = [NSTimer scheduledTimerWithTimeInterval:10.0 target:self
+                                                      selector:@selector(timerAlertLocalPushShowStart:) userInfo:nil repeats:NO];
+
 }
 
 -(void) registerLocalPush {
@@ -1674,6 +1684,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:0];
     localNotification.alertBody = @"Turbulence Ahead ! \n Caution !";
     localNotification.timeZone = [NSTimeZone defaultTimeZone];
+    localNotification.soundName = @"sound.wav";
     [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
 }
 

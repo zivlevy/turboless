@@ -108,7 +108,7 @@
                                                            verticalAccuracy:100 
                                                                   timestamp:[NSDate date]];
         _currentLocation = sampleLocation;
-        _debugAlltitude+=200;
+        _debugAlltitude+=00;
 //        if (_debugAlltitude >40000) _debugAlltitude = 40000;
 //        if (_debugAlltitude <1000) _debugAlltitude = 1000;
 //        NSLog(@"%i",_debugAlltitude);
