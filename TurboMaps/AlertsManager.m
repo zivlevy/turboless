@@ -63,7 +63,7 @@
 # pragma mark - logic
 -(void) tilesInAlertAreaWithLocation:(CLLocation *) location
 {
-    
+      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{ 
     NSMutableDictionary * tilesInRigionBelow = [NSMutableDictionary new];
     NSMutableDictionary * tilesInRigionAt = [NSMutableDictionary new];
     NSMutableDictionary * tilesInRigionAbove = [NSMutableDictionary new];
@@ -90,7 +90,7 @@
                 //get cordinate
                 CLLocationCoordinate2D stepWP = [MapUtils NewLocationFrom:location.coordinate atDistanceInMiles:i alongBearingInDegrees:currentCalcCourse];//currentLocation.course];
                 //convert to location
-                CLLocation * stepLocation = [[CLLocation alloc] initWithCoordinate:stepWP altitude:location.altitude horizontalAccuracy:0 verticalAccuracy:0 timestamp:nil];
+                CLLocation * stepLocation = [[CLLocation alloc] initWithCoordinate:stepWP altitude:location.altitude horizontalAccuracy:0 verticalAccuracy:0 timestamp:[NSDate date]];
                 
                 //get the tile at that location
                 ZLTile tile = [[LocationManager sharedManager] getTileForLocation:stepLocation];
@@ -165,7 +165,7 @@
     _altBelowAlert = [self getMaxSeverityInAlertZonelevel:_arrTurbelenceBelow];
     _altCurrentAlert = [self getMaxSeverityInAlertZonelevel:_arrTurbelenceAt];
     _altAboveAlert = [self getMaxSeverityInAlertZonelevel:_arrTurbelenceAbove];
-    
+});
     
     
 }
@@ -218,6 +218,7 @@
     
     if (DEBUG_MODE) {
         isGoodCourse = true;
+        isGoodLocation = true;
     }
 
     

@@ -58,5 +58,5 @@ typedef struct {
 //Alert
 #define kAlertRange 100
 #define kAlertAngle 15
-#define kAlertSeverityForAlert 3 //start alerting from moderate
+#define kAlertSeverityForAlert 1 //start alerting from moderate
 #endif

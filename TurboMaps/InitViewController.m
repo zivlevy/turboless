@@ -282,7 +282,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
     [super viewWillAppear:animated];
     
     //set timer to watch for good location
-    _timerGpsSignal = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self
+    _timerGpsSignal = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self
                                                      selector:@selector(checkGoodLocation:) userInfo:nil repeats:YES];
     
     // configure map tile source based on previous metadata if available
@@ -1473,7 +1473,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
             if (_currentAltitudeLevel!=altitudeLevel) {
                 //set new level
                 _currentAltitudeLevel = altitudeLevel;
-                
+                _selectedAltitudeLayer  = altitudeLevel;
                 //build scroller and set its auto to current level
                 [_pickerAltitude reloadAllComponents];
                 int rowToShow = kAltitude_NumberOfSteps - (_currentAltitudeLevel +_selectedALtitudeDelta);
@@ -1482,6 +1482,10 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
                 
                 
                 [_pickerAltitude selectRow:rowToShow inComponent:0 animated:YES];
+                
+                //reload view
+                [_map removeAllAnnotations];
+                [self addAnnotationsWithMap:_map];
             }
             
             
@@ -1539,7 +1543,12 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
         case ZLAlert_NoAlerts:
             _viewAlertView.hidden = true;
             _btnAlertSilence.hidden =true;
-            [self blinkAlertView];
+            [self unBlinkAlertView];
+            [_avSound stop];
+            if (_timerAlertSound) {
+                [_timerAlertSound invalidate];
+            }
+            
             break;
             
         case ZLAlert_NewAlert:
@@ -1636,7 +1645,7 @@ typedef NS_ENUM(NSInteger, ZLAltitudeModeState) {
 -(void)sendAlertNotification {
     UILocalNotification* localNotification = [[UILocalNotification alloc] init];
     localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:0];
-    localNotification.alertBody = @"Turbulence Ahead ! \n Coution !";
+    localNotification.alertBody = @"Turbulence Ahead ! \n Caution !";
     localNotification.timeZone = [NSTimeZone defaultTimeZone];
     [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
 }
